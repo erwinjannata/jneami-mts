@@ -1,0 +1,52 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
+
+*{
+  font-family: 'Open Sans', sans-serif;
+}
+
+a{
+  text-decoration: none !important; 
+}
+
+.navbar-text{
+  padding: 8px;
+}
+
+.signature-canvas{
+  border: solid 1px black;
+}
+
+#submitBtn{
+  display: none;
+}
+
+.signatures{
+  text-align: center;
+}
+
+.signature{
+  width: 25%;
+  height: 35%;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: white;
+}
+
+th{
+  white-space: nowrap;
+}
+
+td{
+  white-space: nowrap;
+}
+
+@media only screen and (max-width: 768px) {
+  *{
+    font-size: small;
+  }
+
+  .signature{
+    width: 50%;
+  }
+}
