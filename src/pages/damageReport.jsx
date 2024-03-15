@@ -1,0 +1,55 @@
+import { Col, Container, FloatingLabel, Form, Row } from "react-bootstrap";
+import Menu from "../components/menu";
+import { useState } from "react";
+
+export default function DamageReport() {
+  const [state, setState] = useState({
+    awb: "",
+    damage: "",
+  });
+
+  const handleChange = (e) => {
+    const value = e.target.value;
+    setState({ ...state, [e.target.name]: value });
+  };
+
+  return (
+    <>
+      <Menu />
+      <Container className="mt-4">
+        <Row>
+          <Col>
+            <FloatingLabel
+              controlId="floatingAWB"
+              label="Nomor AWB"
+              className="mb-3"
+            >
+              <Form.Control
+                type="text"
+                name="awb"
+                placeholder="No. AWB"
+                value={state.awb}
+                onChange={handleChange}
+              />
+            </FloatingLabel>
+          </Col>
+          <Col>
+            <FloatingLabel
+              controlId="floatingDamage"
+              label="Jenis Damage"
+              className="mb-3"
+            >
+              <Form.Control
+                type="text"
+                name="damage"
+                placeholder="Jenis Damage"
+                value={state.damage}
+                onChange={handleChange}
+              />
+            </FloatingLabel>
+          </Col>
+        </Row>
+      </Container>
+    </>
+  );
+}

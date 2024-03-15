@@ -52,7 +52,7 @@ export default function Doc() {
   const [currentFocus, setCurrentFocus] = useState();
   const [remark, setRemark] = useState("");
   const [zerofilled, setZeroFilled] = useState("");
-  let navigate = new useNavigate();
+  let navigate = useNavigate();
 
   const handleSubmit = () => {
     setBagList(
@@ -143,36 +143,41 @@ export default function Doc() {
             auth.origin == data.origin ? "vendor" : "receiver"
           }Sign.png`
         );
-        uploadString(storageRef, img64, "data_url", metaData).then(
-          (snapshot) => {
-            getDownloadURL(snapshot.ref).then(async (url) => {
-              let updates = {};
-              if (auth.origin == data.destination) {
-                updates["status"] = "Sampai Tujuan";
-                updates["isReceived"] = true;
-                updates["receivedDate"] = tanggal;
-                updates["receivedBy"] = auth.name;
-                updates["receivedTime"] = jam;
-                updates["receiverSign"] = url;
-                updates["bagList"] = bagList;
-              } else if (auth.origin == data.origin) {
-                updates["status"] = "Dalam Perjalanan";
-                updates["noRef"] = data.noRef;
-                updates["vendorSign"] = url;
-              }
-              db.update(updates)
-                .then(() => {
-                  setLoading(false);
-                  alert("Received");
-                  window.scrollTo(0, 0);
-                })
-                .catch((error) => {
-                  console.log(error.error);
-                  alert("Program mengalami masalah, silahkan hubungi tim IT");
-                });
-            });
-          }
-        );
+        try {
+          uploadString(storageRef, img64, "data_url", metaData).then(
+            (snapshot) => {
+              getDownloadURL(snapshot.ref).then(async (url) => {
+                let updates = {};
+                if (auth.origin == data.destination) {
+                  updates["status"] = "Sampai Tujuan";
+                  updates["isReceived"] = true;
+                  updates["receivedDate"] = tanggal;
+                  updates["receivedBy"] = auth.name;
+                  updates["receivedTime"] = jam;
+                  updates["receiverSign"] = url;
+                  updates["bagList"] = bagList;
+                } else if (auth.origin == data.origin) {
+                  updates["status"] = "Dalam Perjalanan";
+                  updates["noRef"] = data.noRef;
+                  updates["vendorSign"] = url;
+                }
+                db.update(updates)
+                  .then(() => {
+                    setLoading(false);
+                    alert("Received");
+                    setChangedItem(0);
+                    window.scrollTo(0, 0);
+                  })
+                  .catch((error) => {
+                    console.log(error.error);
+                    alert("Program mengalami masalah, silahkan hubungi tim IT");
+                  });
+              });
+            }
+          );
+        } catch (error) {
+          console.log(error);
+        }
       }
     }
   };
@@ -246,7 +251,7 @@ export default function Doc() {
     return () => {
       clearInterval(intervalId);
     };
-  }, [auth.name, auth.origin, auth.level]);
+  }, [auth.name, auth.origin]);
 
   return (
     <>
@@ -260,7 +265,7 @@ export default function Doc() {
             </Col>
             <Col>
               <strong>No. Ref. Vendor </strong> <br />{" "}
-              {data.status != "Dalam Perjalanan" ? data.status : data.noRef}
+              {data.status == "Menunggu Vendor" ? data.status : data.noRef}
             </Col>
           </Row>
           <hr />
@@ -305,7 +310,7 @@ export default function Doc() {
           <hr />
           {data.isReceived ? null : (
             <Row>
-              {auth.origin == data.destination || auth.level >= 4 ? (
+              {auth.origin == data.destination ? (
                 <Col>
                   <Form.Floating>
                     <Form.Control
@@ -320,9 +325,7 @@ export default function Doc() {
                   </Form.Floating>
                 </Col>
               ) : null}
-              {data.status == "Dalam Perjalanan" ||
-              auth.origin == data.origin ||
-              auth.level >= 4 ? (
+              {auth.origin == data.origin ? (
                 <Col>
                   <Form.Floating>
                     <Form.Control

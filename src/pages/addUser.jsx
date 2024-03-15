@@ -73,6 +73,8 @@ export default function AddUser() {
     { id: "9", name: "UTAN" },
     { id: "10", name: "ALAS" },
     { id: "11", name: "TALIWANG" },
+    { id: "12", name: "BOLO" },
+    { id: "13", name: "JEREWEH" },
   ];
 
   useEffect(() => {

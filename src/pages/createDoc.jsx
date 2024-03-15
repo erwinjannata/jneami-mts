@@ -113,6 +113,8 @@ export default function Create() {
     { id: "9", name: "UTAN" },
     { id: "10", name: "ALAS" },
     { id: "11", name: "TALIWANG" },
+    { id: "12", name: "BOLO" },
+    { id: "13", name: "JEREWEH" },
   ];
 
   // Handler Untuk App
@@ -208,37 +210,41 @@ export default function Create() {
           storage,
           `signatures/${year}-${n}/checkerSign.png`
         );
-        uploadString(storageRef, img64, "data_url", metaData).then(
-          (snapshot) => {
-            getDownloadURL(snapshot.ref).then(async (url) => {
-              db.push({
-                noSurat: state.noSurat,
-                origin: state.origin,
-                destination: state.destination,
-                bagList: bagList,
-                approveDate: tanggal,
-                approveTime: jam,
-                receivedDate: "",
-                receivedTime: "",
-                sumPcs: state.sumPcs,
-                sumWeight: state.sumWeight,
-                noRef: state.noRef,
-                preparedBy: state.preparedBy,
-                receivedBy: "",
-                checkerSign: url,
-                receiverSign: "",
-                isReceived: false,
-                vendorSign: "",
-                status: "Menunggu Vendor",
-              }).then(() => {
-                setLoading(false);
-                alert("Approved");
-                navigate("/");
-                window.scrollTo(0, 0);
+        try {
+          uploadString(storageRef, img64, "data_url", metaData).then(
+            (snapshot) => {
+              getDownloadURL(snapshot.ref).then(async (url) => {
+                db.push({
+                  noSurat: state.noSurat,
+                  origin: state.origin,
+                  destination: state.destination,
+                  bagList: bagList,
+                  approveDate: tanggal,
+                  approveTime: jam,
+                  receivedDate: "",
+                  receivedTime: "",
+                  sumPcs: state.sumPcs,
+                  sumWeight: state.sumWeight,
+                  noRef: state.noRef,
+                  preparedBy: state.preparedBy,
+                  receivedBy: "",
+                  checkerSign: url,
+                  receiverSign: "",
+                  isReceived: false,
+                  vendorSign: "",
+                  status: "Menunggu Vendor",
+                }).then(() => {
+                  setLoading(false);
+                  alert("Approved");
+                  navigate("/");
+                  window.scrollTo(0, 0);
+                });
               });
-            });
-          }
-        );
+            }
+          );
+        } catch (error) {
+          alert(error);
+        }
       }
     }
   };
@@ -345,17 +351,17 @@ export default function Create() {
             ))}
           </Row>
           <Row>
-            <Col xs="auto">
+            <div className="d-grid gap-2">
               <Button
                 type="submit"
                 className="mb-2"
-                variant="primary"
+                variant="outline-primary"
                 onClick={handleSubmit}
                 id="submitBtn"
               >
-                Submit
+                Add
               </Button>
-            </Col>
+            </div>
           </Row>
         </form>
         <hr />

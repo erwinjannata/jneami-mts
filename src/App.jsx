@@ -7,6 +7,7 @@ import { AuthProvider } from "./config/authContext";
 import { PrivateRoute } from "./config/prirvateRoute";
 import Penarikan from "./pages/Penarikan";
 import AddUser from "./pages/addUser";
+import DamageReport from "./pages/damageReport";
 
 function App() {
   return (
@@ -43,6 +44,14 @@ function App() {
           element={
             <PrivateRoute>
               <Penarikan />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/damage"
+          element={
+            <PrivateRoute>
+              <DamageReport />
             </PrivateRoute>
           }
         />

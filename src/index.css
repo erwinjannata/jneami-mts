@@ -49,4 +49,8 @@ td{
   .signature{
     width: 50%;
   }
+
+  #submitBtn{
+    display: block;
+  }
 }
