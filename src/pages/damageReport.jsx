@@ -1,8 +1,11 @@
+/* eslint-disable no-unused-vars */
 import { Col, Container, FloatingLabel, Form, Row } from "react-bootstrap";
 import Menu from "../components/menu";
 import { useState } from "react";
+import firebase from "./../config/firebase";
 
 export default function DamageReport() {
+  let db = firebase.database().ref("damageReport");
   const [state, setState] = useState({
     awb: "",
     damage: "",

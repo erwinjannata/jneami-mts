@@ -48,7 +48,7 @@ function App() {
           }
         />
         <Route
-          path="/damage"
+          path="/damage/new"
           element={
             <PrivateRoute>
               <DamageReport />

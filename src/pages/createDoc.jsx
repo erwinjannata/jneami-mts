@@ -272,64 +272,53 @@ export default function Create() {
   return (
     <>
       <Menu />
-      <Container>
-        <Table responsive borderless className="mt-4">
-          <tbody>
-            <tr>
-              <td colSpan={2}>
-                <strong>Nomor Surat : </strong> {state.noSurat}
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <strong>Tanggal :</strong>{" "}
-                {moment(tanggal).locale("id").format("LL")}
-              </td>
-              <td>
-                <strong>Jam :</strong> {moment(d).locale("en-sg").format("LT")}
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <Col>
-                  <Form.Floating>
-                    <Form.Control
-                      id="flotaingOrigin"
-                      type="text"
-                      name="origin"
-                      value={state.origin}
-                      placeholder="Origin"
-                      disabled
-                    ></Form.Control>
-                    <label htmlFor="floatingOrigin">Origin</label>
-                  </Form.Floating>
-                </Col>
-              </td>
-              <td>
-                <Col>
-                  <FloatingLabel
-                    controlId="floatingSelectGrid"
-                    label="Destination"
-                  >
-                    <Form.Select
-                      aria-label="Destination Label"
-                      name="destination"
-                      onChange={handleChange}
-                      value={state.destination || ""}
-                      disabled={loading ? true : false}
-                    >
-                      {destList.map((item, id) => (
-                        <option key={id} value={item.name}>
-                          {item.name}
-                        </option>
-                      ))}
-                    </Form.Select>
-                  </FloatingLabel>
-                </Col>
-              </td>
-            </tr>
-          </tbody>
-        </Table>
+      <Container className="mt-4">
+        <Row className="mb-4">
+          <Col>
+            <strong>Nomor Surat : </strong> {state.noSurat}
+          </Col>
+        </Row>
+        <Row className="mb-4">
+          <Col>
+            <strong>Tanggal :</strong>{" "}
+            {moment(tanggal).locale("id").format("LL")}
+          </Col>
+          <Col>
+            <strong>Jam :</strong> {moment(d).locale("en-sg").format("LT")}
+          </Col>
+        </Row>
+        <Row className="mb-4">
+          <Col>
+            <Form.Floating>
+              <Form.Control
+                id="flotaingOrigin"
+                type="text"
+                name="origin"
+                value={state.origin}
+                placeholder="Origin"
+                disabled
+              ></Form.Control>
+              <label htmlFor="floatingOrigin">Origin</label>
+            </Form.Floating>
+          </Col>
+          <Col>
+            <FloatingLabel controlId="floatingSelectGrid" label="Destination">
+              <Form.Select
+                aria-label="Destination Label"
+                name="destination"
+                onChange={handleChange}
+                value={state.destination || ""}
+                disabled={loading ? true : false}
+              >
+                {destList.map((item, id) => (
+                  <option key={id} value={item.name}>
+                    {item.name}
+                  </option>
+                ))}
+              </Form.Select>
+            </FloatingLabel>
+          </Col>
+        </Row>
         <hr />
         <form onSubmit={handleSubmit}>
           <Row>

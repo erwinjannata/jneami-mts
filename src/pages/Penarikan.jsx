@@ -29,22 +29,7 @@ export default function Penarikan() {
         let data = [];
 
         snapshot.forEach((childSnapshot) => {
-          data.push({
-            key: childSnapshot.key,
-            noSurat: childSnapshot.val().noSurat,
-            noRef: childSnapshot.val().noRef,
-            origin: childSnapshot.val().origin,
-            destination: childSnapshot.val().destination,
-            approvedDate: childSnapshot.val().approveDate,
-            approvedTime: childSnapshot.val().approveTime,
-            preparedBy: childSnapshot.val().preparedBy,
-            receivedDate: childSnapshot.val().receivedDate,
-            receivedTime: childSnapshot.val().receivedTime,
-            receivedBy: childSnapshot.val().receivedBy,
-            status: childSnapshot.val().status,
-            sumPcs: childSnapshot.val().sumPcs,
-            sumWeight: childSnapshot.val().sumWeight,
-          });
+          data.push(childSnapshot.val());
         });
         setDataList(data);
       });
@@ -61,8 +46,8 @@ export default function Penarikan() {
       pcs: row.sumPcs,
       kg: row.sumWeight,
       preparedBy: row.preparedBy,
-      approvedDate: new Date(row.approvedDate),
-      approvedTime: row.approvedTime,
+      approvedDate: new Date(row.approveDate),
+      approvedTime: row.approveTime,
       receivedBy: row.receivedBy,
       receivedDate: row.receivedDate == "" ? "" : new Date(row.receivedDate),
       receivedTime: row.receivedTime,
@@ -207,7 +192,7 @@ export default function Penarikan() {
                           <td>{item.origin}</td>
                           <td>{item.destination}</td>
                           <td>{item.status}</td>
-                          <td>{`${item.approvedDate} ${item.approvedTime}`}</td>
+                          <td>{`${item.approveDate} ${item.approveTime}`}</td>
                           <td>
                             {item.receivedDate == ""
                               ? "-"

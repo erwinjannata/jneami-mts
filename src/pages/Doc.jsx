@@ -218,27 +218,7 @@ export default function Doc() {
   useEffect(() => {
     db.on("value", (snapshot) => {
       if (snapshot.exists()) {
-        setData({
-          ...data,
-          key: snapshot.key,
-          noSurat: snapshot.val().noSurat,
-          noRef: snapshot.val().noRef,
-          preparedBy: snapshot.val().preparedBy,
-          approveDate: snapshot.val().approveDate,
-          approveTime: snapshot.val().approveTime,
-          origin: snapshot.val().origin,
-          destination: snapshot.val().destination,
-          checkerSign: snapshot.val().checkerSign,
-          sumPcs: snapshot.val().sumPcs,
-          sumWeight: snapshot.val().sumWeight,
-          receivedDate: snapshot.val().receivedDate,
-          receivedTime: snapshot.val().receivedTime,
-          receivedBy: snapshot.val().receivedBy,
-          receiverSign: snapshot.val().receiverSign,
-          vendorSign: snapshot.val().vendorSign,
-          isReceived: snapshot.val().isReceived,
-          status: snapshot.val().status,
-        });
+        setData(snapshot.val());
         setBagList(snapshot.val().bagList);
         setZeroFilled(snapshot.val().noSurat.split("/")[3]);
       } else {

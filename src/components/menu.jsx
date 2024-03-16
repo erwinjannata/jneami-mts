@@ -13,8 +13,8 @@ export default function Menu() {
   let menu = [
     { id: "0", nama: "Dashboard", link: "/", req: 1 },
     { id: "1", nama: "Manifest Transit", link: "/create", req: 1 },
-    { id: "2", nama: "Download Data", link: "/get", req: 1 },
-    { id: "3", nama: "Damage Report", link: "/damage", req: 4 },
+    { id: "2", nama: "Damage Report", link: "/damage/new", req: 1 },
+    { id: "3", nama: "Download Data", link: "/get", req: 1 },
     { id: "4", nama: "New User", link: "/add", req: 5 },
   ];
 
