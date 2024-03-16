@@ -1,5 +1,12 @@
 /* eslint-disable no-unused-vars */
-import { Col, Container, FloatingLabel, Form, Row } from "react-bootstrap";
+import {
+  Button,
+  Col,
+  Container,
+  FloatingLabel,
+  Form,
+  Row,
+} from "react-bootstrap";
 import Menu from "../components/menu";
 import { useState } from "react";
 import firebase from "./../config/firebase";
@@ -14,6 +21,16 @@ export default function DamageReport() {
   const handleChange = (e) => {
     const value = e.target.value;
     setState({ ...state, [e.target.name]: value });
+  };
+
+  const handleSubmit = () => {
+    // db.push(state)
+    //   .then(() => {
+    //     alert("OK");
+    //   })
+    //   .catch((error) => {
+    //     console.log(error.message);
+    //   });
   };
 
   return (
@@ -51,6 +68,17 @@ export default function DamageReport() {
               />
             </FloatingLabel>
           </Col>
+        </Row>
+        <Row>
+          <div className="d-grid gap-2">
+            <Button
+              variant="outline-primary"
+              type="submit"
+              onClick={handleSubmit}
+            >
+              Submit
+            </Button>
+          </div>
         </Row>
       </Container>
     </>

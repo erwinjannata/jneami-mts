@@ -143,7 +143,11 @@ export default function Home() {
                 <>
                   {showList
                     .map((item, key) => (
-                      <tr key={key} onClick={() => navigate(`doc/${item.key}`)}>
+                      <tr
+                        key={key}
+                        onClick={() => navigate(`doc/${item.key}`)}
+                        className="user-select-none"
+                      >
                         <td>{item.noSurat}</td>
                         <td>{item.origin}</td>
                         <td>{item.destination}</td>

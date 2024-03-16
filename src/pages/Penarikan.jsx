@@ -174,7 +174,7 @@ export default function Penarikan() {
                   <th>Received at</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="user-select-none">
                 {dataList.length == 0 ? (
                   <>
                     <tr>
