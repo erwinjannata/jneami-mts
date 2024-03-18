@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import {
+  Button,
   Col,
   Container,
   FloatingLabel,
@@ -28,7 +29,6 @@ export default function Home() {
     limit: "10",
   });
   const auth = UseAuth();
-  const firstRender = useRef(true);
 
   const handleChange = (e) => {
     const value = e.target.value;
@@ -72,6 +72,25 @@ export default function Home() {
         setDataList(data);
         setShowList(data);
       });
+    db.on("child_changed", (snapshot) => {
+      if (!("Notification" in window)) {
+        console.log("Push Notification Not Supported");
+      } else {
+        Notification.requestPermission((permission) => {
+          if (
+            permission === "granted" &&
+            auth.origin === snapshot.val().destination
+          ) {
+            new Notification(
+              `Manifest Transit ${
+                snapshot.val().noSurat
+              } dalam perjalanan menuju JNE ${snapshot.val().destination}`
+            );
+          }
+        });
+      }
+      snapshot.val().destination;
+    });
   }, [auth.origin, auth.name, state.showed, state.limit]);
 
   return (
