@@ -2,6 +2,7 @@ import firebase from "firebase/compat/app";
 import "firebase/compat/database";
 import "firebase/compat/auth";
 import "firebase/compat/storage";
+import "firebase/compat/app-check";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -15,5 +16,7 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
+self.FIREBASE_APPCHECK_DEBUG_TOKEN = import.meta.env.VITE_APP_DEBUG_TOKEN;
+firebase.appCheck().activate(import.meta.env.VITE_SITE_KEY, true);
 
 export default firebase;
