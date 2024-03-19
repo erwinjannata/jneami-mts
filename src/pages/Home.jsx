@@ -72,26 +72,40 @@ export default function Home() {
         setDataList(data);
         setShowList(data);
       });
-    db.on("child_changed", (snapshot) => {
+    db.once("child_changed", (snapshot) => {
       if (!("Notification" in window)) {
         console.log("Push Notification Not Supported");
       } else {
-        Notification.requestPermission((permission) => {
-          if (
-            permission === "granted" &&
-            auth.origin === snapshot.val().destination
-          ) {
-            new Notification(
-              `Manifest Transit ${
-                snapshot.val().noSurat
-              } dalam perjalanan menuju JNE ${snapshot.val().destination}`
-            );
-          }
-        });
+        if (
+          snapshot.val().status == "Dalam Perjalanan" &&
+          auth.origin == snapshot.val().destination
+        ) {
+          Notification.requestPermission((permission) => {
+            if (permission == "granted") {
+              new Notification(
+                `Manifest Transit ${
+                  snapshot.val().noSurat
+                } dalam perjalanan menuju JNE ${snapshot.val().destination}`
+              );
+            }
+          });
+        } else if (
+          snapshot.val().status == "Sampai Tujuan" &&
+          auth.origin == snapshot.val().origin
+        ) {
+          Notification.requestPermission((permission) => {
+            if (permission == "granted") {
+              new Notification(
+                `Manifest Transit ${
+                  snapshot.val().noSurat
+                } sampai tujuan di JNE ${snapshot.val().destination}`
+              );
+            }
+          });
+        }
       }
-      snapshot.val().destination;
     });
-  }, [auth.origin, auth.name, state.showed, state.limit]);
+  }, [auth.origin, auth.name, state.showed, state.limit, Notification, window]);
 
   return (
     <>

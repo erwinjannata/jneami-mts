@@ -164,8 +164,9 @@ export default function Doc() {
                 db.update(updates)
                   .then(() => {
                     setLoading(false);
-                    alert("Received");
                     setChangedItem(0);
+                    alert("Received");
+                    navigate("/");
                     window.scrollTo(0, 0);
                   })
                   .catch((error) => {
