@@ -66,7 +66,11 @@ export default function Menu() {
           <hr />
           <Form className="d-flex">
             <Navbar.Text>{`${auth.name} | JNE ${auth.origin}`}</Navbar.Text>
-            <Button variant="outline-danger" onClick={handleLogout}>
+            <Button
+              variant="outline-danger"
+              title="Log Out"
+              onClick={handleLogout}
+            >
               <LuLogOut />
             </Button>
           </Form>

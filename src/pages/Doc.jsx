@@ -151,8 +151,8 @@ export default function Doc() {
                 if (auth.origin == data.destination) {
                   updates["status"] = "Sampai Tujuan";
                   updates["isReceived"] = true;
-                  updates["receivedDate"] = tanggal;
                   updates["receivedBy"] = auth.name;
+                  updates["receivedDate"] = tanggal;
                   updates["receivedTime"] = jam;
                   updates["receiverSign"] = url;
                   updates["bagList"] = bagList;
@@ -164,9 +164,8 @@ export default function Doc() {
                 db.update(updates)
                   .then(() => {
                     setLoading(false);
-                    setChangedItem(0);
                     alert("Received");
-                    navigate("/");
+                    setChangedItem(0);
                     window.scrollTo(0, 0);
                   })
                   .catch((error) => {
@@ -275,8 +274,8 @@ export default function Doc() {
           <Row>
             <Col>
               <strong>Approved at</strong> <br />
-              {`${moment(data.approveDate).locale("id").format("LL")} ${
-                data.approveTime
+              {`${moment(data.approvedDate).locale("id").format("LL")} ${
+                data.approvedTime
               }`}
             </Col>
             <Col>
@@ -471,9 +470,9 @@ export default function Doc() {
                         data={bagList}
                         noSurat={data.noSurat}
                         noRef={data.noRef}
-                        date1={`${moment(data.approveDate)
+                        date1={`${moment(data.approvedDate)
                           .locale("id")
-                          .format("LL")} ${data.approveTime}`}
+                          .format("LL")} ${data.approvedTime}`}
                         date2={
                           data.receivedDate == ""
                             ? "-"

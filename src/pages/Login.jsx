@@ -64,6 +64,7 @@ export default function Login() {
               type="email"
               placeholder="Email"
               name="email"
+              autoComplete="on"
               value={creds.email}
               onChange={handleChange}
               disabled={loading ? true : false}
@@ -77,7 +78,7 @@ export default function Login() {
               name="password"
               value={creds.password}
               onChange={handleChange}
-              autoComplete="off"
+              autoComplete="on"
               disabled={loading ? true : false}
               required
             />

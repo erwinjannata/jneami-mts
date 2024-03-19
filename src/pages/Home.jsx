@@ -60,8 +60,8 @@ export default function Home() {
             noSurat: childSnapshot.val().noSurat,
             origin: childSnapshot.val().origin,
             destination: childSnapshot.val().destination,
-            approvedDate: childSnapshot.val().approveDate,
-            approvedTime: childSnapshot.val().approveTime,
+            approvedDate: childSnapshot.val().approvedDate,
+            approvedTime: childSnapshot.val().approvedTime,
             receivedDate: childSnapshot.val().receivedDate,
             receivedTime: childSnapshot.val().receivedTime,
             status: childSnapshot.val().status,
@@ -122,7 +122,7 @@ export default function Home() {
           <Col>
             <Form onSubmit={handleSearch}>
               <FloatingLabel
-                controlId="floatingInput"
+                controlId="floatingInputNo"
                 label="Cari no. surat"
                 className="mb-3"
               >
@@ -137,7 +137,7 @@ export default function Home() {
             </Form>
           </Col>
           <Col>
-            <FloatingLabel controlId="floatingSelect" label="Data">
+            <FloatingLabel controlId="floatingSelectData" label="Data">
               <Form.Select
                 aria-label="Data"
                 name="showed"
@@ -215,7 +215,7 @@ export default function Home() {
         <hr />
         <Row>
           <Col xl={1} xs={4}>
-            <FloatingLabel controlId="floatingSelect" label="Show">
+            <FloatingLabel controlId="floatingSelectShow" label="Show">
               <Form.Select
                 aria-label="Show"
                 name="limit"

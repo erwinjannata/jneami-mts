@@ -22,7 +22,7 @@ export default function Penarikan() {
   const [show, setShow] = useState(false);
 
   const handleSubmit = () => {
-    db.orderByChild("approveDate")
+    db.orderByChild("approvedDate")
       .startAt(state.start)
       .endAt(state.end)
       .on("value", (snapshot) => {
@@ -46,8 +46,8 @@ export default function Penarikan() {
       pcs: row.sumPcs,
       kg: row.sumWeight,
       preparedBy: row.preparedBy,
-      approvedDate: new Date(row.approveDate),
-      approvedTime: row.approveTime,
+      approvedDate: new Date(row.approvedDate),
+      approvedTime: row.approvedTime,
       receivedBy: row.receivedBy,
       receivedDate: row.receivedDate == "" ? "" : new Date(row.receivedDate),
       receivedTime: row.receivedTime,
@@ -192,7 +192,7 @@ export default function Penarikan() {
                           <td>{item.origin}</td>
                           <td>{item.destination}</td>
                           <td>{item.status}</td>
-                          <td>{`${item.approveDate} ${item.approveTime}`}</td>
+                          <td>{`${item.approvedDate} ${item.approvedTime}`}</td>
                           <td>
                             {item.receivedDate == ""
                               ? "-"
