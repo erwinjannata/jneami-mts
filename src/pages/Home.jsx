@@ -72,40 +72,47 @@ export default function Home() {
         setDataList(data);
         setShowList(data);
       });
-    db.once("child_changed", (snapshot) => {
+    db.on("child_changed", (snapshot) => {
       if (!("Notification" in window)) {
         console.log("Push Notification Not Supported");
       } else {
-        if (
-          snapshot.val().status == "Dalam Perjalanan" &&
-          auth.origin == snapshot.val().destination
-        ) {
-          Notification.requestPermission((permission) => {
-            if (permission == "granted") {
-              new Notification(
-                `Manifest Transit ${
-                  snapshot.val().noSurat
-                } dalam perjalanan menuju JNE ${snapshot.val().destination}`
-              );
-            }
-          });
-        } else if (
-          snapshot.val().status == "Sampai Tujuan" &&
-          auth.origin == snapshot.val().origin
-        ) {
-          Notification.requestPermission((permission) => {
-            if (permission == "granted") {
-              new Notification(
-                `Manifest Transit ${
-                  snapshot.val().noSurat
-                } sampai tujuan di JNE ${snapshot.val().destination}`
-              );
-            }
-          });
-        }
+        Notification.requestPermission().then((permission) => {
+          if (permission == "granted") {
+            let i = 0;
+            const interval = setInterval(() => {
+              if (
+                auth.origin == snapshot.val().destination &&
+                snapshot.val().status == "Dalam Perjalanan"
+              ) {
+                const notif = new Notification(`Manifest Transit Sub Agen`, {
+                  tag: "notification",
+                  renotify: true,
+                  body: `${
+                    snapshot.val().noSurat
+                  } dalam perjalanan menuju JNE ${snapshot.val().destination}`,
+                });
+              } else if (
+                auth.origin == snapshot.val().origin &&
+                snapshot.val().status == "Sampai Tujuan"
+              ) {
+                const notif = new Notification(`Manifest Transit Sub Agen`, {
+                  tag: "notification",
+                  renotify: true,
+                  body: `${snapshot.val().noSurat} telah sampai tujuan di JNE ${
+                    snapshot.val().destination
+                  }`,
+                });
+              }
+              if (i == 1) {
+                clearInterval(interval);
+              }
+              i++;
+            }, 200);
+          }
+        });
       }
     });
-  }, [auth.origin, auth.name, state.showed, state.limit, Notification, window]);
+  }, [auth.origin, auth.name, state.showed, state.limit, Notification]);
 
   return (
     <>
