@@ -46,6 +46,7 @@ export default function Penarikan() {
             status: childSnapshot.val().status,
             sumPcs: childSnapshot.val().sumPcs,
             sumWeight: childSnapshot.val().sumWeight,
+            bagList: childSnapshot.val().bagList,
           });
         });
         setDataList(data);
@@ -54,21 +55,30 @@ export default function Penarikan() {
   };
 
   const handleDownload = () => {
-    const processedData = dataList.map((row) => ({
-      noSurat: row.noSurat,
-      noRef: row.noRef,
-      origin: row.origin,
-      destination: row.destination,
-      status: row.status,
-      pcs: row.sumPcs,
-      kg: row.sumWeight,
-      preparedBy: row.preparedBy,
-      approvedDate: new Date(row.approvedDate),
-      approvedTime: row.approvedTime,
-      receivedBy: row.receivedBy,
-      receivedDate: row.receivedDate == "" ? "" : new Date(row.receivedDate),
-      receivedTime: row.receivedTime,
-    }));
+    let processedData = [];
+    dataList.map((row, idx) => {
+      for (let i = 0; i < dataList[idx].bagList.length; i++) {
+        processedData.push({
+          noManifest: dataList[idx].bagList[i].manifestNo,
+          pcs: dataList[idx].bagList[i].pcs,
+          kg: dataList[idx].bagList[i].kg,
+          remark: dataList[idx].bagList[i].remark,
+          statusBag: dataList[idx].bagList[i].statusBag,
+          noSurat: row.noSurat,
+          noRef: row.noRef,
+          origin: row.origin,
+          destination: row.destination,
+          status: row.status,
+          preparedBy: row.preparedBy,
+          approvedDate: new Date(row.approvedDate),
+          approvedTime: row.approvedTime,
+          receivedBy: row.receivedBy,
+          receivedDate:
+            row.receivedDate == "" ? "" : new Date(row.receivedDate),
+          receivedTime: row.receivedTime,
+        });
+      }
+    });
     const worksheet = utils.json_to_sheet(processedData.reverse());
     const workbook = utils.book_new();
     utils.book_append_sheet(workbook, worksheet, "Data List");
@@ -76,13 +86,16 @@ export default function Penarikan() {
       worksheet,
       [
         [
-          "No. Surat",
+          "No. Manifest",
+          "Pcs",
+          "Kg",
+          "Remark",
+          "Status Bag",
+          "No. Surat Manifest",
           "No. Referensi Vendor",
           "Origin",
           "Destination",
-          "Status",
-          "Total Pcs",
-          "Total Weight",
+          "Status Manifest",
           "Approved by",
           "Approved Date",
           "Approved Time",
