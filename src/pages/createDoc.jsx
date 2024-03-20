@@ -101,20 +101,23 @@ export default function Create() {
   ];
 
   let destList = [
-    { id: "0", name: "MATARAM" },
-    { id: "1", name: "LOMBOK BARAT" },
-    { id: "2", name: "LOMBOK TIMUR" },
-    { id: "3", name: "PRAYA" },
-    { id: "4", name: "TANJUNG" },
-    { id: "5", name: "BIMA" },
-    { id: "6", name: "DOMPU" },
-    { id: "7", name: "MANGGELEWA" },
-    { id: "8", name: "SUMBAWA" },
-    { id: "9", name: "UTAN" },
-    { id: "10", name: "ALAS" },
-    { id: "11", name: "TALIWANG" },
-    { id: "12", name: "BOLO" },
-    { id: "13", name: "JEREWEH" },
+    { id: "0", name: "ALAS" },
+    { id: "1", name: "BIMA" },
+    { id: "2", name: "BOLO" },
+    { id: "3", name: "DOMPU" },
+    { id: "4", name: "EMPANG" },
+    { id: "5", name: "JEREWEH" },
+    { id: "6", name: "LOMBOK BARAT" },
+    { id: "7", name: "LOMBOK TIMUR" },
+    { id: "8", name: "MANGGELEWA" },
+    { id: "9", name: "MATARAM" },
+    { id: "10", name: "PADOLO" },
+    { id: "11", name: "PLAMPANG" },
+    { id: "12", name: "PRAYA" },
+    { id: "13", name: "SUMBAWA" },
+    { id: "14", name: "TALIWANG" },
+    { id: "15", name: "TANJUNG" },
+    { id: "16", name: "UTAN" },
   ];
 
   // Handler Untuk App
@@ -152,7 +155,7 @@ export default function Create() {
             pcs: state.pcs,
             kg: state.kg,
             remark: state.remark,
-            statusBag: "Belum Diterima",
+            statusBag: "Menunggu Vendor",
           },
         ]);
         setState({
@@ -216,22 +219,22 @@ export default function Create() {
               getDownloadURL(snapshot.ref).then(async (url) => {
                 db.push({
                   noSurat: state.noSurat,
+                  noRef: state.noRef,
                   origin: state.origin,
                   destination: state.destination,
                   bagList: bagList,
                   approvedDate: tanggal,
                   approvedTime: jam,
+                  preparedBy: state.preparedBy,
                   receivedDate: "",
                   receivedTime: "",
+                  receivedBy: "",
                   sumPcs: state.sumPcs,
                   sumWeight: state.sumWeight,
-                  noRef: state.noRef,
-                  preparedBy: state.preparedBy,
-                  receivedBy: "",
                   checkerSign: url,
                   receiverSign: "",
-                  isReceived: false,
                   vendorSign: "",
+                  isReceived: false,
                   status: "Menunggu Vendor",
                 }).then(() => {
                   setLoading(false);

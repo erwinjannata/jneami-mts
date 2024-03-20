@@ -67,36 +67,57 @@ export default function Doc() {
   };
 
   const handleReceive = (idx) => {
-    setBagList(
-      bagList.map((lists, index) => {
-        if (index == idx) {
-          return { ...lists, statusBag: "Diterima" };
-        } else {
-          return lists;
-        }
-      })
-    );
-    setChangedItem(changedItem + 1);
+    if (auth.origin == data.destination && data.status == "Menunggu Vendor") {
+      alert("Bag belum diterima oleh vendor");
+    } else {
+      setBagList(
+        bagList.map((lists, index) => {
+          if (index == idx) {
+            return {
+              ...lists,
+              statusBag: `${
+                auth.origin == data.origin ? "Dalam Perjalanan" : "Received"
+              }`,
+            };
+          } else {
+            return lists;
+          }
+        })
+      );
+      setChangedItem(changedItem + 1);
+    }
   };
 
   const handleUnreceive = (idx) => {
-    setBagList(
-      bagList.map((lists, index) => {
-        if (index == idx) {
-          return { ...lists, statusBag: "Tidak Masuk" };
-        } else {
-          return lists;
-        }
-      })
-    );
-    setChangedItem(changedItem + 1);
+    if (auth.origin == data.destination && data.status == "Menunggu Vendor") {
+      alert("Bag belum diterima oleh vendor");
+    } else {
+      setBagList(
+        bagList.map((lists, index) => {
+          if (index == idx) {
+            return {
+              ...lists,
+              statusBag: `${
+                auth.origin == data.origin ? "Missing" : "Unreceived"
+              }`,
+            };
+          } else {
+            return lists;
+          }
+        })
+      );
+      setChangedItem(changedItem + 1);
+    }
   };
 
   const handleCancel = (idx) => {
     setBagList(
       bagList.map((lists, index) => {
         if (index == idx) {
-          return { ...lists, statusBag: "Belum Diterima" };
+          return {
+            ...lists,
+            statusBag: `${data.bagList[idx].statusBag}`,
+          };
         } else {
           return lists;
         }
@@ -115,12 +136,9 @@ export default function Doc() {
       alert("Kiriman belum diterima oleh vendor");
     } else if (data.noRef == "") {
       alert("Nomor referensi vendor kosong");
-    } else if (changedItem == 0 && auth.origin == data.destination) {
+    } else if (changedItem == 0) {
       alert("Belum ada bag yang diterima");
-    } else if (
-      changedItem != bagList.length &&
-      auth.origin == data.destination
-    ) {
+    } else if (changedItem != bagList.length) {
       alert("Periksa lagi barang yang belum diterima");
     } else {
       setShowSignature(true);
@@ -148,6 +166,7 @@ export default function Doc() {
             (snapshot) => {
               getDownloadURL(snapshot.ref).then(async (url) => {
                 let updates = {};
+                updates["bagList"] = bagList;
                 if (auth.origin == data.destination) {
                   updates["status"] = "Sampai Tujuan";
                   updates["isReceived"] = true;
@@ -155,8 +174,9 @@ export default function Doc() {
                   updates["receivedDate"] = tanggal;
                   updates["receivedTime"] = jam;
                   updates["receiverSign"] = url;
-                  updates["bagList"] = bagList;
                 } else if (auth.origin == data.origin) {
+                  updates["approvedDate"] = tanggal;
+                  updates["approvedTime"] = jam;
                   updates["status"] = "Dalam Perjalanan";
                   updates["noRef"] = data.noRef;
                   updates["vendorSign"] = url;
@@ -205,9 +225,9 @@ export default function Doc() {
           "Pcs / Koli",
           "Kg / Weight",
           "Remark",
-          "Status",
+          "Status Bag",
           "No Surat",
-          "Status Kiriman",
+          "Status Manifest",
         ],
       ],
       { origin: "A1" }
@@ -355,55 +375,54 @@ export default function Doc() {
                   <td>{item.statusBag}</td>
                   <td>{item.remark}</td>
                   <td>
-                    {auth.origin == data.destination &&
-                    data.isReceived == false ? (
+                    {(auth.origin == data.origin &&
+                      data.status == "Menunggu Vendor") ||
+                    (auth.origin == data.destination &&
+                      data.status == "Dalam Perjalanan") ? (
                       <>
-                        {data.isReceived ||
-                        data.status == "Menunggu Vendor" ? null : (
-                          <>
-                            {item.statusBag == "Diterima" ||
-                            item.statusBag == "Tidak Masuk" ? (
-                              <Button
-                                variant="danger"
-                                className="m-2"
-                                onClick={() => handleCancel(index)}
-                                disabled={loading ? true : false}
-                              >
-                                Batalkan
-                              </Button>
-                            ) : (
-                              <div className="d-flex">
-                                <Button
-                                  variant="primary"
-                                  className="m-2"
-                                  onClick={() => handleReceive(index)}
-                                  disabled={loading ? true : false}
-                                >
-                                  Received
-                                </Button>
-                                <Button
-                                  variant="secondary"
-                                  className="m-2"
-                                  onClick={() => handleUnreceive(index)}
-                                  disabled={loading ? true : false}
-                                >
-                                  Unreceived
-                                </Button>
-                                <Button
-                                  variant="warning"
-                                  className="m-2"
-                                  onClick={() => {
-                                    setShow(true),
-                                      setCurrentFocus(index),
-                                      setRemark("");
-                                  }}
-                                  disabled={loading ? true : false}
-                                >
-                                  Remark
-                                </Button>
-                              </div>
-                            )}
-                          </>
+                        {(auth.origin == data.destination &&
+                          item.statusBag != "Dalam Perjalanan") ||
+                        (auth.origin == data.origin &&
+                          item.statusBag != "Menunggu Vendor") ? (
+                          <Button
+                            variant="danger"
+                            className="m-2"
+                            onClick={() => handleCancel(index)}
+                            disabled={loading ? true : false}
+                          >
+                            Batalkan
+                          </Button>
+                        ) : (
+                          <div className="d-flex">
+                            <Button
+                              variant="primary"
+                              className="m-2"
+                              onClick={() => handleReceive(index)}
+                              disabled={loading ? true : false}
+                            >
+                              Received
+                            </Button>
+                            <Button
+                              variant="secondary"
+                              className="m-2"
+                              onClick={() => handleUnreceive(index)}
+                              disabled={loading ? true : false}
+                            >
+                              Unreceived
+                            </Button>
+                            <Button
+                              variant="warning"
+                              className="m-2"
+                              onClick={() => {
+                                setShow(true),
+                                  setCurrentFocus(index),
+                                  setRemark("");
+                              }}
+                              disabled={loading ? true : false}
+                            >
+                              Remark
+                            </Button>
+                          </div>
                         )}
                       </>
                     ) : null}

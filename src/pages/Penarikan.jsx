@@ -10,9 +10,11 @@ import firebase from "./../config/firebase";
 import { useState } from "react";
 import { utils, writeFile } from "xlsx";
 import { MdFileDownload } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
 
 export default function Penarikan() {
   const d = new Date();
+  let navigate = useNavigate();
   const [state, setState] = useState({
     start: moment(d).locale("en-ca").format("L"),
     end: moment(d).locale("en-ca").format("L"),
@@ -29,7 +31,22 @@ export default function Penarikan() {
         let data = [];
 
         snapshot.forEach((childSnapshot) => {
-          data.push(childSnapshot.val());
+          data.push({
+            key: childSnapshot.key,
+            noSurat: childSnapshot.val().noSurat,
+            noRef: childSnapshot.val().noRef,
+            origin: childSnapshot.val().origin,
+            destination: childSnapshot.val().destination,
+            preparedBy: childSnapshot.val().preparedBy,
+            approvedDate: childSnapshot.val().approvedDate,
+            approvedTime: childSnapshot.val().approvedTime,
+            receivedDate: childSnapshot.val().receivedDate,
+            receivedTime: childSnapshot.val().receivedTime,
+            receivedBy: childSnapshot.val().receivedBy,
+            status: childSnapshot.val().status,
+            sumPcs: childSnapshot.val().sumPcs,
+            sumWeight: childSnapshot.val().sumWeight,
+          });
         });
         setDataList(data);
       });
@@ -163,7 +180,7 @@ export default function Penarikan() {
               overflowY: "scroll",
             }}
           >
-            <Table responsive>
+            <Table responsive hover>
               <thead>
                 <tr>
                   <th>No. Surat</th>
@@ -187,7 +204,10 @@ export default function Penarikan() {
                   <>
                     {dataList
                       .map((item, key) => (
-                        <tr key={key}>
+                        <tr
+                          key={key}
+                          onClick={() => navigate(`/doc/${item.key}`)}
+                        >
                           <td>{item.noSurat}</td>
                           <td>{item.origin}</td>
                           <td>{item.destination}</td>
