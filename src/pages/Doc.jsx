@@ -381,7 +381,8 @@ export default function Doc() {
                       data.status == "Dalam Perjalanan") ? (
                       <>
                         {(auth.origin == data.destination &&
-                          item.statusBag != "Dalam Perjalanan") ||
+                          item.statusBag == "Received") ||
+                        item.statusBag == "Unreceived" ||
                         (auth.origin == data.origin &&
                           item.statusBag != "Menunggu Vendor") ? (
                           <Button
