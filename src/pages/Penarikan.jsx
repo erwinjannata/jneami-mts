@@ -60,8 +60,8 @@ export default function Penarikan() {
       for (let i = 0; i < dataList[idx].bagList.length; i++) {
         processedData.push({
           noManifest: dataList[idx].bagList[i].manifestNo,
-          pcs: dataList[idx].bagList[i].pcs,
-          kg: dataList[idx].bagList[i].kg,
+          pcs: parseFloat(dataList[idx].bagList[i].pcs),
+          kg: parseFloat(dataList[idx].bagList[i].kg),
           remark: dataList[idx].bagList[i].remark,
           statusBag: dataList[idx].bagList[i].statusBag,
           noSurat: row.noSurat,
