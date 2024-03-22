@@ -400,6 +400,11 @@ export default function Doc() {
                               className="m-2"
                               onClick={() => handleReceive(index)}
                               disabled={loading ? true : false}
+                              style={
+                                item.statusBag == "Missing"
+                                  ? { display: "none" }
+                                  : { display: "block" }
+                              }
                             >
                               Received
                             </Button>
