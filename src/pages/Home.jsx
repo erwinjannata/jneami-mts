@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import {
-  Button,
+  Card,
   Col,
   Container,
   FloatingLabel,
@@ -17,10 +17,18 @@ import moment from "moment";
 import "moment/dist/locale/id";
 import { useNavigate } from "react-router-dom";
 import { UseAuth } from "../config/authContext";
+import { FaTruckLoading } from "react-icons/fa";
+import { FaTruckPlane } from "react-icons/fa6";
+import { FaBoxes } from "react-icons/fa";
 
 export default function Home() {
+  const auth = UseAuth();
   let db = firebase.database().ref("manifestTransit/");
   let navigate = new useNavigate();
+  const [windowSize, setWindowSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
   const [dataList, setDataList] = useState([]);
   const [showList, setShowList] = useState([]);
   const [state, setState] = useState({
@@ -28,7 +36,48 @@ export default function Home() {
     showed: "origin",
     limit: "10",
   });
-  const auth = UseAuth();
+
+  let cardsCategories = [
+    {
+      id: "0",
+      key: "primary",
+      bg: "primary",
+      textColor: "white",
+      title: "Sampai Tujuan",
+      text: showList.reduce(
+        (counter, obj) =>
+          obj.status == "Sampai Tujuan" ? (counter += 1) : counter,
+        0
+      ),
+      icon: <FaTruckLoading size={55} />,
+    },
+    {
+      id: "0",
+      key: "warning",
+      bg: "warning",
+      textColor: "dark",
+      title: "Dalam Perjalanan",
+      text: showList.reduce(
+        (counter, obj) =>
+          obj.status == "Dalam Perjalanan" ? (counter += 1) : counter,
+        0
+      ),
+      icon: <FaTruckPlane size={55} />,
+    },
+    {
+      id: "0",
+      key: "danger",
+      bg: "danger",
+      textColor: "white",
+      title: "Menunggu Vendor",
+      text: showList.reduce(
+        (counter, obj) =>
+          obj.status == "Menunggu Vendor" ? (counter += 1) : counter,
+        0
+      ),
+      icon: <FaBoxes size={55} />,
+    },
+  ];
 
   const handleChange = (e) => {
     const value = e.target.value;
@@ -112,6 +161,20 @@ export default function Home() {
         });
       }
     });
+
+    const handleResize = () => {
+      setWindowSize({
+        ...windowSize,
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
   }, [auth.origin, auth.name, state.showed, state.limit, Notification]);
 
   return (
@@ -119,6 +182,35 @@ export default function Home() {
       <Menu />
       <Container>
         <Row className="mt-4">
+          {cardsCategories.map((category, idx) => (
+            <Col key={idx} xs={windowSize.width >= 768 ? "" : "0"}>
+              <Card
+                bg={category.bg}
+                key={category.key}
+                text={category.textColor}
+                className="mb-2"
+                border={category.bg}
+              >
+                <Card.Body>
+                  <Row>
+                    <Col xs={3} lg={2}>
+                      {category.icon}
+                    </Col>
+                    <Col xs={9} lg={10}>
+                      <Card.Title className="small">
+                        {category.title}
+                      </Card.Title>
+                      <Card.Text className="display-6">
+                        {category.text}
+                      </Card.Text>
+                    </Col>
+                  </Row>
+                </Card.Body>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+        <Row className="mt-2">
           <Col>
             <Form onSubmit={handleSearch}>
               <FloatingLabel

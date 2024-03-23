@@ -6,7 +6,7 @@ import logo from "./../images/jne_brand.png";
 import "./../index.css";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { UseAuth } from "./../config/authContext";
-import { Button, Form } from "react-bootstrap";
+import { Button, Form, Offcanvas } from "react-bootstrap";
 import { LuLogOut } from "react-icons/lu";
 
 export default function Menu() {
@@ -27,7 +27,7 @@ export default function Menu() {
   };
 
   return (
-    <Navbar expand="lg" className="bg-body-tertiary" sticky="top">
+    <Navbar key="xl" expand="xl" className="bg-body-tertiary" sticky="top">
       <Container fluid>
         <Navbar.Brand>
           <Link to="/">
@@ -39,42 +39,56 @@ export default function Menu() {
             ></img>
           </Link>
         </Navbar.Brand>
-        <Navbar.Toggle aria-controls="navbarScroll" />
-        <Navbar.Collapse className="navbarScroll">
-          <Nav
-            className="me-auto my-2 my-lg-0"
-            style={{ maxHeight: "100px" }}
-            navbarScroll
-          >
-            {menu.map((m) => (
-              <Nav key={m.id}>
-                {auth.level >= m.req ? (
-                  <Navbar.Text>
-                    <NavLink
-                      to={m.link}
-                      style={({ isActive }) => ({
-                        color: isActive ? "blue" : "black",
-                      })}
-                    >
-                      {m.nama}
-                    </NavLink>
-                  </Navbar.Text>
-                ) : null}
-              </Nav>
-            ))}
-          </Nav>
-          <hr />
-          <Form className="d-flex">
-            <Navbar.Text>{`${auth.name} | JNE ${auth.origin}`}</Navbar.Text>
-            <Button
-              variant="outline-danger"
-              title="Log Out"
-              onClick={handleLogout}
-            >
-              <LuLogOut />
-            </Button>
-          </Form>
-        </Navbar.Collapse>
+        <Navbar.Toggle aria-controls="offcanvasNavbar-expand-xl" />
+        <Navbar.Offcanvas
+          id="offcanvasNavbar-expand-xl"
+          aria-labelledby="offcanvasNavbarLabel-expand-xl"
+          placement="start"
+        >
+          <Offcanvas.Header closeButton>
+            <Offcanvas.Title id={`offcanvasNavbarLabel-expand-xl`}>
+              <img
+                src={logo}
+                alt="JNE"
+                className="logo"
+                style={{ height: "50px" }}
+              ></img>
+            </Offcanvas.Title>
+          </Offcanvas.Header>
+          <Offcanvas.Body>
+            <Nav className="me-auto my-2 my-lg-0">
+              {menu.map((m) => (
+                <Nav key={m.id}>
+                  {auth.level >= m.req ? (
+                    <Navbar.Text>
+                      <NavLink
+                        to={m.link}
+                        style={({ isActive }) => ({
+                          color: isActive ? "blue" : "black",
+                        })}
+                      >
+                        {m.nama}
+                      </NavLink>
+                    </Navbar.Text>
+                  ) : null}
+                </Nav>
+              ))}
+            </Nav>
+            <Nav>
+              <hr />
+              <Form className="d-flex">
+                <Navbar.Text>{`${auth.name} | JNE ${auth.origin}`}</Navbar.Text>
+                <Button
+                  variant="outline-danger"
+                  title="Log Out"
+                  onClick={handleLogout}
+                >
+                  <LuLogOut />
+                </Button>
+              </Form>
+            </Nav>
+          </Offcanvas.Body>
+        </Navbar.Offcanvas>
       </Container>
     </Navbar>
   );

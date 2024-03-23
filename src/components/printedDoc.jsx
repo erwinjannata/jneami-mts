@@ -108,6 +108,7 @@ const Print = ({
   receiverSign,
   checkerName,
   receiverName,
+  driverName,
 }) => {
   let totalPage = Math.ceil(data.length / 20);
 
@@ -194,7 +195,7 @@ const Print = ({
                 )}
                 {vendorSign == "" ? null : (
                   <View style={styles.signRow2}>
-                    <Text>Vendor</Text>
+                    <Text>{driverName}</Text>
                   </View>
                 )}
               </View>
@@ -236,6 +237,7 @@ Print.propTypes = {
   receiverSign: PropTypes.string,
   checkerName: PropTypes.string,
   receiverName: PropTypes.string,
+  driverName: PropTypes.string,
 };
 
 export default Print;

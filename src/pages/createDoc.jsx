@@ -40,7 +40,10 @@ export default function Create() {
   const tanggal = moment(d).locale("en-ca").format("L");
   const jam = moment(d).locale("en-sg").format("LT");
   let year = d.getFullYear().toString().substring(2, 4);
-  const windowWidth = useRef(window.innerWidth);
+  const [windowSize, setWindowSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
   const [show, setShow] = useState(false);
   const [img64, setImg64] = useState("");
 
@@ -263,11 +266,21 @@ export default function Create() {
       });
       setN(zerofilled);
     });
+    const handleResize = () => {
+      setWindowSize({
+        ...windowSize,
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    window.addEventListener("resize", handleResize);
     const intervalId = setInterval(() => {
       setD(new Date());
     }, 1000);
     return () => {
       clearInterval(intervalId);
+      window.removeEventListener("resize", handleResize);
     };
   }, [auth.origin, auth.name, auth.level, state.origin, state.preparedBy]);
 
@@ -326,7 +339,7 @@ export default function Create() {
         <form onSubmit={handleSubmit}>
           <Row>
             {formsList.map((item, idx) => (
-              <Col xs={windowWidth.current >= 768 ? item.xs : "0"} key={idx}>
+              <Col xs={windowSize.width >= 768 ? item.xs : "0"} key={idx}>
                 <Form.Floating className="mb-3">
                   <Form.Control
                     id={`${item.name}Input`}

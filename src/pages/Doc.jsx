@@ -42,6 +42,10 @@ export default function Doc() {
   const tanggal = moment(d).locale("en-ca").format("L");
   const jam = moment(d).locale("en-sg").format("LT");
   const [img64, setImg64] = useState("");
+  const [windowSize, setWindowSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
 
   let db = firebase.database().ref(`/manifestTransit/${key}`);
   const [data, setData] = useState([]);
@@ -53,6 +57,11 @@ export default function Doc() {
   const [remark, setRemark] = useState("");
   const [zerofilled, setZeroFilled] = useState("");
   let navigate = useNavigate();
+
+  const handleChange = (e) => {
+    const value = e.target.value;
+    setData({ ...data, [e.target.name]: value });
+  };
 
   const handleSubmit = () => {
     setBagList(
@@ -179,6 +188,8 @@ export default function Doc() {
                   updates["approvedTime"] = jam;
                   updates["status"] = "Dalam Perjalanan";
                   updates["noRef"] = data.noRef;
+                  (updates["noPolisi"] = data.noPolisi),
+                    (updates["driver"] = data.driver);
                   updates["vendorSign"] = url;
                 }
                 db.update(updates)
@@ -245,11 +256,21 @@ export default function Doc() {
         navigate("/");
       }
     });
+    const handleResize = () => {
+      setWindowSize({
+        ...windowSize,
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    window.addEventListener("resize", handleResize);
     const intervalId = setInterval(() => {
       setD(new Date());
     }, 1000);
     return () => {
       clearInterval(intervalId);
+      window.removeEventListener("resize", handleResize);
     };
   }, [auth.name, auth.origin]);
 
@@ -264,8 +285,7 @@ export default function Doc() {
               {data.noSurat}
             </Col>
             <Col>
-              <strong>No. Ref. Vendor </strong> <br />{" "}
-              {data.status == "Menunggu Vendor" ? data.status : data.noRef}
+              <strong>Status</strong> <br /> {data.status}
             </Col>
           </Row>
           <hr />
@@ -308,45 +328,69 @@ export default function Doc() {
             </Col>
           </Row>
           <hr />
-          {data.isReceived ? null : (
+          {auth.origin != data.origin &&
+          auth.origin != data.destination ? null : (
             <Row>
-              {auth.origin == data.destination ? (
-                <Col>
-                  <Form.Floating>
-                    <Form.Control
-                      id="flotaingPrepared"
-                      type="text"
-                      name="receiver"
-                      value={auth.name || ""}
-                      placeholder="Receiver"
-                      disabled
-                    ></Form.Control>
-                    <label htmlFor="floatingPrepared">Receiver</label>
-                  </Form.Floating>
-                </Col>
-              ) : null}
-              {auth.origin == data.origin ? (
-                <Col>
-                  <Form.Floating>
-                    <Form.Control
-                      id="flotaingNoRef"
-                      type="text"
-                      name="noRef"
-                      value={data.noRef || ""}
-                      placeholder="No. Ref. Vendor"
-                      onChange={(e) =>
-                        setData({ ...data, noRef: e.target.value })
-                      }
-                      disabled={
-                        data.isReceived || data.status == "Dalam Perjalanan"
-                          ? true
-                          : false
-                      }
-                    ></Form.Control>
-                    <label htmlFor="floatingNoRef">No. Ref. Vendor</label>
-                  </Form.Floating>
-                </Col>
-              ) : null}
+              <Col xs={windowSize.width >= 768 ? "" : "0"}>
+                <Form.Floating className="mb-3">
+                  <Form.Control
+                    id="flotaingNoRef"
+                    type="text"
+                    name="noRef"
+                    value={data.noRef || ""}
+                    placeholder="No. Ref. Vendor"
+                    onChange={auth.origin == data.origin ? handleChange : null}
+                    disabled={
+                      data.isReceived ||
+                      data.status == "Dalam Perjalanan" ||
+                      auth.origin == data.destination
+                        ? true
+                        : false
+                    }
+                  ></Form.Control>
+                  <label htmlFor="floatingNoRef">No. Ref. Vendor</label>
+                </Form.Floating>
+              </Col>
+              <Col xs={windowSize.width >= 768 ? "" : "0"}>
+                <Form.Floating className="mb-3">
+                  <Form.Control
+                    id="flotaingNoPolisi"
+                    type="text"
+                    name="noPolisi"
+                    value={data.noPolisi || ""}
+                    placeholder="No. Polisi Kendaraan"
+                    onChange={auth.origin == data.origin ? handleChange : null}
+                    disabled={
+                      data.isReceived ||
+                      data.status == "Dalam Perjalanan" ||
+                      auth.origin == data.destination
+                        ? true
+                        : false
+                    }
+                  ></Form.Control>
+                  <label htmlFor="floatingNoPolisi">No. Polisi Kendaraan</label>
+                </Form.Floating>
+              </Col>
+              <Col xs={windowSize.width >= 768 ? "" : "0"}>
+                <Form.Floating className="mb-3">
+                  <Form.Control
+                    id="flotaingDriver"
+                    type="text"
+                    name="driver"
+                    value={data.driver || ""}
+                    placeholder="Nama Driver"
+                    onChange={auth.origin == data.origin ? handleChange : null}
+                    disabled={
+                      data.isReceived ||
+                      data.status == "Dalam Perjalanan" ||
+                      auth.origin == data.destination
+                        ? true
+                        : false
+                    }
+                  ></Form.Control>
+                  <label htmlFor="floatingDriver">Nama Driver</label>
+                </Form.Floating>
+              </Col>
             </Row>
           )}
         </div>
@@ -514,6 +558,7 @@ export default function Doc() {
                         receiverSign={data.receiverSign}
                         checkerName={data.preparedBy}
                         receiverName={data.receivedBy}
+                        driverName={data.driver}
                       />
                     }
                     fileName={`${data.noSurat}.pdf`}
@@ -567,7 +612,7 @@ export default function Doc() {
                   src={data.vendorSign}
                   alt="Received by"
                 />
-                <p>Vendor</p>
+                <p>{data.driver}</p>
               </>
             )}
           </Col>
