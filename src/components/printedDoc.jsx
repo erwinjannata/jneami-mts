@@ -109,6 +109,8 @@ const Print = ({
   checkerName,
   receiverName,
   driverName,
+  status,
+  noPolisi,
 }) => {
   let totalPage = Math.ceil(data.length / 20);
 
@@ -128,6 +130,14 @@ const Print = ({
                 <Text style={styles.dataRowB}>: {noSurat}</Text>
                 <Text style={styles.dataRowA}>No. Ref Vendor</Text>
                 <Text style={styles.dataRowB}>: {noRef}</Text>
+              </View>
+            </View>
+            <View style={[styles.row, styles.noBorder]}>
+              <View style={[styles.rowB, styles.noBorder]}>
+                <Text style={styles.dataRowA}>Status</Text>
+                <Text style={styles.dataRowB}>: {status}</Text>
+                <Text style={styles.dataRowA}>No. Polisi</Text>
+                <Text style={styles.dataRowB}>: {noPolisi}</Text>
               </View>
             </View>
             <View style={[styles.row, styles.noBorder]}>
@@ -238,6 +248,8 @@ Print.propTypes = {
   checkerName: PropTypes.string,
   receiverName: PropTypes.string,
   driverName: PropTypes.string,
+  status: PropTypes.string,
+  noPolisi: PropTypes.string,
 };
 
 export default Print;

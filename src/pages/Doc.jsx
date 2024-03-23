@@ -559,6 +559,8 @@ export default function Doc() {
                         checkerName={data.preparedBy}
                         receiverName={data.receivedBy}
                         driverName={data.driver}
+                        status={data.status}
+                        noPolisi={data.noPolisi}
                       />
                     }
                     fileName={`${data.noSurat}.pdf`}

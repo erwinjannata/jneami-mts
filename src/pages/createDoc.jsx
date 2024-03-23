@@ -134,12 +134,12 @@ export default function Create() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (state.manifestNo == "") {
-      alert("Manifest Number kosong");
+    if (state.manifestNo == "" || state.manifestNo == "AMI/MT/00") {
+      alert("Manifest Number invalid");
     } else if (state.pcs <= 0) {
-      alert("Data Pcs(koli) tidak valid");
+      alert("Data Pcs(koli) invalid");
     } else if (state.kg <= 0) {
-      alert("Data Berat(kg) tidak valid");
+      alert("Data Berat(kg) invalid");
     } else {
       const isExist = bagList.some((element) => {
         if (element.manifestNo === state.manifestNo) {
