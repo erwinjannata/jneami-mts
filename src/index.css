@@ -8,6 +8,16 @@ a{
   text-decoration: none !important; 
 }
 
+.screen{
+  display: flex;
+  height: 100%;
+  min-height: 400px;
+}
+
+.container{
+  padding: 20px 30px 20px 30px !important;
+}
+
 .navbar-text{
   padding: 8px;
 }
@@ -41,7 +51,7 @@ td{
   white-space: nowrap;
 }
 
-@media only screen and (max-width: 768px) {
+@media only screen and (max-width: 1024px) {
   *{
     font-size: small;
   }
@@ -52,5 +62,15 @@ td{
 
   #submitBtn{
     display: block;
+  }
+
+  .container{
+    padding: 10px !important;
+  }
+
+  .screen{
+    display: block;
+    height: 100%;
+    min-height: 400px;
   }
 }

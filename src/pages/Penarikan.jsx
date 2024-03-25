@@ -117,9 +117,11 @@ export default function Penarikan() {
   };
 
   return (
-    <>
+    <div className="screen">
       <Menu />
-      <Container className="mt-4">
+      <Container>
+        <h2>Penarikan Data</h2>
+        <hr />
         <Row>
           <Col>
             <label htmlFor="startDate" className="mx-2">
@@ -241,6 +243,6 @@ export default function Penarikan() {
           </div>
         ) : null}
       </Container>
-    </>
+    </div>
   );
 }

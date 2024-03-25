@@ -34,7 +34,7 @@ export default function DamageReport() {
   };
 
   return (
-    <>
+    <div className="screen">
       <Menu />
       <Container className="mt-4">
         <Row>
@@ -81,6 +81,6 @@ export default function DamageReport() {
           </div>
         </Row>
       </Container>
-    </>
+    </div>
   );
 }

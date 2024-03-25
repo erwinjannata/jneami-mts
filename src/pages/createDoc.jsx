@@ -11,7 +11,7 @@ import {
   Spinner,
 } from "react-bootstrap";
 import { passiveSupport } from "passive-events-support/src/utils";
-import Menu from "../components/menu";
+import NavMenu from "../components/menu";
 import SignatureModal from "../components/signatureModal";
 import firebase from "../config/firebase";
 import {
@@ -237,8 +237,13 @@ export default function Create() {
                   checkerSign: url,
                   receiverSign: "",
                   vendorSign: "",
+                  isArrived: false,
                   isReceived: false,
                   status: "Menunggu Vendor",
+                  arrivalDate: "",
+                  arrivalTime: "",
+                  departureDate: "",
+                  departureTime: "",
                 }).then(() => {
                   setLoading(false);
                   alert("Approved");
@@ -286,9 +291,11 @@ export default function Create() {
 
   // Render aplikasi
   return (
-    <>
-      <Menu />
-      <Container className="mt-4">
+    <div className="screen">
+      <NavMenu />
+      <Container>
+        <h2>Manifest Transit Sub Agen</h2>
+        <hr />
         <Row className="mb-4">
           <Col>
             <strong>Nomor Surat : </strong> {state.noSurat}
@@ -431,6 +438,6 @@ export default function Create() {
           onSubmit={approve}
         />
       </Container>
-    </>
+    </div>
   );
 }

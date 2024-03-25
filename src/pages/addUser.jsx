@@ -87,9 +87,11 @@ export default function AddUser() {
   }, [auth.level, navigate]);
 
   return (
-    <>
+    <div className="screen">
       <Menu />
-      <Container className="mt-4">
+      <Container>
+        <h2>Add User</h2>
+        <hr />
         <Form>
           <FloatingLabel controlId="floatingName" label="Nama" className="mb-3">
             <Form.Control
@@ -164,6 +166,6 @@ export default function AddUser() {
           Add User
         </Button>
       </Container>
-    </>
+    </div>
   );
 }

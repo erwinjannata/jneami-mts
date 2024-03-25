@@ -17,9 +17,8 @@ import moment from "moment";
 import "moment/dist/locale/id";
 import { useNavigate } from "react-router-dom";
 import { UseAuth } from "../config/authContext";
-import { FaTruckLoading } from "react-icons/fa";
-import { FaTruckPlane } from "react-icons/fa6";
-import { FaBoxes } from "react-icons/fa";
+import { FaTruckLoading, FaBoxes } from "react-icons/fa";
+import { FaTruckPlane, FaPlaneCircleCheck } from "react-icons/fa6";
 
 export default function Home() {
   const auth = UseAuth();
@@ -36,46 +35,59 @@ export default function Home() {
     showed: "origin",
     limit: "10",
   });
+  const [total, setTotal] = useState(0);
 
   let cardsCategories = [
     {
       id: "0",
+      key: "secondary",
+      bg: "secondary",
+      textColor: "white",
+      title: "Received",
+      text: dataList.reduce(
+        (counter, obj) => (obj.status == "Received" ? (counter += 1) : counter),
+        0
+      ),
+      icon: <FaTruckLoading size={50} />,
+    },
+    {
+      id: "1",
       key: "primary",
       bg: "primary",
       textColor: "white",
       title: "Sampai Tujuan",
-      text: showList.reduce(
+      text: dataList.reduce(
         (counter, obj) =>
           obj.status == "Sampai Tujuan" ? (counter += 1) : counter,
         0
       ),
-      icon: <FaTruckLoading size={55} />,
+      icon: <FaPlaneCircleCheck size={50} />,
     },
     {
-      id: "0",
+      id: "2",
       key: "warning",
       bg: "warning",
       textColor: "dark",
       title: "Dalam Perjalanan",
-      text: showList.reduce(
+      text: dataList.reduce(
         (counter, obj) =>
           obj.status == "Dalam Perjalanan" ? (counter += 1) : counter,
         0
       ),
-      icon: <FaTruckPlane size={55} />,
+      icon: <FaTruckPlane size={50} />,
     },
     {
-      id: "0",
+      id: "3",
       key: "danger",
       bg: "danger",
       textColor: "white",
       title: "Menunggu Vendor",
-      text: showList.reduce(
+      text: dataList.reduce(
         (counter, obj) =>
           obj.status == "Menunggu Vendor" ? (counter += 1) : counter,
         0
       ),
-      icon: <FaBoxes size={55} />,
+      icon: <FaBoxes size={50} />,
     },
   ];
 
@@ -109,10 +121,10 @@ export default function Home() {
             noSurat: childSnapshot.val().noSurat,
             origin: childSnapshot.val().origin,
             destination: childSnapshot.val().destination,
-            approvedDate: childSnapshot.val().approvedDate,
-            approvedTime: childSnapshot.val().approvedTime,
-            receivedDate: childSnapshot.val().receivedDate,
-            receivedTime: childSnapshot.val().receivedTime,
+            departureDate: childSnapshot.val().departureDate,
+            departureTime: childSnapshot.val().departureTime,
+            arrivalDate: childSnapshot.val().arrivalDate,
+            arrivalTime: childSnapshot.val().arrivalTime,
             status: childSnapshot.val().status,
             sumPcs: childSnapshot.val().sumPcs,
             sumWeight: childSnapshot.val().sumWeight,
@@ -134,7 +146,7 @@ export default function Home() {
                 snapshot.val().status == "Dalam Perjalanan"
               ) {
                 const notif = new Notification(`Manifest Transit Sub Agen`, {
-                  tag: "notification",
+                  tag: "departureNotification",
                   renotify: true,
                   body: `${
                     snapshot.val().noSurat
@@ -142,10 +154,11 @@ export default function Home() {
                 });
               } else if (
                 auth.origin == snapshot.val().origin &&
-                snapshot.val().status == "Sampai Tujuan"
+                snapshot.val().isArrived == true &&
+                snapshot.val().isReceived == false
               ) {
                 const notif = new Notification(`Manifest Transit Sub Agen`, {
-                  tag: "notification",
+                  tag: "arrivalNotification",
                   renotify: true,
                   body: `${snapshot.val().noSurat} telah sampai tujuan di JNE ${
                     snapshot.val().destination
@@ -178,9 +191,11 @@ export default function Home() {
   }, [auth.origin, auth.name, state.showed, state.limit, Notification]);
 
   return (
-    <>
+    <div className="screen">
       <Menu />
       <Container>
+        <h2>Dashboard</h2>
+        <hr />
         <Row className="mt-4">
           {cardsCategories.map((category, idx) => (
             <Col key={idx} xs={windowSize.width >= 768 ? "" : "0"}>
@@ -193,10 +208,10 @@ export default function Home() {
               >
                 <Card.Body>
                   <Row>
-                    <Col xs={3} lg={2}>
+                    <Col xs={3} sm={3} lg={3}>
                       {category.icon}
                     </Col>
-                    <Col xs={9} lg={10}>
+                    <Col xs={9} sm={9} lg={9}>
                       <Card.Title className="small">
                         {category.title}
                       </Card.Title>
@@ -253,8 +268,8 @@ export default function Home() {
                 <th>Origin</th>
                 <th>Destination</th>
                 <th>Status</th>
-                <th>Approved at</th>
-                <th>Received at</th>
+                <th>Waktu Keberangkatan</th>
+                <th>Waktu Kedatangan</th>
               </tr>
             </thead>
             <tbody
@@ -285,15 +300,17 @@ export default function Home() {
                         <td>{item.destination}</td>
                         <td>{item.status}</td>
                         <td>
-                          {`${moment(item.approvedDate)
-                            .locale("id")
-                            .format("LL")} ${item.approvedTime}`}
+                          {item.departureDate == ""
+                            ? "-"
+                            : `${moment(item.departureDate)
+                                .locale("id")
+                                .format("LL")} ${item.departureTime}`}
                         </td>
                         <td>
-                          {item.receivedDate != ""
-                            ? `${moment(item.receivedDate)
+                          {item.arrivalDate != ""
+                            ? `${moment(item.arrivalDate)
                                 .locale("id")
-                                .format("LL")} ${item.receivedTime}`
+                                .format("LL")} ${item.arrivalTime}`
                             : "-"}
                         </td>
                       </tr>
@@ -324,6 +341,6 @@ export default function Home() {
           </Col>
         </Row>
       </Container>
-    </>
+    </div>
   );
 }
