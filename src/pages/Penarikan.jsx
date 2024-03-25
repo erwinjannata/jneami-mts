@@ -35,6 +35,7 @@ export default function Penarikan() {
             key: childSnapshot.key,
             noSurat: childSnapshot.val().noSurat,
             noRef: childSnapshot.val().noRef,
+            noPolisi: childSnapshot.val().noPolisi,
             origin: childSnapshot.val().origin,
             destination: childSnapshot.val().destination,
             preparedBy: childSnapshot.val().preparedBy,
@@ -42,10 +43,15 @@ export default function Penarikan() {
             approvedTime: childSnapshot.val().approvedTime,
             receivedDate: childSnapshot.val().receivedDate,
             receivedTime: childSnapshot.val().receivedTime,
+            arrivalDate: childSnapshot.val().arrivalDate,
+            arrivalTime: childSnapshot.val().arrivalTime,
+            departureDate: childSnapshot.val().departureDate,
+            departureTime: childSnapshot.val().departureTime,
             receivedBy: childSnapshot.val().receivedBy,
             status: childSnapshot.val().status,
             sumPcs: childSnapshot.val().sumPcs,
             sumWeight: childSnapshot.val().sumWeight,
+            driver: childSnapshot.val().driver,
             bagList: childSnapshot.val().bagList,
           });
         });
@@ -76,6 +82,12 @@ export default function Penarikan() {
           receivedDate:
             row.receivedDate == "" ? "" : new Date(row.receivedDate),
           receivedTime: row.receivedTime,
+          departureDate: new Date(row.departureDate),
+          departureTime: row.departureTime,
+          arrivalDate: new Date(row.arrivalDate),
+          arrivalTime: row.arrivalTime,
+          noPolisi: row.noPolisi,
+          driver: row.driver,
         });
       }
     });
@@ -102,6 +114,12 @@ export default function Penarikan() {
           "Received by",
           "Received Date",
           "Received Time",
+          "Tanggal Keberangkatan",
+          "Waktu Keberangkatan",
+          "Tanggal Kedatangan",
+          "Waktu Kedatangan",
+          "No. Polisi Kendaraan",
+          "Driver",
         ],
       ],
       { origin: "A1" }
