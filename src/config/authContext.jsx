@@ -66,9 +66,25 @@ export const AuthProvider = ({ children }) => {
     });
   };
 
+  const resetPassword = (email) => {
+    try {
+      firebase
+        .auth()
+        .sendPasswordResetEmail(email)
+        .then(() => {
+          alert("Email terkirim, cek inbox Gmail");
+        })
+        .catch((error) => {
+          alert(error.message);
+        });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <AuthContext.Provider
-      value={{ user, uid, name, origin, level, login, logout }}
+      value={{ user, uid, name, origin, level, login, logout, resetPassword }}
     >
       {children}
     </AuthContext.Provider>

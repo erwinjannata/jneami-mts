@@ -11,10 +11,12 @@ import {
 } from "react-bootstrap";
 import logo from "./../images/jne_brand.png";
 import "./../styles/login.css";
+import { MdArrowBackIos, MdArrowForwardIos } from "react-icons/md";
 
 export default function Login() {
   const [creds, setCreds] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
+  const [isReset, setIsReset] = useState(false);
 
   const auth = UseAuth();
   let navigate = useNavigate();
@@ -42,6 +44,13 @@ export default function Login() {
     }
   };
 
+  const handleReset = async (e) => {
+    e.preventDefault();
+    await auth.resetPassword(creds.email);
+    setCreds({ ...creds, email: "" });
+    setIsReset(false);
+  };
+
   useEffect(() => {
     if (auth.user != null) {
       navigate(redirectPath);
@@ -55,11 +64,7 @@ export default function Login() {
           <img src={logo} alt="JNE" />
         </Link>
         <Form className="mt-5 d-grid gap-2">
-          <FloatingLabel
-            controlId="floatingInput"
-            label="Email"
-            className="mb-3"
-          >
+          <FloatingLabel controlId="floatingInput" label="Email">
             <Form.Control
               type="email"
               placeholder="Email"
@@ -71,20 +76,22 @@ export default function Login() {
               required
             />
           </FloatingLabel>
-          <FloatingLabel controlId="floatingPassword" label="Password">
-            <Form.Control
-              type="password"
-              placeholder="Password"
-              name="password"
-              value={creds.password}
-              onChange={handleChange}
-              autoComplete="on"
-              disabled={loading ? true : false}
-              required
-            />
-          </FloatingLabel>
+          {isReset ? null : (
+            <FloatingLabel controlId="floatingPassword" label="Password">
+              <Form.Control
+                type="password"
+                placeholder="Password"
+                name="password"
+                value={creds.password}
+                onChange={handleChange}
+                autoComplete="on"
+                disabled={loading ? true : false}
+                required
+              />
+            </FloatingLabel>
+          )}
           {loading ? (
-            <Button variant="primary" disabled className="mt-4">
+            <Button variant="primary" disabled className="mt-2">
               <Spinner
                 as="span"
                 animation="grow"
@@ -97,14 +104,26 @@ export default function Login() {
           ) : (
             <Button
               variant="primary"
-              className="mt-4"
+              className="mt-2"
               type="submit"
-              onClick={handleLogin}
+              onClick={isReset ? handleReset : handleLogin}
             >
-              Login
+              {isReset ? "Kirim email konfirmasi" : "Login"}
             </Button>
           )}
         </Form>
+        <p
+          className="mt-4"
+          onClick={() => setIsReset(!isReset)}
+          style={{
+            cursor: "pointer",
+            textAlign: "justify",
+            color: "#0d6efd",
+          }}
+        >
+          {isReset ? <MdArrowBackIos /> : <MdArrowForwardIos />}{" "}
+          {isReset ? "Kembali" : `Reset Password`}
+        </p>
       </Container>
     </div>
   );
