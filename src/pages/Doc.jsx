@@ -155,28 +155,39 @@ export default function Doc() {
   };
 
   const handleArrival = () => {
-    if (confirm("Konfirmasi kedatangan bag") == true) {
-      setLoading(true);
-      try {
-        let updates = {};
-        updates["status"] = "Sampai Tujuan";
-        updates["isArrived"] = true;
-        updates["arrivalDate"] = tanggal;
-        updates["arrivalTime"] = jam;
-        db.update(updates)
-          .then(() => {
-            setLoading(false);
-            alert("Bag diterima, konfirmasi kelengkapan bag");
-            setChangedItem(0);
-            window.scrollTo(0, 0);
-          })
-          .catch((error) => {
-            console.log(error.error);
-            alert("Program mengalami masalah, silahkan hubungi tim IT");
-          });
-      } catch (error) {
-        console.log(error);
+    if (
+      data.status == "Dalam Perjalanan" &&
+      data.noPolisi != "" &&
+      data.noRef != "" &&
+      data.departureDate != ""
+    ) {
+      if (confirm("Konfirmasi kedatangan bag") == true) {
+        setLoading(true);
+        try {
+          let updates = {};
+          updates["status"] = "Sampai Tujuan";
+          updates["isArrived"] = true;
+          updates["arrivalDate"] = tanggal;
+          updates["arrivalTime"] = jam;
+          db.update(updates)
+            .then(() => {
+              setLoading(false);
+              alert("Bag diterima, konfirmasi kelengkapan bag");
+              setChangedItem(0);
+              window.scrollTo(0, 0);
+            })
+            .catch((error) => {
+              console.log(error.error);
+              alert("Program mengalami masalah, silahkan hubungi tim IT");
+            });
+        } catch (error) {
+          console.log(error);
+        }
       }
+    } else {
+      alert(
+        "Kiriman belum berangkat dari Origin / belum di konfirmasi oleh vendor"
+      );
     }
   };
 
@@ -347,9 +358,9 @@ export default function Doc() {
             <Col>
               <strong>Received at </strong> <br />{" "}
               {data.isReceived
-                ? `${moment(data.receivedDate)
-                    .locale("id")
-                    .format("LL")} pukul ${data.receivedTime}`
+                ? `${moment(data.receivedDate).locale("id").format("LL")} ${
+                    data.receivedTime
+                  }`
                 : "-"}
             </Col>
           </Row>
@@ -561,7 +572,9 @@ export default function Doc() {
                 (auth.origin == data.destination &&
                   data.status != "Sampai Tujuan") ||
                 (auth.origin == data.origin &&
-                  data.status != "Menunggu Vendor") ? null : (
+                  data.status != "Menunggu Vendor") ||
+                (auth.origin != data.origin &&
+                  auth.origin != data.destination) ? null : (
                   <Button variant="primary" onClick={handleApproval}>
                     Approve
                   </Button>

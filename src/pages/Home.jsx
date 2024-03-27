@@ -32,16 +32,15 @@ export default function Home() {
   const [showList, setShowList] = useState([]);
   const [state, setState] = useState({
     number: "",
-    showed: "origin",
+    showed: "all",
     limit: "10",
   });
-  const [total, setTotal] = useState(0);
 
   let cardsCategories = [
     {
       id: "0",
-      key: "secondary",
-      bg: "secondary",
+      key: "dark",
+      bg: "dark",
       textColor: "white",
       title: "Received",
       text: dataList.reduce(
@@ -109,13 +108,18 @@ export default function Home() {
   };
 
   useEffect(() => {
-    db.orderByChild(`${state.showed}/`)
-      .equalTo(auth.origin)
-      .limitToLast(parseInt(state.limit))
-      .on("value", (snapshot) => {
-        let data = [];
+    let filters =
+      state.showed == "all"
+        ? db
+        : db.orderByChild(`${state.showed}`).equalTo(auth.origin);
+    filters.limitToLast(parseInt(state.limit)).on("value", (snapshot) => {
+      let data = [];
 
-        snapshot.forEach((childSnapshot) => {
+      snapshot.forEach((childSnapshot) => {
+        if (
+          childSnapshot.val().origin == auth.origin ||
+          childSnapshot.val().destination == auth.origin
+        ) {
           data.push({
             key: childSnapshot.key,
             noSurat: childSnapshot.val().noSurat,
@@ -129,10 +133,11 @@ export default function Home() {
             sumPcs: childSnapshot.val().sumPcs,
             sumWeight: childSnapshot.val().sumWeight,
           });
-        });
-        setDataList(data);
-        setShowList(data);
+        }
       });
+      setDataList(data);
+      setShowList(data);
+    });
     db.on("child_changed", (snapshot) => {
       if (!("Notification" in window)) {
         console.log("Push Notification Not Supported");
@@ -251,6 +256,7 @@ export default function Home() {
                 onChange={handleChange}
                 value={state.showed}
               >
+                <option value="all">All</option>
                 <option value="origin">Origin {auth.origin}</option>
                 <option value="destination">Destination {auth.origin}</option>
               </Form.Select>

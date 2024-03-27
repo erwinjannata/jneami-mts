@@ -122,7 +122,7 @@ export default function Login() {
           }}
         >
           {isReset ? <MdArrowBackIos /> : <MdArrowForwardIos />}{" "}
-          {isReset ? "Kembali" : `Reset Password`}
+          {isReset ? "Kembali" : `Ganti Password`}
         </p>
       </Container>
     </div>

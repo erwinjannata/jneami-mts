@@ -82,9 +82,10 @@ export default function Penarikan() {
           receivedDate:
             row.receivedDate == "" ? "" : new Date(row.receivedDate),
           receivedTime: row.receivedTime,
-          departureDate: new Date(row.departureDate),
+          departureDate:
+            row.departureDate == "" ? "" : new Date(row.departureDate),
           departureTime: row.departureTime,
-          arrivalDate: new Date(row.arrivalDate),
+          arrivalDate: row.arrivalDate == "" ? "" : new Date(row.arrivalDate),
           arrivalTime: row.arrivalTime,
           noPolisi: row.noPolisi,
           driver: row.driver,
