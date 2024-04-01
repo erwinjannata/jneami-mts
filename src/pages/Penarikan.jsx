@@ -45,6 +45,7 @@ export default function Penarikan() {
             receivedTime: childSnapshot.val().receivedTime,
             arrivalDate: childSnapshot.val().arrivalDate,
             arrivalTime: childSnapshot.val().arrivalTime,
+            durasi: childSnapshot.val().durasi,
             departureDate: childSnapshot.val().departureDate,
             departureTime: childSnapshot.val().departureTime,
             receivedBy: childSnapshot.val().receivedBy,
@@ -87,6 +88,7 @@ export default function Penarikan() {
           departureTime: row.departureTime,
           arrivalDate: row.arrivalDate == "" ? "" : new Date(row.arrivalDate),
           arrivalTime: row.arrivalTime,
+          durasi: row.durasi,
           noPolisi: row.noPolisi,
           driver: row.driver,
         });
@@ -119,6 +121,7 @@ export default function Penarikan() {
           "Waktu Keberangkatan",
           "Tanggal Kedatangan",
           "Waktu Kedatangan",
+          "Durasi Perjalanan",
           "No. Polisi Kendaraan",
           "Driver",
         ],

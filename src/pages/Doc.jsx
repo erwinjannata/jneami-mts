@@ -58,6 +58,24 @@ export default function Doc() {
   const [zerofilled, setZeroFilled] = useState("");
   let navigate = useNavigate();
 
+  let berangkat = `${moment(data.departureDate).locale("id").format("L")} ${
+    data.departureTime
+  }:00`;
+  let tiba = `${moment(tanggal).locale("id").format("L")} ${jam}:00`;
+
+  let dura = moment(tiba, "DD/MM/YYYY HH:mm:ss").diff(
+    moment(berangkat, "DD/MM/YYYY HH:mm:ss")
+  );
+
+  let durasi = moment.duration(dura);
+
+  var finalDurasi = [
+    Math.floor(durasi.asHours()) <= 0
+      ? ""
+      : `${Math.floor(durasi.asHours())} jam`,
+    Math.floor(durasi.minutes() <= 0) ? "" : `${durasi.minutes()} menit`,
+  ].join(Math.floor(durasi.asHours()) <= 0 ? "" : " ");
+
   const handleChange = (e) => {
     const value = e.target.value;
     setData({ ...data, [e.target.name]: value });
@@ -169,6 +187,7 @@ export default function Doc() {
           updates["isArrived"] = true;
           updates["arrivalDate"] = tanggal;
           updates["arrivalTime"] = jam;
+          updates["durasi"] = finalDurasi;
           db.update(updates)
             .then(() => {
               setLoading(false);

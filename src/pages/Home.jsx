@@ -132,6 +132,7 @@ export default function Home() {
             status: childSnapshot.val().status,
             sumPcs: childSnapshot.val().sumPcs,
             sumWeight: childSnapshot.val().sumWeight,
+            durasi: childSnapshot.val().durasi,
           });
         }
       });
@@ -276,6 +277,7 @@ export default function Home() {
                 <th>Status</th>
                 <th>Waktu Keberangkatan</th>
                 <th>Waktu Kedatangan</th>
+                <th>Durasi Perjalanan</th>
               </tr>
             </thead>
             <tbody
@@ -319,6 +321,7 @@ export default function Home() {
                                 .format("LL")} ${item.arrivalTime}`
                             : "-"}
                         </td>
+                        <td>{item.durasi == undefined ? "-" : item.durasi}</td>
                       </tr>
                     ))
                     .reverse()}
