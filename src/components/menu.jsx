@@ -45,7 +45,7 @@ export default function NavMenu() {
       id: "3",
       nama: "Penarikan Data",
       link: "/get",
-      req: 1,
+      req: 2,
       icon: <HiDocumentArrowDown size={20} />,
     },
     {

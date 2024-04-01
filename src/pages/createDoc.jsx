@@ -244,12 +244,18 @@ export default function Create() {
                   arrivalTime: "",
                   departureDate: "",
                   departureTime: "",
-                }).then(() => {
-                  setLoading(false);
-                  alert("Approved");
-                  navigate("/");
-                  window.scrollTo(0, 0);
-                });
+                })
+                  .then(() => {
+                    setLoading(false);
+                    alert("Approved");
+                    navigate("/");
+                    window.scrollTo(0, 0);
+                  })
+                  .catch((error) => {
+                    alert(error.message);
+                    navigate("/");
+                    window.scrollTo(0, 0);
+                  });
               });
             }
           );
