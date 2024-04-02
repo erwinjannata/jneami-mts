@@ -54,7 +54,7 @@ export default function Create() {
 
   const [bagList, setBagList] = useState([]);
   const [state, setState] = useState({
-    manifestNo: "AMI/MT/00",
+    manifestNo: "AMI/MTS/00",
     pcs: "",
     kg: "",
     remark: "",
@@ -134,7 +134,7 @@ export default function Create() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (state.manifestNo == "" || state.manifestNo == "AMI/MT/00") {
+    if (state.manifestNo == "" || state.manifestNo == "AMI/MTS/00") {
       alert("Manifest Number invalid");
     } else if (state.pcs <= 0) {
       alert("Data Pcs(koli) invalid");
@@ -165,7 +165,7 @@ export default function Create() {
           ...state,
           sumPcs: state.sumPcs + parseInt(state.pcs),
           sumWeight: state.sumWeight + parseFloat(state.kg),
-          manifestNo: "AMI/MT/00",
+          manifestNo: "AMI/MTS/00",
           pcs: "",
           kg: "",
           remark: "",
