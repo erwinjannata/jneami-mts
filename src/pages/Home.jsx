@@ -257,7 +257,7 @@ export default function Home() {
                 onChange={handleChange}
                 value={state.showed}
               >
-                <option value="all">All</option>
+                <option value="all">All Data</option>
                 <option value="origin">Origin {auth.origin}</option>
                 <option value="destination">Destination {auth.origin}</option>
               </Form.Select>

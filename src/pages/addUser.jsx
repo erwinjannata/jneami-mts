@@ -14,6 +14,7 @@ export default function AddUser() {
     password: "",
     name: "",
     origin: "MATARAM",
+    level: 1,
   });
 
   const handleChange = (e) => {
@@ -24,7 +25,7 @@ export default function AddUser() {
     });
   };
 
-  const handleSubmit = (e, name, email, password, origin) => {
+  const handleSubmit = (e, name, email, password, origin, level) => {
     if (name != "") {
       e.preventDefault();
       let db = firebase.database();
@@ -37,7 +38,7 @@ export default function AddUser() {
             .set({
               name: name,
               origin: origin,
-              permissionLevel: 1,
+              permissionLevel: level,
             })
             .then(() => {
               alert("Registered");
@@ -48,6 +49,7 @@ export default function AddUser() {
             email: "",
             password: "",
             origin: "MATARAM",
+            level: 1,
           });
         })
         .catch((error) => {
@@ -150,6 +152,24 @@ export default function AddUser() {
               ))}
             </Form.Select>
           </FloatingLabel>
+          <FloatingLabel
+            controlId="floatingLevel"
+            label="Permission Level"
+            className="mb-3"
+          >
+            <Form.Select
+              aria-label="Permission Level"
+              onChange={handleChange}
+              name="level"
+              value={creds.level}
+            >
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+            </Form.Select>
+          </FloatingLabel>
         </Form>
         <Button
           variant="primary"
@@ -159,7 +179,8 @@ export default function AddUser() {
               creds.name,
               creds.email,
               creds.password,
-              creds.origin
+              creds.origin,
+              creds.level
             )
           }
         >

@@ -14,6 +14,7 @@ import { HiDocumentPlus } from "react-icons/hi2";
 import { HiDocumentArrowDown } from "react-icons/hi2";
 import { CgDanger } from "react-icons/cg";
 import { RiUserAddFill } from "react-icons/ri";
+import { FaPlane } from "react-icons/fa6";
 import { LuLogOut } from "react-icons/lu";
 import { MenuItem, Sidebar, Menu } from "react-pro-sidebar";
 import { useEffect, useState } from "react";
@@ -50,6 +51,13 @@ export default function NavMenu() {
     },
     {
       id: "4",
+      nama: "Vendor",
+      link: "/vendor",
+      req: 5,
+      icon: <FaPlane size={20} />,
+    },
+    {
+      id: "5",
       nama: "New User",
       link: "/add",
       req: 5,
@@ -151,7 +159,8 @@ export default function NavMenu() {
                 ) : null
               )}
               <hr className="mx-3" style={{ color: "#e9f5f9" }} />
-              <MenuItem disabled>{`${auth.name} | ${auth.origin}`}</MenuItem>
+              <MenuItem disabled>{`${auth.name}`}</MenuItem>
+              <MenuItem disabled>{`${auth.origin}`}</MenuItem>
               <Button
                 variant="outline-danger"
                 title="Log Out"
@@ -216,7 +225,7 @@ export default function NavMenu() {
                 <Nav>
                   <hr />
                   <Form className="d-flex">
-                    <Navbar.Text>{`${auth.name} | JNE ${auth.origin}`}</Navbar.Text>
+                    <Navbar.Text>{`${auth.name} | ${auth.origin}`}</Navbar.Text>
                     <Button
                       variant="outline-danger"
                       title="Log Out"

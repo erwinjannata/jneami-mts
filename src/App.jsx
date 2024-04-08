@@ -8,6 +8,7 @@ import { PrivateRoute } from "./config/prirvateRoute";
 import Penarikan from "./pages/Penarikan";
 import AddUser from "./pages/addUser";
 import DamageReport from "./pages/damageReport";
+import Vendor from "./pages/Vendor";
 
 function App() {
   return (
@@ -60,6 +61,14 @@ function App() {
           element={
             <PrivateRoute>
               <AddUser />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/vendor"
+          element={
+            <PrivateRoute>
+              <Vendor />
             </PrivateRoute>
           }
         />

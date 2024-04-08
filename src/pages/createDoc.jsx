@@ -132,7 +132,7 @@ export default function Create() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e, index) => {
     e.preventDefault();
     if (state.manifestNo == "" || state.manifestNo == "AMI/MTS/00") {
       alert("Manifest Number invalid");
@@ -153,7 +153,6 @@ export default function Create() {
         setBagList([
           ...bagList,
           {
-            no: bagList.length + 1,
             manifestNo: state.manifestNo,
             pcs: state.pcs,
             kg: state.kg,
@@ -175,16 +174,18 @@ export default function Create() {
   };
 
   const handleRemove = (manifestNo, pcs, kg) => {
-    setBagList((current) =>
-      current.filter((number) => {
-        return number.manifestNo !== manifestNo;
-      })
-    );
-    setState({
-      ...state,
-      sumPcs: state.sumPcs - pcs,
-      sumWeight: state.sumWeight - kg,
-    });
+    if (confirm("Hapus bag?") == true) {
+      setBagList((current) =>
+        current.filter((number) => {
+          return number.manifestNo !== manifestNo;
+        })
+      );
+      setState({
+        ...state,
+        sumPcs: state.sumPcs - pcs,
+        sumWeight: state.sumWeight - kg,
+      });
+    }
   };
 
   const handleApproval = () => {
@@ -397,9 +398,9 @@ export default function Create() {
             </thead>
             <tbody>
               {bagList
-                .map((item) => (
+                .map((item, idx) => (
                   <tr key={item.manifestNo}>
-                    <td>{item.no}</td>
+                    <td>{idx + 1}</td>
                     <td>{item.manifestNo}</td>
                     <td>{item.pcs}</td>
                     <td>{item.kg}</td>

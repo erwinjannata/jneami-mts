@@ -271,7 +271,6 @@ export default function Doc() {
 
   const handleDownload = () => {
     const processedData = bagList.map((row) => ({
-      no: row.no,
       manifestNo: row.manifestNo,
       pcs: row.pcs,
       koli: row.kg,
@@ -287,7 +286,6 @@ export default function Doc() {
       worksheet,
       [
         [
-          "No",
           "Manifest Number",
           "Pcs / Koli",
           "Kg / Weight",
