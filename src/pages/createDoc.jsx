@@ -109,14 +109,14 @@ export default function Create() {
     { id: "2", name: "BOLO" },
     { id: "3", name: "DOMPU" },
     { id: "4", name: "EMPANG" },
-    { id: "5", name: "JEREWEH" },
-    { id: "6", name: "GERUNG" },
-    { id: "7", name: "SELONG" },
-    { id: "8", name: "MANGGELEWA" },
-    { id: "9", name: "MATARAM" },
-    { id: "10", name: "PADOLO" },
-    { id: "11", name: "PLAMPANG" },
-    { id: "12", name: "PRAYA" },
+    { id: "5", name: "GERUNG" },
+    { id: "6", name: "JEREWEH" },
+    { id: "7", name: "MANGGELEWA" },
+    { id: "8", name: "MATARAM" },
+    { id: "9", name: "PADOLO" },
+    { id: "10", name: "PLAMPANG" },
+    { id: "11", name: "PRAYA" },
+    { id: "12", name: "SELONG" },
     { id: "13", name: "SUMBAWA" },
     { id: "14", name: "TALIWANG" },
     { id: "15", name: "TANJUNG" },
@@ -270,6 +270,9 @@ export default function Create() {
   // Dijalankan ketika aplikasi dibuka
   useEffect(() => {
     setState({ ...state, origin: auth.origin, preparedBy: auth.name });
+    if (auth.origin == "VENDOR") {
+      navigate("/vendor");
+    }
     db.on("value", (snapshot) => {
       let zerofilled = ("00000" + (snapshot.numChildren() + 1)).slice(-5);
       setState({
@@ -286,13 +289,26 @@ export default function Create() {
       });
     };
 
+    const unloadCallback = (e) => {
+      e.preventDefault();
+      e.returnValue = "";
+      return "";
+    };
+
     window.addEventListener("resize", handleResize);
+    if (bagList.length >= 0) {
+      window.addEventListener("beforeunload", unloadCallback);
+    }
+
     const intervalId = setInterval(() => {
       setD(new Date());
     }, 1000);
     return () => {
       clearInterval(intervalId);
       window.removeEventListener("resize", handleResize);
+      if (bagList.length >= 0) {
+        window.removeEventListener("beforeunload", unloadCallback);
+      }
     };
   }, [auth.origin, auth.name, auth.level, state.origin, state.preparedBy]);
 

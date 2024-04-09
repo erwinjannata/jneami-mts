@@ -65,6 +65,16 @@ export default function NavMenu() {
     },
   ];
 
+  let vendorMenu = [
+    {
+      id: "0",
+      nama: "Dashboard",
+      link: "/vendor",
+      req: 1,
+      icon: <MdHomeFilled size={20} />,
+    },
+  ];
+
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
@@ -133,7 +143,7 @@ export default function NavMenu() {
                 },
               }}
             >
-              <Link to="/">
+              <Link to={auth.origin == "VENDOR" ? "/vendor" : "/"}>
                 <img
                   src={logoWhite}
                   alt="JNE"
@@ -146,17 +156,36 @@ export default function NavMenu() {
                 ></img>
               </Link>
               <hr className="mx-3" style={{ color: "#e9f5f9" }} />
-              {menu.map((m) =>
-                auth.level >= m.req ? (
-                  <MenuItem
-                    key={m.id}
-                    component={<Link to={m.link} />}
-                    icon={m.icon}
-                    style={{ color: "#e9f5f9" }}
-                  >
-                    {m.nama}
-                  </MenuItem>
-                ) : null
+              {auth.origin == "VENDOR" ? (
+                <>
+                  {vendorMenu.map((m) =>
+                    auth.level >= m.req ? (
+                      <MenuItem
+                        key={m.id}
+                        component={<Link to={m.link} />}
+                        icon={m.icon}
+                        style={{ color: "#e9f5f9" }}
+                      >
+                        {m.nama}
+                      </MenuItem>
+                    ) : null
+                  )}
+                </>
+              ) : (
+                <>
+                  {menu.map((m) =>
+                    auth.level >= m.req ? (
+                      <MenuItem
+                        key={m.id}
+                        component={<Link to={m.link} />}
+                        icon={m.icon}
+                        style={{ color: "#e9f5f9" }}
+                      >
+                        {m.nama}
+                      </MenuItem>
+                    ) : null
+                  )}
+                </>
               )}
               <hr className="mx-3" style={{ color: "#e9f5f9" }} />
               <MenuItem disabled>{`${auth.name}`}</MenuItem>
@@ -176,7 +205,7 @@ export default function NavMenu() {
         <Navbar key="xl" expand="xl" className="bg-body-tertiary" sticky="top">
           <Container fluid>
             <Navbar.Brand>
-              <Link to="/">
+              <Link to={auth.origin == "VENDOR" ? "/vendor" : "/"}>
                 <img
                   src={logo}
                   alt="JNE"
@@ -204,24 +233,45 @@ export default function NavMenu() {
                 </Offcanvas.Title>
               </Offcanvas.Header>
               <Offcanvas.Body>
-                <Nav className="me-auto my-2 my-lg-0">
-                  {menu.map((m) => (
-                    <Nav key={m.id}>
-                      {auth.level >= m.req ? (
-                        <Navbar.Text>
-                          <NavLink
-                            to={m.link}
-                            style={({ isActive }) => ({
-                              color: isActive ? "lightblue" : "white",
-                            })}
-                          >
-                            {m.nama}
-                          </NavLink>
-                        </Navbar.Text>
-                      ) : null}
-                    </Nav>
-                  ))}
-                </Nav>
+                {auth.origin == "VENDOR" ? (
+                  <Nav className="me-auto my-2 my-lg-0">
+                    {vendorMenu.map((m) => (
+                      <Nav key={m.id}>
+                        {auth.level >= m.req ? (
+                          <Navbar.Text>
+                            <NavLink
+                              to={m.link}
+                              style={({ isActive }) => ({
+                                color: isActive ? "lightblue" : "white",
+                              })}
+                            >
+                              {m.nama}
+                            </NavLink>
+                          </Navbar.Text>
+                        ) : null}
+                      </Nav>
+                    ))}
+                  </Nav>
+                ) : (
+                  <Nav className="me-auto my-2 my-lg-0">
+                    {menu.map((m) => (
+                      <Nav key={m.id}>
+                        {auth.level >= m.req ? (
+                          <Navbar.Text>
+                            <NavLink
+                              to={m.link}
+                              style={({ isActive }) => ({
+                                color: isActive ? "lightblue" : "white",
+                              })}
+                            >
+                              {m.nama}
+                            </NavLink>
+                          </Navbar.Text>
+                        ) : null}
+                      </Nav>
+                    ))}
+                  </Nav>
+                )}
                 <Nav>
                   <hr />
                   <Form className="d-flex">

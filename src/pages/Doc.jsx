@@ -216,6 +216,7 @@ export default function Doc() {
     } else {
       if (confirm("Konfirmasi approve?") == true) {
         setLoading(true);
+        let check = bagList.some((item) => "Unreceived" === item.statusBag);
         const storage = getStorage();
         const metaData = {
           contentType: "image/png",
@@ -233,7 +234,7 @@ export default function Doc() {
                 let updates = {};
                 updates["bagList"] = bagList;
                 if (auth.origin == data.destination) {
-                  updates["status"] = "Received";
+                  updates["status"] = check ? "Received*" : "Received";
                   updates["isReceived"] = true;
                   updates["receivedBy"] = auth.name;
                   updates["receivedDate"] = tanggal;
@@ -318,13 +319,24 @@ export default function Doc() {
       });
     };
 
+    const unloadCallback = (e) => {
+      e.preventDefault();
+      e.returnValue = "";
+      return "";
+    };
+
     window.addEventListener("resize", handleResize);
+    if (changedItem != 0) {
+      window.addEventListener("beforeunload", unloadCallback);
+    }
+
     const intervalId = setInterval(() => {
       setD(new Date());
     }, 1000);
     return () => {
       clearInterval(intervalId);
       window.removeEventListener("resize", handleResize);
+      window.removeEventListener("beforeunload", unloadCallback);
     };
   }, [auth.name, auth.origin]);
 

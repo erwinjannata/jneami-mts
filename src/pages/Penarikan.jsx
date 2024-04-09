@@ -7,13 +7,15 @@ import moment from "moment";
 import "moment/locale/en-ca";
 import "moment/locale/id";
 import firebase from "./../config/firebase";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { utils, writeFile } from "xlsx";
 import { MdFileDownload } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import { UseAuth } from "../config/authContext";
 
 export default function Penarikan() {
   const d = new Date();
+  let auth = UseAuth();
   let navigate = useNavigate();
   const [state, setState] = useState({
     start: moment(d).locale("en-ca").format("L"),
@@ -137,6 +139,12 @@ export default function Penarikan() {
         .format("LL")}.xlsx`
     );
   };
+
+  useEffect(() => {
+    if (auth.origin == "VENDOR") {
+      navigate("/vendor");
+    }
+  }, [auth.origin]);
 
   return (
     <div className="screen">

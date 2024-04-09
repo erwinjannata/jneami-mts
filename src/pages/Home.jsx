@@ -44,7 +44,10 @@ export default function Home() {
       textColor: "white",
       title: "Received",
       text: dataList.reduce(
-        (counter, obj) => (obj.status == "Received" ? (counter += 1) : counter),
+        (counter, obj) =>
+          obj.status == "Received" || obj.status == "Received*"
+            ? (counter += 1)
+            : counter,
         0
       ),
       icon: <FaTruckLoading size={50} />,
@@ -103,11 +106,13 @@ export default function Home() {
         : dataList.filter((datalist) =>
             datalist.noSurat.toUpperCase().includes(state.number)
           );
-    console.log(searchResult);
     setShowList(searchResult);
   };
 
   useEffect(() => {
+    if (auth.origin == "VENDOR") {
+      navigate("/vendor");
+    }
     let filters =
       state.showed == "all"
         ? db
