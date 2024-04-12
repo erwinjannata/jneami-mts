@@ -39,7 +39,10 @@ export default function Vendor() {
       textColor: "white",
       title: "Received",
       text: data.reduce(
-        (counter, obj) => (obj.status == "Received" ? (counter += 1) : counter),
+        (counter, obj) =>
+          obj.status == "Received" || obj.status == "Received*"
+            ? (counter += 1)
+            : counter,
         0
       ),
       icon: <FaTruckLoading size={50} />,
@@ -101,6 +104,16 @@ export default function Vendor() {
     setShowList(searchResult);
   };
 
+  const handleFilter = (status) => {
+    if (state.filtered == true && state.currentFilter == status) {
+      setShowList(data);
+      setState({ ...state, filtered: false, currentFilter: "" });
+    } else {
+      setShowList(data.filter((datalist) => datalist.status.includes(status)));
+      setState({ ...state, filtered: true, currentFilter: status });
+    }
+  };
+
   useEffect(() => {
     db.limitToLast(parseInt(state.limit)).on("value", (snapshot) => {
       let list = [];
@@ -144,11 +157,22 @@ export default function Vendor() {
           {cardsCategories.map((category, idx) => (
             <Col key={idx} xs={windowSize.width >= 768 ? "" : "0"}>
               <Card
-                bg={category.bg}
+                bg={
+                  (state.filtered == true) &
+                  (state.currentFilter == category.title)
+                    ? "white"
+                    : category.bg
+                }
                 key={category.key}
-                text={category.textColor}
-                className="mb-2"
+                text={
+                  (state.filtered == true) &
+                  (state.currentFilter == category.title)
+                    ? category.bg
+                    : category.textColor
+                }
                 border={category.bg}
+                className="mb-2 user-select-none"
+                onClick={() => handleFilter(category.title)}
               >
                 <Card.Body>
                   <Row>
@@ -200,18 +224,30 @@ export default function Vendor() {
             </tr>
           </thead>
           <tbody>
-            {showList
-              .map((item, idx) => (
-                <tr key={idx} onClick={() => navigate(`/doc/${item.key}`)}>
-                  <td>{item.noSurat}</td>
-                  <td>{item.origin}</td>
-                  <td>{item.destination}</td>
-                  <td>{item.sumPcs}</td>
-                  <td>{item.sumWeight}</td>
-                  <td>{item.status}</td>
+            {showList.length == 0 ? (
+              <>
+                <tr>
+                  <td colSpan={6} align="center">
+                    <i>Data tidak ditemukan</i>
+                  </td>
                 </tr>
-              ))
-              .reverse()}
+              </>
+            ) : (
+              <>
+                {showList
+                  .map((item, idx) => (
+                    <tr key={idx} onClick={() => navigate(`/doc/${item.key}`)}>
+                      <td>{item.noSurat}</td>
+                      <td>{item.origin}</td>
+                      <td>{item.destination}</td>
+                      <td>{item.sumPcs}</td>
+                      <td>{item.sumWeight}</td>
+                      <td>{item.status}</td>
+                    </tr>
+                  ))
+                  .reverse()}
+              </>
+            )}
           </tbody>
         </Table>
         <hr />

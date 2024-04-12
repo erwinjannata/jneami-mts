@@ -34,6 +34,8 @@ export default function Home() {
     number: "",
     showed: "all",
     limit: "10",
+    filtered: false,
+    currentFilter: "",
   });
 
   let cardsCategories = [
@@ -107,6 +109,18 @@ export default function Home() {
             datalist.noSurat.toUpperCase().includes(state.number)
           );
     setShowList(searchResult);
+  };
+
+  const handleFilter = (status) => {
+    if (state.filtered == true && state.currentFilter == status) {
+      setShowList(dataList);
+      setState({ ...state, filtered: false, currentFilter: "" });
+    } else {
+      setShowList(
+        dataList.filter((datalist) => datalist.status.includes(status))
+      );
+      setState({ ...state, filtered: true, currentFilter: status });
+    }
   };
 
   useEffect(() => {
@@ -211,11 +225,22 @@ export default function Home() {
           {cardsCategories.map((category, idx) => (
             <Col key={idx} xs={windowSize.width >= 768 ? "" : "0"}>
               <Card
-                bg={category.bg}
+                bg={
+                  (state.filtered == true) &
+                  (state.currentFilter == category.title)
+                    ? "white"
+                    : category.bg
+                }
                 key={category.key}
-                text={category.textColor}
-                className="mb-2"
+                text={
+                  (state.filtered == true) &
+                  (state.currentFilter == category.title)
+                    ? category.bg
+                    : category.textColor
+                }
                 border={category.bg}
+                className="mb-2 user-select-none"
+                onClick={() => handleFilter(category.title)}
               >
                 <Card.Body>
                   <Row>
@@ -294,7 +319,7 @@ export default function Home() {
               {showList.length == 0 ? (
                 <>
                   <tr>
-                    <td colSpan={6} align="center">
+                    <td colSpan={7} align="center">
                       <i>Data tidak ditemukan</i>
                     </td>
                   </tr>
