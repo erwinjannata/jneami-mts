@@ -245,6 +245,7 @@ export default function Create() {
                   arrivalTime: "",
                   departureDate: "",
                   departureTime: "",
+                  count: 0,
                 })
                   .then(() => {
                     setLoading(false);
@@ -274,7 +275,13 @@ export default function Create() {
       navigate("/vendor");
     }
     db.on("value", (snapshot) => {
-      let zerofilled = ("00000" + (snapshot.numChildren() + 1)).slice(-5);
+      let count = 0;
+      snapshot.forEach((childSnapshot) => {
+        if (!childSnapshot.val().noSurat.includes("_")) {
+          count++;
+        }
+      });
+      let zerofilled = ("00000" + (count + 1)).slice(-5);
       setState({
         ...state,
         noSurat: `AMI/MTM/${year}/${zerofilled}`,

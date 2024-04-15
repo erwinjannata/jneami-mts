@@ -47,9 +47,11 @@ export default function Doc() {
     height: window.innerHeight,
   });
 
-  let db = firebase.database().ref(`/manifestTransit/${key}`);
+  let db = firebase.database().ref(`/manifestTransit`);
   const [data, setData] = useState([]);
   const [bagList, setBagList] = useState([]);
+  const [overloadedItem, setOverloadedItem] = useState([]);
+  const [selected, setSelected] = useState([]);
   const [changedItem, setChangedItem] = useState(0);
   const [show, setShow] = useState(false);
   const [showSignature, setShowSignature] = useState(false);
@@ -137,7 +139,30 @@ export default function Doc() {
     }
   };
 
-  const handleCancel = (idx) => {
+  const handleOverload = (idx) => {
+    setBagList(
+      bagList.map((lists, index) => {
+        if (index == idx) {
+          return {
+            ...lists,
+            statusBag: "Overload",
+          };
+        } else {
+          return lists;
+        }
+      })
+    );
+    setData({
+      ...data,
+      sumPcs: data.sumPcs - bagList[idx].pcs,
+      sumWeight: data.sumWeight - bagList[idx].kg,
+    });
+    setOverloadedItem((item) => [...item, bagList[idx]]);
+    setSelected((overloaded) => [...overloaded, idx]);
+    setChangedItem(changedItem + 1);
+  };
+
+  const handleCancel = (idx, manifestNo) => {
     setBagList(
       bagList.map((lists, index) => {
         if (index == idx) {
@@ -150,6 +175,19 @@ export default function Doc() {
         }
       })
     );
+    if (selected.indexOf(idx) > -1) {
+      selected.splice(selected.indexOf(idx), 1);
+      setOverloadedItem((current) =>
+        current.filter((number) => {
+          return number.manifestNo !== manifestNo;
+        })
+      );
+      setData({
+        ...data,
+        sumPcs: data.sumPcs + parseFloat(bagList[idx].pcs),
+        sumWeight: data.sumWeight + parseFloat(bagList[idx].kg),
+      });
+    }
     setChangedItem(changedItem - 1);
   };
 
@@ -188,7 +226,8 @@ export default function Doc() {
           updates["arrivalDate"] = tanggal;
           updates["arrivalTime"] = jam;
           updates["durasi"] = finalDurasi;
-          db.update(updates)
+          db.child(key)
+            .update(updates)
             .then(() => {
               setLoading(false);
               alert("Bag diterima, konfirmasi kelengkapan bag");
@@ -216,7 +255,9 @@ export default function Doc() {
     } else {
       if (confirm("Konfirmasi approve?") == true) {
         setLoading(true);
-        let check = bagList.some((item) => "Unreceived" === item.statusBag);
+        let checkUnreceive = bagList.some(
+          (item) => "Unreceived" === item.statusBag
+        );
         const storage = getStorage();
         const metaData = {
           contentType: "image/png",
@@ -228,13 +269,52 @@ export default function Doc() {
           }Sign.png`
         );
         try {
+          if (overloadedItem.length != 0) {
+            setOverloadedItem(
+              overloadedItem.map((item) => {
+                return { ...item, statusBag: "Menunggu Vendor" };
+              })
+            );
+            db.push({
+              noSurat: `${data.noSurat}_${parseInt(data.count) + 1}`,
+              noRef: "",
+              origin: data.origin,
+              destination: data.destination,
+              bagList: overloadedItem,
+              approvedDate: tanggal,
+              approvedTime: jam,
+              preparedBy: data.preparedBy,
+              receivedDate: "",
+              receivedTime: "",
+              receivedBy: "",
+              sumPcs: overloadedItem.reduce((prev, current) => {
+                return prev + parseFloat(current.pcs);
+              }, 0),
+              sumWeight: overloadedItem.reduce((prev, current) => {
+                return prev + parseFloat(current.kg);
+              }, 0),
+              checkerSign: data.checkerSign,
+              receiverSign: "",
+              vendorSign: "",
+              isArrived: false,
+              isReceived: false,
+              status: "Menunggu Vendor",
+              arrivalDate: "",
+              arrivalTime: "",
+              departureDate: "",
+              departureTime: "",
+              count: parseInt(data.count) + 1,
+            });
+          }
           uploadString(storageRef, img64, "data_url", metaData).then(
             (snapshot) => {
               getDownloadURL(snapshot.ref).then(async (url) => {
                 let updates = {};
-                updates["bagList"] = bagList;
+                updates["bagList"] = bagList.filter(
+                  (bags) => !bags.statusBag.includes("Overload")
+                );
                 if (auth.origin == data.destination) {
-                  updates["status"] = check ? "Received*" : "Received";
+                  updates["status"] = checkUnreceive ? "Received*" : "Received";
                   updates["isReceived"] = true;
                   updates["receivedBy"] = auth.name;
                   updates["receivedDate"] = tanggal;
@@ -243,13 +323,16 @@ export default function Doc() {
                 } else if (auth.origin == data.origin) {
                   updates["departureDate"] = tanggal;
                   updates["departureTime"] = jam;
+                  updates["sumPcs"] = data.sumPcs;
+                  updates["sumWeight"] = data.sumWeight;
                   updates["status"] = "Dalam Perjalanan";
                   updates["noRef"] = data.noRef;
                   (updates["noPolisi"] = data.noPolisi),
                     (updates["driver"] = data.driver);
                   updates["vendorSign"] = url;
                 }
-                db.update(updates)
+                db.child(key)
+                  .update(updates)
                   .then(() => {
                     setLoading(false);
                     alert("Received");
@@ -302,7 +385,7 @@ export default function Doc() {
   };
 
   useEffect(() => {
-    db.on("value", (snapshot) => {
+    db.child(key).on("value", (snapshot) => {
       if (snapshot.exists()) {
         setData(snapshot.val());
         setBagList(snapshot.val().bagList);
@@ -522,7 +605,9 @@ export default function Doc() {
                             <Button
                               variant="danger"
                               className="m-2"
-                              onClick={() => handleCancel(index)}
+                              onClick={() =>
+                                handleCancel(index, item.manifestNo)
+                              }
                               disabled={loading ? true : false}
                             >
                               Batalkan
@@ -562,6 +647,16 @@ export default function Doc() {
                               >
                                 Remark
                               </Button>
+                              {auth.origin == data.origin ? (
+                                <Button
+                                  variant="outline-danger"
+                                  className="m-2"
+                                  onClick={() => handleOverload(index)}
+                                  disabled={loading ? true : false}
+                                >
+                                  Overload
+                                </Button>
+                              ) : null}
                             </div>
                           )}
                         </>
@@ -647,8 +742,8 @@ export default function Doc() {
                         }
                         origin={data.origin}
                         destination={data.destination}
-                        sumKoli={data.sumPcs}
-                        sumWeight={data.sumWeight}
+                        sumKoli={parseFloat(data.sumPcs)}
+                        sumWeight={parseFloat(data.sumWeight)}
                         checkerSign={data.checkerSign}
                         vendorSign={data.vendorSign}
                         receiverSign={data.receiverSign}
