@@ -60,6 +60,18 @@ export default function Doc() {
   const [zerofilled, setZeroFilled] = useState("");
   let navigate = useNavigate();
 
+  let totalKoli = bagList.reduce((prev, next) => {
+    return prev + parseInt(next.koli);
+  }, 0);
+
+  let totalPcs = bagList.reduce((prev, next) => {
+    return prev + parseInt(next.pcs);
+  }, 0);
+
+  let totalWeight = bagList.reduce((prev, next) => {
+    return prev + parseInt(next.kg);
+  }, 0);
+
   let berangkat = `${moment(data.departureDate).locale("id").format("L")} ${
     data.departureTime
   }:00`;
@@ -152,11 +164,6 @@ export default function Doc() {
         }
       })
     );
-    setData({
-      ...data,
-      sumPcs: data.sumPcs - bagList[idx].pcs,
-      sumWeight: data.sumWeight - bagList[idx].kg,
-    });
     setOverloadedItem((item) => [...item, bagList[idx]]);
     setSelected((overloaded) => [...overloaded, idx]);
     setChangedItem(changedItem + 1);
@@ -182,11 +189,6 @@ export default function Doc() {
           return number.manifestNo !== manifestNo;
         })
       );
-      setData({
-        ...data,
-        sumPcs: data.sumPcs + parseFloat(bagList[idx].pcs),
-        sumWeight: data.sumWeight + parseFloat(bagList[idx].kg),
-      });
     }
     setChangedItem(changedItem - 1);
   };
@@ -205,6 +207,8 @@ export default function Doc() {
       alert("Belum ada bag yang diterima");
     } else if (changedItem != bagList.length) {
       alert("Periksa lagi barang yang belum diterima");
+    } else if (overloadedItem.length == bagList.length) {
+      alert("Semua bag tidak diangkut vendor, konfirmasi kembali data bag");
     } else {
       setShowSignature(true);
     }
@@ -269,7 +273,10 @@ export default function Doc() {
           }Sign.png`
         );
         try {
-          if (overloadedItem.length != 0) {
+          if (
+            overloadedItem.length != 0 &&
+            overloadedItem.length != bagList.length
+          ) {
             setOverloadedItem(
               overloadedItem.map((item) => {
                 return { ...item, statusBag: "Menunggu Vendor" };
@@ -287,12 +294,6 @@ export default function Doc() {
               receivedDate: "",
               receivedTime: "",
               receivedBy: "",
-              sumPcs: overloadedItem.reduce((prev, current) => {
-                return prev + parseFloat(current.pcs);
-              }, 0),
-              sumWeight: overloadedItem.reduce((prev, current) => {
-                return prev + parseFloat(current.kg);
-              }, 0),
               checkerSign: data.checkerSign,
               receiverSign: "",
               vendorSign: "",
@@ -323,8 +324,6 @@ export default function Doc() {
                 } else if (auth.origin == data.origin) {
                   updates["departureDate"] = tanggal;
                   updates["departureTime"] = jam;
-                  updates["sumPcs"] = data.sumPcs;
-                  updates["sumWeight"] = data.sumWeight;
                   updates["status"] = "Dalam Perjalanan";
                   updates["noRef"] = data.noRef;
                   (updates["noPolisi"] = data.noPolisi),
@@ -356,8 +355,9 @@ export default function Doc() {
   const handleDownload = () => {
     const processedData = bagList.map((row) => ({
       manifestNo: row.manifestNo,
+      koli: row.koli,
       pcs: row.pcs,
-      koli: row.kg,
+      kg: row.kg,
       remark: row.remark,
       status: row.statusBag,
       noSurat: data.noSurat,
@@ -371,7 +371,8 @@ export default function Doc() {
       [
         [
           "Manifest Number",
-          "Pcs / Koli",
+          "Koli",
+          "Pcs",
           "Kg / Weight",
           "Remark",
           "Status Bag",
@@ -571,6 +572,7 @@ export default function Doc() {
               <tr>
                 <th>No.</th>
                 <th>Manifest No.</th>
+                <th>Koli</th>
                 <th>Pcs</th>
                 <th>Kg</th>
                 <th>Status Bag</th>
@@ -578,93 +580,96 @@ export default function Doc() {
               </tr>
             </thead>
             <tbody>
-              {bagList.map((item, index) => (
-                <tr key={index}>
-                  <td>{index + 1}</td>
-                  <td>{item.manifestNo}</td>
-                  <td>{item.pcs}</td>
-                  <td>{item.kg}</td>
-                  <td>{item.statusBag}</td>
-                  <td>{item.remark}</td>
-                  {(auth.origin == data.origin &&
-                    data.status == "Menunggu Vendor") ||
-                  (auth.origin == data.destination &&
-                    data.status == "Sampai Tujuan") ? (
-                    <td>
+              {bagList == undefined
+                ? null
+                : bagList.map((item, index) => (
+                    <tr key={index}>
+                      <td>{index + 1}</td>
+                      <td>{item.manifestNo}</td>
+                      <td>{item.koli == undefined ? "-" : item.koli}</td>
+                      <td>{item.pcs}</td>
+                      <td>{item.kg}</td>
+                      <td>{item.statusBag}</td>
+                      <td>{item.remark}</td>
                       {(auth.origin == data.origin &&
                         data.status == "Menunggu Vendor") ||
                       (auth.origin == data.destination &&
-                        data.isArrived == true &&
-                        data.isReceived == false) ? (
-                        <>
-                          {(auth.origin == data.destination &&
-                            item.statusBag == "Received") ||
-                          item.statusBag == "Unreceived" ||
-                          (auth.origin == data.origin &&
-                            item.statusBag != "Menunggu Vendor") ? (
-                            <Button
-                              variant="danger"
-                              className="m-2"
-                              onClick={() =>
-                                handleCancel(index, item.manifestNo)
-                              }
-                              disabled={loading ? true : false}
-                            >
-                              Batalkan
-                            </Button>
-                          ) : (
-                            <div className="d-flex">
-                              <Button
-                                variant="primary"
-                                className="m-2"
-                                onClick={() => handleReceive(index)}
-                                disabled={loading ? true : false}
-                                style={
-                                  item.statusBag == "Missing"
-                                    ? { display: "none" }
-                                    : { display: "block" }
-                                }
-                              >
-                                Received
-                              </Button>
-                              <Button
-                                variant="secondary"
-                                className="m-2"
-                                onClick={() => handleUnreceive(index)}
-                                disabled={loading ? true : false}
-                              >
-                                Unreceived
-                              </Button>
-                              <Button
-                                variant="warning"
-                                className="m-2"
-                                onClick={() => {
-                                  setShow(true),
-                                    setCurrentFocus(index),
-                                    setRemark("");
-                                }}
-                                disabled={loading ? true : false}
-                              >
-                                Remark
-                              </Button>
-                              {auth.origin == data.origin ? (
+                        data.status == "Sampai Tujuan") ? (
+                        <td>
+                          {(auth.origin == data.origin &&
+                            data.status == "Menunggu Vendor") ||
+                          (auth.origin == data.destination &&
+                            data.isArrived == true &&
+                            data.isReceived == false) ? (
+                            <>
+                              {(auth.origin == data.destination &&
+                                item.statusBag == "Received") ||
+                              item.statusBag == "Unreceived" ||
+                              (auth.origin == data.origin &&
+                                item.statusBag != "Menunggu Vendor") ? (
                                 <Button
-                                  variant="outline-danger"
+                                  variant="danger"
                                   className="m-2"
-                                  onClick={() => handleOverload(index)}
+                                  onClick={() =>
+                                    handleCancel(index, item.manifestNo)
+                                  }
                                   disabled={loading ? true : false}
                                 >
-                                  Overload
+                                  Batalkan
                                 </Button>
-                              ) : null}
-                            </div>
-                          )}
-                        </>
+                              ) : (
+                                <div className="d-flex">
+                                  <Button
+                                    variant="primary"
+                                    className="m-2"
+                                    onClick={() => handleReceive(index)}
+                                    disabled={loading ? true : false}
+                                    style={
+                                      item.statusBag == "Missing"
+                                        ? { display: "none" }
+                                        : { display: "block" }
+                                    }
+                                  >
+                                    Received
+                                  </Button>
+                                  <Button
+                                    variant="secondary"
+                                    className="m-2"
+                                    onClick={() => handleUnreceive(index)}
+                                    disabled={loading ? true : false}
+                                  >
+                                    Unreceived
+                                  </Button>
+                                  <Button
+                                    variant="warning"
+                                    className="m-2"
+                                    onClick={() => {
+                                      setShow(true),
+                                        setCurrentFocus(index),
+                                        setRemark("");
+                                    }}
+                                    disabled={loading ? true : false}
+                                  >
+                                    Remark
+                                  </Button>
+                                  {auth.origin == data.origin ? (
+                                    <Button
+                                      variant="outline-danger"
+                                      className="m-2"
+                                      onClick={() => handleOverload(index)}
+                                      disabled={loading ? true : false}
+                                    >
+                                      Overload
+                                    </Button>
+                                  ) : null}
+                                </div>
+                              )}
+                            </>
+                          ) : null}
+                        </td>
                       ) : null}
-                    </td>
-                  ) : null}
-                </tr>
-              ))}
+                    </tr>
+                  ))}
             </tbody>
           </Table>
         </div>
@@ -672,9 +677,17 @@ export default function Doc() {
           <Col>
             <p>
               <strong>
+                Total Koli <br />
+              </strong>{" "}
+              {`${totalKoli} koli`}
+            </p>
+          </Col>
+          <Col>
+            <p>
+              <strong>
                 Total Pcs <br />
               </strong>{" "}
-              {`${data.sumPcs} koli`}
+              {`${totalPcs} pcs`}
             </p>
           </Col>
           <Col>
@@ -682,7 +695,7 @@ export default function Doc() {
               <strong>
                 Total Weight <br />
               </strong>{" "}
-              {`${data.sumWeight} kg`}
+              {`${totalWeight} kg`}
             </p>
           </Col>
         </Row>
@@ -742,8 +755,6 @@ export default function Doc() {
                         }
                         origin={data.origin}
                         destination={data.destination}
-                        sumKoli={parseFloat(data.sumPcs)}
-                        sumWeight={parseFloat(data.sumWeight)}
                         checkerSign={data.checkerSign}
                         vendorSign={data.vendorSign}
                         receiverSign={data.receiverSign}

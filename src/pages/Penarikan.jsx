@@ -52,8 +52,6 @@ export default function Penarikan() {
             departureTime: childSnapshot.val().departureTime,
             receivedBy: childSnapshot.val().receivedBy,
             status: childSnapshot.val().status,
-            sumPcs: childSnapshot.val().sumPcs,
-            sumWeight: childSnapshot.val().sumWeight,
             driver: childSnapshot.val().driver,
             bagList: childSnapshot.val().bagList,
           });
@@ -69,6 +67,10 @@ export default function Penarikan() {
       for (let i = 0; i < dataList[idx].bagList.length; i++) {
         processedData.push({
           noManifest: dataList[idx].bagList[i].manifestNo,
+          koli:
+            dataList[idx].bagList[i].koli == undefined
+              ? "-"
+              : parseFloat(dataList[idx].bagList[i].koli),
           pcs: parseFloat(dataList[idx].bagList[i].pcs),
           kg: parseFloat(dataList[idx].bagList[i].kg),
           remark: dataList[idx].bagList[i].remark,
@@ -104,6 +106,7 @@ export default function Penarikan() {
       [
         [
           "No. Manifest",
+          "Koli",
           "Pcs",
           "Kg",
           "Remark",

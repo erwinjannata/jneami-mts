@@ -92,6 +92,9 @@ const styles = StyleSheet.create({
   smaller: {
     fontSize: "10",
   },
+  hidden: {
+    visibility: "hidden",
+  },
 });
 const Print = ({
   data,
@@ -101,8 +104,6 @@ const Print = ({
   date2,
   origin,
   destination,
-  sumKoli,
-  sumWeight,
   checkerSign,
   vendorSign,
   receiverSign,
@@ -113,6 +114,16 @@ const Print = ({
   noPolisi,
 }) => {
   let totalPage = Math.ceil(data.length / 20);
+
+  let totalKoli = data.reduce((prev, next) => {
+    return prev + parseInt(next.koli);
+  }, 0);
+  let totalPcs = data.reduce((prev, next) => {
+    return prev + parseInt(next.pcs);
+  }, 0);
+  let totalWeight = data.reduce((prev, next) => {
+    return prev + parseInt(next.kg);
+  }, 0);
 
   return (
     <Document>
@@ -158,10 +169,18 @@ const Print = ({
             </View>
             <View style={[styles.row, styles.noBorder]}>
               <View style={[styles.rowB, styles.noBorder]}>
-                <Text style={styles.dataRowA}>Total Koli</Text>
-                <Text style={styles.dataRowB}>: {`${sumKoli} pcs`}</Text>
+                <Text style={styles.dataRowA}>Total Pcs</Text>
+                <Text style={styles.dataRowB}>: {`${totalPcs} pcs`}</Text>
                 <Text style={styles.dataRowA}>Total Weight</Text>
-                <Text style={styles.dataRowB}>: {`${sumWeight} kg`}</Text>
+                <Text style={styles.dataRowB}>: {`${totalWeight} kg`}</Text>
+              </View>
+            </View>
+            <View style={[styles.row, styles.noBorder]}>
+              <View style={[styles.rowB, styles.noBorder]}>
+                <Text style={styles.dataRowA}>Total Koli</Text>
+                <Text style={styles.dataRowB}>: {`${totalKoli} koli`}</Text>
+                <Text style={[styles.dataRowA, styles.hidden]}></Text>
+                <Text style={[styles.dataRowB, styles.hidden]}></Text>
               </View>
             </View>
           </View>
@@ -240,8 +259,6 @@ Print.propTypes = {
   date2: PropTypes.string,
   origin: PropTypes.string,
   destination: PropTypes.string,
-  sumKoli: PropTypes.number,
-  sumWeight: PropTypes.number,
   checkerSign: PropTypes.string,
   vendorSign: PropTypes.string,
   receiverSign: PropTypes.string,

@@ -33,7 +33,7 @@ export default function Home() {
   const [state, setState] = useState({
     number: "",
     showed: "all",
-    limit: "10",
+    limit: "50",
     filtered: false,
     currentFilter: "",
   });
@@ -131,7 +131,7 @@ export default function Home() {
       state.showed == "all"
         ? db
         : db.orderByChild(`${state.showed}`).equalTo(auth.origin);
-    filters.limitToLast(parseInt(state.limit)).on("value", (snapshot) => {
+    filters.on("value", (snapshot) => {
       let data = [];
 
       snapshot.forEach((childSnapshot) => {
@@ -149,14 +149,12 @@ export default function Home() {
             arrivalDate: childSnapshot.val().arrivalDate,
             arrivalTime: childSnapshot.val().arrivalTime,
             status: childSnapshot.val().status,
-            sumPcs: childSnapshot.val().sumPcs,
-            sumWeight: childSnapshot.val().sumWeight,
             durasi: childSnapshot.val().durasi,
           });
         }
       });
-      setDataList(data);
-      setShowList(data);
+      setDataList(data.slice(0, state.limit));
+      setShowList(data.slice(0, state.limit));
     });
     db.on("child_changed", (snapshot) => {
       if (!("Notification" in window)) {
@@ -370,11 +368,11 @@ export default function Home() {
                 onChange={handleChange}
                 value={state.limit}
               >
-                <option value="10">10</option>
-                <option value="25">25</option>
                 <option value="50">50</option>
                 <option value="100">100</option>
+                <option value="250">250</option>
                 <option value="500">500</option>
+                <option value="1000">1000</option>
               </Form.Select>
             </FloatingLabel>
           </Col>

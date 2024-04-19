@@ -55,18 +55,29 @@ export default function Create() {
   const [bagList, setBagList] = useState([]);
   const [state, setState] = useState({
     manifestNo: "AMI/MTS/00",
+    koli: "",
     pcs: "",
     kg: "",
     remark: "",
     noSurat: "",
     origin: auth.origin,
     destination: "MATARAM",
-    sumPcs: 0,
-    sumWeight: 0.0,
     noRef: "",
     preparedBy: auth.name,
     checkerSign: "",
   });
+
+  let totalKoli = bagList.reduce((prev, next) => {
+    return prev + parseInt(next.koli);
+  }, 0);
+
+  let totalPcs = bagList.reduce((prev, next) => {
+    return prev + parseInt(next.pcs);
+  }, 0);
+
+  let totalWeight = bagList.reduce((prev, next) => {
+    return prev + parseInt(next.kg);
+  }, 0);
 
   let formsList = [
     {
@@ -79,6 +90,14 @@ export default function Create() {
     },
     {
       idx: "1",
+      name: "koli",
+      text: "Koli",
+      type: "number",
+      xs: "auto",
+      value: state.koli,
+    },
+    {
+      idx: "2",
       name: "pcs",
       text: "Pcs",
       type: "number",
@@ -86,7 +105,7 @@ export default function Create() {
       value: state.pcs,
     },
     {
-      idx: "2",
+      idx: "3",
       name: "kg",
       text: "Kg",
       type: "number",
@@ -94,7 +113,7 @@ export default function Create() {
       value: state.kg,
     },
     {
-      idx: "3",
+      idx: "4",
       name: "remark",
       text: "Remark",
       type: "text",
@@ -109,18 +128,16 @@ export default function Create() {
     { id: "2", name: "BOLO" },
     { id: "3", name: "DOMPU" },
     { id: "4", name: "EMPANG" },
-    { id: "5", name: "GERUNG" },
-    { id: "6", name: "JEREWEH" },
-    { id: "7", name: "MANGGELEWA" },
-    { id: "8", name: "MATARAM" },
-    { id: "9", name: "PADOLO" },
-    { id: "10", name: "PLAMPANG" },
-    { id: "11", name: "PRAYA" },
-    { id: "12", name: "SELONG" },
-    { id: "13", name: "SUMBAWA" },
-    { id: "14", name: "TALIWANG" },
-    { id: "15", name: "TANJUNG" },
-    { id: "16", name: "UTAN" },
+    { id: "5", name: "MANGGELEWA" },
+    { id: "6", name: "MATARAM" },
+    { id: "7", name: "PADOLO" },
+    { id: "8", name: "PLAMPANG" },
+    { id: "9", name: "PRAYA" },
+    { id: "10", name: "SELONG" },
+    { id: "11", name: "SUMBAWA" },
+    { id: "12", name: "TALIWANG" },
+    { id: "13", name: "TANJUNG" },
+    { id: "14", name: "UTAN" },
   ];
 
   // Handler Untuk App
@@ -140,6 +157,8 @@ export default function Create() {
       alert("Data Pcs(koli) invalid");
     } else if (state.kg <= 0) {
       alert("Data Berat(kg) invalid");
+    } else if (state.koli <= 0) {
+      alert("Jumlah koli invalid");
     } else {
       const isExist = bagList.some((element) => {
         if (element.manifestNo === state.manifestNo) {
@@ -154,6 +173,7 @@ export default function Create() {
           ...bagList,
           {
             manifestNo: state.manifestNo,
+            koli: state.koli,
             pcs: state.pcs,
             kg: state.kg,
             remark: state.remark,
@@ -162,9 +182,8 @@ export default function Create() {
         ]);
         setState({
           ...state,
-          sumPcs: state.sumPcs + parseInt(state.pcs),
-          sumWeight: state.sumWeight + parseFloat(state.kg),
           manifestNo: "AMI/MTS/00",
+          koli: "",
           pcs: "",
           kg: "",
           remark: "",
@@ -180,11 +199,6 @@ export default function Create() {
           return number.manifestNo !== manifestNo;
         })
       );
-      setState({
-        ...state,
-        sumPcs: state.sumPcs - pcs,
-        sumWeight: state.sumWeight - kg,
-      });
     }
   };
 
@@ -233,8 +247,6 @@ export default function Create() {
                   receivedDate: "",
                   receivedTime: "",
                   receivedBy: "",
-                  sumPcs: state.sumPcs,
-                  sumWeight: state.sumWeight,
                   checkerSign: url,
                   receiverSign: "",
                   vendorSign: "",
@@ -319,6 +331,7 @@ export default function Create() {
     };
   }, [auth.origin, auth.name, auth.level, state.origin, state.preparedBy]);
 
+  console.log(bagList);
   // Render aplikasi
   return (
     <div className="screen">
@@ -413,6 +426,7 @@ export default function Create() {
               <tr>
                 <th>No.</th>
                 <th>Manifest No.</th>
+                <th>Koli</th>
                 <th>Pcs</th>
                 <th>Kg</th>
                 <th>Remark</th>
@@ -425,6 +439,7 @@ export default function Create() {
                   <tr key={item.manifestNo}>
                     <td>{idx + 1}</td>
                     <td>{item.manifestNo}</td>
+                    <td>{item.koli}</td>
                     <td>{item.pcs}</td>
                     <td>{item.kg}</td>
                     <td>{item.remark}</td>
@@ -448,8 +463,15 @@ export default function Create() {
         <hr />
         <Row>
           <Col>
-            <p>Total Pcs : {state.sumPcs}</p>
-            <p>Total Kg : {state.sumWeight}</p>
+            <p>
+              <strong>Total Koli</strong> : {totalKoli}
+            </p>
+            <p>
+              <strong>Total Pcs</strong> : {totalPcs}
+            </p>
+            <p>
+              <strong>Total Kg</strong> : {totalWeight}
+            </p>
           </Col>
           <Col>
             {loading ? (

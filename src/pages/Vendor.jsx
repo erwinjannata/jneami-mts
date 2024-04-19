@@ -123,8 +123,6 @@ export default function Vendor() {
           noSurat: childSnapshot.val().noSurat,
           origin: childSnapshot.val().origin,
           destination: childSnapshot.val().destination,
-          sumPcs: childSnapshot.val().sumPcs,
-          sumWeight: childSnapshot.val().sumWeight,
           status: childSnapshot.val().status,
         });
       });
@@ -218,8 +216,6 @@ export default function Vendor() {
               <th>No. Surat</th>
               <th>Origin</th>
               <th>Destination</th>
-              <th>Pcs (Koli)</th>
-              <th>Weight</th>
               <th>Status Manifest</th>
             </tr>
           </thead>
@@ -240,8 +236,6 @@ export default function Vendor() {
                       <td>{item.noSurat}</td>
                       <td>{item.origin}</td>
                       <td>{item.destination}</td>
-                      <td>{item.sumPcs}</td>
-                      <td>{item.sumWeight}</td>
                       <td>{item.status}</td>
                     </tr>
                   ))
