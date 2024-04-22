@@ -144,6 +144,7 @@ export default function Penarikan() {
   };
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     if (auth.origin == "VENDOR") {
       navigate("/vendor");
     }
@@ -235,6 +236,8 @@ export default function Penarikan() {
                   <th>Origin</th>
                   <th>Destination</th>
                   <th>Status</th>
+                  <th>Koli</th>
+                  <th>Weight</th>
                   <th>Approved at</th>
                   <th>Received at</th>
                 </tr>
@@ -260,6 +263,16 @@ export default function Penarikan() {
                           <td>{item.origin}</td>
                           <td>{item.destination}</td>
                           <td>{item.status}</td>
+                          <td>
+                            {item.bagList.reduce((prev, next) => {
+                              return prev + parseInt(next.koli);
+                            }, 0) + " koli"}
+                          </td>
+                          <td>
+                            {item.bagList.reduce((prev, next) => {
+                              return prev + parseInt(next.kg);
+                            }, 0) + " kg"}
+                          </td>
                           <td>{`${item.approvedDate} ${item.approvedTime}`}</td>
                           <td>
                             {item.receivedDate == ""

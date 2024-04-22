@@ -6,6 +6,7 @@ import {
   Container,
   FloatingLabel,
   Form,
+  Placeholder,
   Row,
   Table,
 } from "react-bootstrap";
@@ -37,6 +38,7 @@ export default function Home() {
     filtered: false,
     currentFilter: "",
   });
+  const [loading, setLoading] = useState(true);
 
   let cardsCategories = [
     {
@@ -97,7 +99,12 @@ export default function Home() {
 
   const handleChange = (e) => {
     const value = e.target.value;
-    setState({ ...state, [e.target.name]: value });
+    setState({
+      ...state,
+      [e.target.name]: value,
+      filtered: false,
+      currentFilter: "",
+    });
   };
 
   const handleSearch = (e) => {
@@ -135,10 +142,7 @@ export default function Home() {
       let data = [];
 
       snapshot.forEach((childSnapshot) => {
-        if (
-          childSnapshot.val().origin == auth.origin ||
-          childSnapshot.val().destination == auth.origin
-        ) {
+        if (auth.origin == "MATARAM") {
           data.push({
             key: childSnapshot.key,
             noSurat: childSnapshot.val().noSurat,
@@ -150,11 +154,34 @@ export default function Home() {
             arrivalTime: childSnapshot.val().arrivalTime,
             status: childSnapshot.val().status,
             durasi: childSnapshot.val().durasi,
+            noPolisi: childSnapshot.val().noPolisi,
+            bagList: childSnapshot.val().bagList,
           });
+        } else {
+          if (
+            childSnapshot.val().origin == auth.origin ||
+            childSnapshot.val().destination == auth.origin
+          ) {
+            data.push({
+              key: childSnapshot.key,
+              noSurat: childSnapshot.val().noSurat,
+              origin: childSnapshot.val().origin,
+              destination: childSnapshot.val().destination,
+              departureDate: childSnapshot.val().departureDate,
+              departureTime: childSnapshot.val().departureTime,
+              arrivalDate: childSnapshot.val().arrivalDate,
+              arrivalTime: childSnapshot.val().arrivalTime,
+              status: childSnapshot.val().status,
+              durasi: childSnapshot.val().durasi,
+              noPolisi: childSnapshot.val().noPolisi,
+              bagList: childSnapshot.val().bagList,
+            });
+          }
         }
       });
-      setDataList(data.slice(0, state.limit));
-      setShowList(data.slice(0, state.limit));
+      setDataList(data.slice(data.length - parseInt(state.limit), data.length));
+      setShowList(data.slice(data.length - parseInt(state.limit), data.length));
+      setLoading(false);
     });
     db.on("child_changed", (snapshot) => {
       if (!("Notification" in window)) {
@@ -177,8 +204,8 @@ export default function Home() {
                 });
               } else if (
                 auth.origin == snapshot.val().origin &&
-                snapshot.val().isArrived == true &&
-                snapshot.val().isReceived == false
+                snapshot.val().isArrived != "" &&
+                snapshot.val().isReceived == ""
               ) {
                 const notif = new Notification(`Manifest Transit Sub Agen`, {
                   tag: "arrivalNotification",
@@ -249,9 +276,15 @@ export default function Home() {
                       <Card.Title className="small">
                         {category.title}
                       </Card.Title>
-                      <Card.Text className="display-6">
-                        {category.text}
-                      </Card.Text>
+                      {loading ? (
+                        <Placeholder as={Card.Text} animation="glow">
+                          <Placeholder xs={1} size="lg" />
+                        </Placeholder>
+                      ) : (
+                        <Card.Text className="display-6">
+                          {category.text}
+                        </Card.Text>
+                      )}
                     </Col>
                   </Row>
                 </Card.Body>
@@ -293,9 +326,7 @@ export default function Home() {
           </Col>
         </Row>
         <hr />
-        <div
-          style={{ maxHeight: "375px", overflowY: "scroll", display: "block" }}
-        >
+        <div className="tableData">
           <Table responsive hover>
             <thead>
               <tr>
@@ -303,21 +334,26 @@ export default function Home() {
                 <th>Origin</th>
                 <th>Destination</th>
                 <th>Status</th>
+                <th>Koli</th>
+                <th>Weight</th>
                 <th>Waktu Keberangkatan</th>
                 <th>Waktu Kedatangan</th>
                 <th>Durasi Perjalanan</th>
+                <th>No. Polisi</th>
               </tr>
             </thead>
             <tbody
               style={{
                 maxHeight: "375px",
-                overflowY: "scroll",
               }}
             >
               {showList.length == 0 ? (
                 <>
                   <tr>
-                    <td colSpan={7} align="center">
+                    <td
+                      colSpan={windowSize.width > "768" ? 10 : 6}
+                      align="center"
+                    >
                       <i>Data tidak ditemukan</i>
                     </td>
                   </tr>
@@ -336,6 +372,16 @@ export default function Home() {
                         <td>{item.destination}</td>
                         <td>{item.status}</td>
                         <td>
+                          {item.bagList.reduce((prev, next) => {
+                            return prev + parseInt(next.koli);
+                          }, 0)}
+                        </td>
+                        <td>
+                          {item.bagList.reduce((prev, next) => {
+                            return prev + parseInt(next.kg);
+                          }, 0) + " kg"}
+                        </td>
+                        <td>
                           {item.departureDate == ""
                             ? "-"
                             : `${moment(item.departureDate)
@@ -350,6 +396,7 @@ export default function Home() {
                             : "-"}
                         </td>
                         <td>{item.durasi == undefined ? "-" : item.durasi}</td>
+                        <td>{item.noPolisi}</td>
                       </tr>
                     ))
                     .reverse()}

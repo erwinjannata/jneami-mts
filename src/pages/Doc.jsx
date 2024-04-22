@@ -63,11 +63,9 @@ export default function Doc() {
   let totalKoli = bagList.reduce((prev, next) => {
     return prev + parseInt(next.koli);
   }, 0);
-
   let totalPcs = bagList.reduce((prev, next) => {
     return prev + parseInt(next.pcs);
   }, 0);
-
   let totalWeight = bagList.reduce((prev, next) => {
     return prev + parseInt(next.kg);
   }, 0);
@@ -76,13 +74,10 @@ export default function Doc() {
     data.departureTime
   }:00`;
   let tiba = `${moment(tanggal).locale("id").format("L")} ${jam}:00`;
-
   let dura = moment(tiba, "DD/MM/YYYY HH:mm:ss").diff(
     moment(berangkat, "DD/MM/YYYY HH:mm:ss")
   );
-
   let durasi = moment.duration(dura);
-
   var finalDurasi = [
     Math.floor(durasi.asHours()) <= 0
       ? ""
@@ -90,6 +85,7 @@ export default function Doc() {
     Math.floor(durasi.minutes() <= 0) ? "" : `${durasi.minutes()} menit`,
   ].join(Math.floor(durasi.asHours()) <= 0 ? "" : " ");
 
+  //Functions
   const handleChange = (e) => {
     const value = e.target.value;
     setData({ ...data, [e.target.name]: value });
@@ -386,6 +382,7 @@ export default function Doc() {
   };
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     db.child(key).on("value", (snapshot) => {
       if (snapshot.exists()) {
         setData(snapshot.val());

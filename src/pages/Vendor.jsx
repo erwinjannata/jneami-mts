@@ -20,7 +20,7 @@ export default function Vendor() {
   const auth = UseAuth();
   const [state, setState] = useState({
     searched: "",
-    limit: 10,
+    limit: 50,
   });
   const [data, setData] = useState([]);
   const [showList, setShowList] = useState([]);
@@ -115,6 +115,7 @@ export default function Vendor() {
   };
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     db.limitToLast(parseInt(state.limit)).on("value", (snapshot) => {
       let list = [];
       snapshot.forEach((childSnapshot) => {
@@ -124,6 +125,7 @@ export default function Vendor() {
           origin: childSnapshot.val().origin,
           destination: childSnapshot.val().destination,
           status: childSnapshot.val().status,
+          bagList: childSnapshot.val().bagList,
         });
       });
       setData(list);
@@ -210,40 +212,59 @@ export default function Vendor() {
             </Form>
           </Col>
         </Row>
-        <Table responsive hover>
-          <thead>
-            <tr>
-              <th>No. Surat</th>
-              <th>Origin</th>
-              <th>Destination</th>
-              <th>Status Manifest</th>
-            </tr>
-          </thead>
-          <tbody>
-            {showList.length == 0 ? (
-              <>
-                <tr>
-                  <td colSpan={6} align="center">
-                    <i>Data tidak ditemukan</i>
-                  </td>
-                </tr>
-              </>
-            ) : (
-              <>
-                {showList
-                  .map((item, idx) => (
-                    <tr key={idx} onClick={() => navigate(`/doc/${item.key}`)}>
-                      <td>{item.noSurat}</td>
-                      <td>{item.origin}</td>
-                      <td>{item.destination}</td>
-                      <td>{item.status}</td>
-                    </tr>
-                  ))
-                  .reverse()}
-              </>
-            )}
-          </tbody>
-        </Table>
+        <div
+          style={{ maxHeight: "500px", overflowY: "scroll", display: "block" }}
+        >
+          <Table responsive hover>
+            <thead>
+              <tr>
+                <th>No. Surat</th>
+                <th>Origin</th>
+                <th>Destination</th>
+                <th>Koli</th>
+                <th>Weight</th>
+                <th>Status Manifest</th>
+              </tr>
+            </thead>
+            <tbody>
+              {showList.length == 0 ? (
+                <>
+                  <tr>
+                    <td colSpan={6} align="center">
+                      <i>Data tidak ditemukan</i>
+                    </td>
+                  </tr>
+                </>
+              ) : (
+                <>
+                  {showList
+                    .map((item, idx) => (
+                      <tr
+                        key={idx}
+                        onClick={() => navigate(`/doc/${item.key}`)}
+                      >
+                        <td>{item.noSurat}</td>
+                        <td>{item.origin}</td>
+                        <td>{item.destination}</td>
+                        <td>
+                          {item.bagList.reduce((prev, next) => {
+                            return prev + parseInt(next.koli);
+                          }, 0) + " koli"}
+                        </td>
+                        <td>
+                          {item.bagList.reduce((prev, next) => {
+                            return prev + parseInt(next.kg);
+                          }, 0) + " kg"}
+                        </td>
+                        <td>{item.status}</td>
+                      </tr>
+                    ))
+                    .reverse()}
+                </>
+              )}
+            </tbody>
+          </Table>
+        </div>
         <hr />
         <Row>
           <Col xl={1} xs={4}>
@@ -254,11 +275,11 @@ export default function Vendor() {
                 onChange={handleChange}
                 value={state.limit}
               >
-                <option value="10">10</option>
-                <option value="25">25</option>
                 <option value="50">50</option>
                 <option value="100">100</option>
+                <option value="250">250</option>
                 <option value="500">500</option>
+                <option value="1000">1000</option>
               </Form.Select>
             </FloatingLabel>
           </Col>

@@ -47,7 +47,7 @@ export default function Create() {
   const [show, setShow] = useState(false);
   const [img64, setImg64] = useState("");
 
-  let db = firebase.database().ref("manifestTransit/");
+  let db = firebase.database();
   let navigate = new useNavigate();
   const [loading, setLoading] = useState(false);
   const [n, setN] = useState("");
@@ -192,7 +192,7 @@ export default function Create() {
     }
   };
 
-  const handleRemove = (manifestNo, pcs, kg) => {
+  const handleRemove = (manifestNo) => {
     if (confirm("Hapus bag?") == true) {
       setBagList((current) =>
         current.filter((number) => {
@@ -235,30 +235,31 @@ export default function Create() {
           uploadString(storageRef, img64, "data_url", metaData).then(
             (snapshot) => {
               getDownloadURL(snapshot.ref).then(async (url) => {
-                db.push({
-                  noSurat: state.noSurat,
-                  noRef: state.noRef,
-                  origin: state.origin,
-                  destination: state.destination,
-                  bagList: bagList,
-                  approvedDate: tanggal,
-                  approvedTime: jam,
-                  preparedBy: state.preparedBy,
-                  receivedDate: "",
-                  receivedTime: "",
-                  receivedBy: "",
-                  checkerSign: url,
-                  receiverSign: "",
-                  vendorSign: "",
-                  isArrived: false,
-                  isReceived: false,
-                  status: "Menunggu Vendor",
-                  arrivalDate: "",
-                  arrivalTime: "",
-                  departureDate: "",
-                  departureTime: "",
-                  count: 0,
-                })
+                db.ref("manifestTransit/")
+                  .push({
+                    noSurat: state.noSurat,
+                    noRef: state.noRef,
+                    origin: state.origin,
+                    destination: state.destination,
+                    bagList: bagList,
+                    approvedDate: tanggal,
+                    approvedTime: jam,
+                    preparedBy: state.preparedBy,
+                    receivedDate: "",
+                    receivedTime: "",
+                    receivedBy: "",
+                    checkerSign: url,
+                    receiverSign: "",
+                    vendorSign: "",
+                    isArrived: false,
+                    isReceived: false,
+                    status: "Menunggu Vendor",
+                    arrivalDate: "",
+                    arrivalTime: "",
+                    departureDate: "",
+                    departureTime: "",
+                    count: 0,
+                  })
                   .then(() => {
                     setLoading(false);
                     alert("Approved");
@@ -282,11 +283,12 @@ export default function Create() {
 
   // Dijalankan ketika aplikasi dibuka
   useEffect(() => {
+    window.scrollTo(0, 0);
     setState({ ...state, origin: auth.origin, preparedBy: auth.name });
     if (auth.origin == "VENDOR") {
       navigate("/vendor");
     }
-    db.on("value", (snapshot) => {
+    db.ref("manifestTransit/").on("value", (snapshot) => {
       let count = 0;
       snapshot.forEach((childSnapshot) => {
         if (!childSnapshot.val().noSurat.includes("_")) {
@@ -331,7 +333,6 @@ export default function Create() {
     };
   }, [auth.origin, auth.name, auth.level, state.origin, state.preparedBy]);
 
-  console.log(bagList);
   // Render aplikasi
   return (
     <div className="screen">
@@ -447,9 +448,7 @@ export default function Create() {
                       <Button
                         variant="danger"
                         disabled={loading ? true : false}
-                        onClick={() =>
-                          handleRemove(item.manifestNo, item.pcs, item.kg)
-                        }
+                        onClick={() => handleRemove(item.manifestNo)}
                       >
                         <FaRegTrashAlt />
                       </Button>

@@ -81,6 +81,7 @@ export default function AddUser() {
   ];
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     if (auth.level < 5) {
       navigate("/");
     }
