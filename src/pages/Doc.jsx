@@ -269,40 +269,6 @@ export default function Doc() {
           }Sign.png`
         );
         try {
-          if (
-            overloadedItem.length != 0 &&
-            overloadedItem.length != bagList.length
-          ) {
-            setOverloadedItem(
-              overloadedItem.map((item) => {
-                return { ...item, statusBag: "Menunggu Vendor" };
-              })
-            );
-            db.push({
-              noSurat: `${data.noSurat}_${parseInt(data.count) + 1}`,
-              noRef: "",
-              origin: data.origin,
-              destination: data.destination,
-              bagList: overloadedItem,
-              approvedDate: tanggal,
-              approvedTime: jam,
-              preparedBy: data.preparedBy,
-              receivedDate: "",
-              receivedTime: "",
-              receivedBy: "",
-              checkerSign: data.checkerSign,
-              receiverSign: "",
-              vendorSign: "",
-              isArrived: false,
-              isReceived: false,
-              status: "Menunggu Vendor",
-              arrivalDate: "",
-              arrivalTime: "",
-              departureDate: "",
-              departureTime: "",
-              count: parseInt(data.count) + 1,
-            });
-          }
           uploadString(storageRef, img64, "data_url", metaData).then(
             (snapshot) => {
               getDownloadURL(snapshot.ref).then(async (url) => {
@@ -329,6 +295,37 @@ export default function Doc() {
                 db.child(key)
                   .update(updates)
                   .then(() => {
+                    if (overloadedItem.length != 0) {
+                      setOverloadedItem(
+                        overloadedItem.map((item) => {
+                          return { ...item, statusBag: "Menunggu Vendor" };
+                        })
+                      );
+                      db.push({
+                        noSurat: `${data.noSurat}_${parseInt(data.count) + 1}`,
+                        noRef: "",
+                        origin: data.origin,
+                        destination: data.destination,
+                        bagList: overloadedItem,
+                        approvedDate: tanggal,
+                        approvedTime: jam,
+                        preparedBy: data.preparedBy,
+                        receivedDate: "",
+                        receivedTime: "",
+                        receivedBy: "",
+                        checkerSign: data.checkerSign,
+                        receiverSign: "",
+                        vendorSign: "",
+                        isArrived: false,
+                        isReceived: false,
+                        status: "Menunggu Vendor",
+                        arrivalDate: "",
+                        arrivalTime: "",
+                        departureDate: "",
+                        departureTime: "",
+                        count: parseInt(data.count) + 1,
+                      });
+                    }
                     setLoading(false);
                     alert("Received");
                     setChangedItem(0);

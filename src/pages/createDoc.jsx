@@ -172,14 +172,24 @@ export default function Create() {
         setBagList([
           ...bagList,
           {
-            manifestNo: state.manifestNo,
+            manifestNo: state.manifestNo.toUpperCase(),
             koli: state.koli,
             pcs: state.pcs,
             kg: state.kg,
-            remark: state.remark,
+            remark: state.remark.toUpperCase(),
             statusBag: "Menunggu Vendor",
           },
         ]);
+        var items = JSON.parse(localStorage.getItem("bagList")) || [];
+        items.push({
+          manifestNo: state.manifestNo.toUpperCase(),
+          koli: state.koli,
+          pcs: state.pcs,
+          kg: state.kg,
+          remark: state.remark.toUpperCase(),
+          statusBag: "Menunggu Vendor",
+        });
+        localStorage.setItem("bagList", JSON.stringify(items));
         setState({
           ...state,
           manifestNo: "AMI/MTS/00",
@@ -192,13 +202,16 @@ export default function Create() {
     }
   };
 
-  const handleRemove = (manifestNo) => {
+  const handleRemove = (index, manifestNo) => {
     if (confirm("Hapus bag?") == true) {
       setBagList((current) =>
         current.filter((number) => {
           return number.manifestNo !== manifestNo;
         })
       );
+      var items = JSON.parse(localStorage.getItem("bagList"));
+      items.splice(index, 1);
+      localStorage.setItem("bagList", JSON.stringify(items));
     }
   };
 
@@ -263,6 +276,7 @@ export default function Create() {
                   .then(() => {
                     setLoading(false);
                     alert("Approved");
+                    localStorage.removeItem("bagList");
                     navigate("/");
                     window.scrollTo(0, 0);
                   })
@@ -285,6 +299,10 @@ export default function Create() {
   useEffect(() => {
     window.scrollTo(0, 0);
     setState({ ...state, origin: auth.origin, preparedBy: auth.name });
+    const items = JSON.parse(localStorage.getItem("bagList"));
+    if (items) {
+      setBagList(items);
+    }
     if (auth.origin == "VENDOR") {
       navigate("/vendor");
     }
@@ -448,7 +466,7 @@ export default function Create() {
                       <Button
                         variant="danger"
                         disabled={loading ? true : false}
-                        onClick={() => handleRemove(item.manifestNo)}
+                        onClick={() => handleRemove(idx, item.manifestNo)}
                       >
                         <FaRegTrashAlt />
                       </Button>

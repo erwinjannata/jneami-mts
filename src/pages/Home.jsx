@@ -8,6 +8,7 @@ import {
   Form,
   Placeholder,
   Row,
+  Spinner,
   Table,
 } from "react-bootstrap";
 import Menu from "../components/menu";
@@ -37,8 +38,29 @@ export default function Home() {
     limit: "50",
     filtered: false,
     currentFilter: "",
+    origin: "All Cabang",
+    destination: "All Cabang",
   });
   const [loading, setLoading] = useState(true);
+
+  let cabangList = [
+    { id: "0", name: "All Cabang" },
+    { id: "1", name: "ALAS" },
+    { id: "2", name: "BIMA" },
+    { id: "3", name: "BOLO" },
+    { id: "4", name: "DOMPU" },
+    { id: "5", name: "EMPANG" },
+    { id: "6", name: "MANGGELEWA" },
+    { id: "7", name: "MATARAM" },
+    { id: "8", name: "PADOLO" },
+    { id: "9", name: "PLAMPANG" },
+    { id: "10", name: "PRAYA" },
+    { id: "11", name: "SELONG" },
+    { id: "12", name: "SUMBAWA" },
+    { id: "13", name: "TALIWANG" },
+    { id: "14", name: "TANJUNG" },
+    { id: "15", name: "UTAN" },
+  ];
 
   let cardsCategories = [
     {
@@ -104,11 +126,28 @@ export default function Home() {
       [e.target.name]: value,
       filtered: false,
       currentFilter: "",
+      origin: "All Cabang",
+      destination: "All Cabang",
+    });
+  };
+
+  const handleCabang = (e) => {
+    const value = e.target.value;
+    setState({
+      ...state,
+      [e.target.name]: value,
+      filtered: false,
+      currentFilter: "",
     });
   };
 
   const handleSearch = (e) => {
     e.preventDefault();
+    setState({
+      ...state,
+      origin: "All Cabang",
+      destination: "All Cabang",
+    });
     const searchResult =
       state.number == ""
         ? dataList
@@ -121,12 +160,20 @@ export default function Home() {
   const handleFilter = (status) => {
     if (state.filtered == true && state.currentFilter == status) {
       setShowList(dataList);
-      setState({ ...state, filtered: false, currentFilter: "" });
+      setState({
+        ...state,
+        filtered: false,
+        currentFilter: "",
+      });
     } else {
+      setState({
+        ...state,
+        filtered: true,
+        currentFilter: status,
+      });
       setShowList(
         dataList.filter((datalist) => datalist.status.includes(status))
       );
-      setState({ ...state, filtered: true, currentFilter: status });
     }
   };
 
@@ -179,8 +226,36 @@ export default function Home() {
           }
         }
       });
-      setDataList(data.slice(data.length - parseInt(state.limit), data.length));
-      setShowList(data.slice(data.length - parseInt(state.limit), data.length));
+
+      var result = data;
+      if (state.origin == "All Cabang" && state.destination != "All Cabang") {
+        result = data.filter((datalist) => {
+          return datalist["destination"] == state.destination;
+        });
+      } else if (
+        state.origin != "All Cabang" &&
+        state.destination == "All Cabang"
+      ) {
+        result = data.filter((datalist) => {
+          return datalist["origin"] == state.origin;
+        });
+      } else if (
+        state.origin != "All Cabang" &&
+        state.destination != "All Cabang"
+      ) {
+        result = data.filter((datalist) => {
+          return (
+            datalist["origin"] == state.origin &&
+            datalist["destination"] == state.destination
+          );
+        });
+      }
+      setDataList(
+        result.slice(result.length - parseInt(state.limit), result.length)
+      );
+      setShowList(
+        result.slice(result.length - parseInt(state.limit), result.length)
+      );
       setLoading(false);
     });
     db.on("child_changed", (snapshot) => {
@@ -238,7 +313,16 @@ export default function Home() {
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, [auth.origin, auth.name, state.showed, state.limit, Notification]);
+  }, [
+    auth.origin,
+    auth.name,
+    state.number,
+    state.limit,
+    state.origin,
+    state.destination,
+    state.showed,
+    Notification,
+  ]);
 
   return (
     <div className="screen">
@@ -325,6 +409,44 @@ export default function Home() {
             </FloatingLabel>
           </Col>
         </Row>
+        <Row>
+          {state.showed == "all" || state.showed == "destination" ? (
+            <Col>
+              <FloatingLabel controlId="floatingSelectData" label="Origin">
+                <Form.Select
+                  aria-label="Origin"
+                  name="origin"
+                  onChange={handleCabang}
+                  value={state.origin}
+                >
+                  {cabangList.map((item, id) => (
+                    <option key={id} value={item.name}>
+                      {item.name}
+                    </option>
+                  ))}
+                </Form.Select>
+              </FloatingLabel>
+            </Col>
+          ) : null}
+          {state.showed == "all" || state.showed == "origin" ? (
+            <Col>
+              <FloatingLabel controlId="floatingSelectData" label="Destination">
+                <Form.Select
+                  aria-label="Destination"
+                  name="destination"
+                  onChange={handleCabang}
+                  value={state.destination}
+                >
+                  {cabangList.map((item, id) => (
+                    <option key={id} value={item.name}>
+                      {item.name}
+                    </option>
+                  ))}
+                </Form.Select>
+              </FloatingLabel>
+            </Col>
+          ) : null}
+        </Row>
         <hr />
         <div className="tableData">
           <Table responsive hover>
@@ -342,67 +464,83 @@ export default function Home() {
                 <th>No. Polisi</th>
               </tr>
             </thead>
-            <tbody
-              style={{
-                maxHeight: "375px",
-              }}
-            >
-              {showList.length == 0 ? (
-                <>
-                  <tr>
-                    <td
-                      colSpan={windowSize.width > "768" ? 10 : 6}
-                      align="center"
-                    >
-                      <i>Data tidak ditemukan</i>
-                    </td>
-                  </tr>
-                </>
-              ) : (
-                <>
-                  {showList
-                    .map((item, key) => (
-                      <tr
-                        key={key}
-                        onClick={() => navigate(`doc/${item.key}`)}
-                        className="user-select-none"
+            {loading ? (
+              <tbody>
+                <tr>
+                  <td colSpan={10}>
+                    <Placeholder animation="wave">
+                      <Placeholder xs={12} bg="secondary" size="lg" />
+                    </Placeholder>
+                  </td>
+                </tr>
+              </tbody>
+            ) : (
+              <tbody
+                style={{
+                  maxHeight: "375px",
+                }}
+              >
+                {showList.length == 0 ? (
+                  <>
+                    <tr>
+                      <td
+                        colSpan={windowSize.width > "768" ? 10 : 6}
+                        align="center"
                       >
-                        <td>{item.noSurat}</td>
-                        <td>{item.origin}</td>
-                        <td>{item.destination}</td>
-                        <td>{item.status}</td>
-                        <td>
-                          {item.bagList.reduce((prev, next) => {
-                            return prev + parseInt(next.koli);
-                          }, 0)}
-                        </td>
-                        <td>
-                          {item.bagList.reduce((prev, next) => {
-                            return prev + parseInt(next.kg);
-                          }, 0) + " kg"}
-                        </td>
-                        <td>
-                          {item.departureDate == ""
-                            ? "-"
-                            : `${moment(item.departureDate)
-                                .locale("id")
-                                .format("LL")} ${item.departureTime}`}
-                        </td>
-                        <td>
-                          {item.arrivalDate != ""
-                            ? `${moment(item.arrivalDate)
-                                .locale("id")
-                                .format("LL")} ${item.arrivalTime}`
-                            : "-"}
-                        </td>
-                        <td>{item.durasi == undefined ? "-" : item.durasi}</td>
-                        <td>{item.noPolisi}</td>
-                      </tr>
-                    ))
-                    .reverse()}
-                </>
-              )}
-            </tbody>
+                        <i>Data tidak ditemukan</i>
+                      </td>
+                    </tr>
+                  </>
+                ) : (
+                  <>
+                    {showList
+                      .map((item, key) => (
+                        <tr
+                          key={key}
+                          onClick={() => navigate(`doc/${item.key}`)}
+                          className="user-select-none"
+                        >
+                          <td>{item.noSurat}</td>
+                          <td>{item.origin}</td>
+                          <td>{item.destination}</td>
+                          <td>{item.status}</td>
+                          <td>
+                            {item.bagList
+                              .reduce((prev, next) => {
+                                return prev + parseInt(next.koli);
+                              }, 0)
+                              .toString()}
+                          </td>
+                          <td>
+                            {item.bagList.reduce((prev, next) => {
+                              return prev + parseInt(next.kg);
+                            }, 0) + " kg"}
+                          </td>
+                          <td>
+                            {item.departureDate == ""
+                              ? "-"
+                              : `${moment(item.departureDate)
+                                  .locale("id")
+                                  .format("LL")} ${item.departureTime}`}
+                          </td>
+                          <td>
+                            {item.arrivalDate != ""
+                              ? `${moment(item.arrivalDate)
+                                  .locale("id")
+                                  .format("LL")} ${item.arrivalTime}`
+                              : "-"}
+                          </td>
+                          <td>
+                            {item.durasi == undefined ? "-" : item.durasi}
+                          </td>
+                          <td>{item.noPolisi}</td>
+                        </tr>
+                      ))
+                      .reverse()}
+                  </>
+                )}
+              </tbody>
+            )}
           </Table>
         </div>
         <hr />
