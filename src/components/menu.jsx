@@ -151,6 +151,8 @@ export default function NavMenu() {
                   style={{
                     height: "50px",
                     display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
                     margin: "0 auto",
                   }}
                 ></img>
@@ -164,7 +166,12 @@ export default function NavMenu() {
                         key={m.id}
                         component={<Link to={m.link} />}
                         icon={m.icon}
-                        style={{ color: "#e9f5f9" }}
+                        style={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          color: "#e9f5f9",
+                        }}
                       >
                         {m.nama}
                       </MenuItem>
@@ -179,7 +186,12 @@ export default function NavMenu() {
                         key={m.id}
                         component={<Link to={m.link} />}
                         icon={m.icon}
-                        style={{ color: "#e9f5f9" }}
+                        style={{
+                          color: "#e9f5f9",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
                       >
                         {m.nama}
                       </MenuItem>
@@ -195,6 +207,11 @@ export default function NavMenu() {
                 title="Log Out"
                 onClick={handleLogout}
                 className="mx-3"
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
               >
                 <LuLogOut /> Logout
               </Button>

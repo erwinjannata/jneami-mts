@@ -288,8 +288,8 @@ export default function Doc() {
                   updates["departureTime"] = jam;
                   updates["status"] = "Dalam Perjalanan";
                   updates["noRef"] = data.noRef;
-                  (updates["noPolisi"] = data.noPolisi),
-                    (updates["driver"] = data.driver);
+                  updates["noPolisi"] = data.noPolisi;
+                  updates["driver"] = data.driver;
                   updates["vendorSign"] = url;
                 }
                 db.child(key)
