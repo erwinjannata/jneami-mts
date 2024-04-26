@@ -61,7 +61,7 @@ export default function Create() {
     remark: "",
     noSurat: "",
     origin: auth.origin,
-    destination: "MATARAM",
+    destination: "",
     noRef: "",
     preparedBy: auth.name,
     checkerSign: "",
@@ -216,7 +216,9 @@ export default function Create() {
   };
 
   const handleApproval = () => {
-    if (state.origin == state.destination) {
+    if (state.destination == "") {
+      alert("Pilih destination valid");
+    } else if (state.origin == state.destination) {
       alert("Destinasi tidak boleh sama dengan Origin");
     } else if (state.origin == "") {
       alert("Origin kosong, harap refresh halaman, atau login ulang");
@@ -395,11 +397,14 @@ export default function Create() {
                 value={state.destination || ""}
                 disabled={loading ? true : false}
               >
-                {destList.map((item, id) => (
-                  <option key={id} value={item.name}>
-                    {item.name}
-                  </option>
-                ))}
+                <option value="">-Pilih Destination-</option>
+                {destList.map((item, id) =>
+                  auth.origin == item.name ? null : (
+                    <option key={id} value={item.name}>
+                      {item.name}
+                    </option>
+                  )
+                )}
               </Form.Select>
             </FloatingLabel>
           </Col>
