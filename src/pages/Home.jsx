@@ -193,7 +193,7 @@ export default function Home() {
       state.showed == "all"
         ? db
         : db.orderByChild(`${state.showed}`).equalTo(auth.origin);
-    filters.on("value", (snapshot) => {
+    filters.limitToLast(1000).on("value", (snapshot) => {
       let data = [];
 
       snapshot.forEach((childSnapshot) => {
@@ -258,12 +258,9 @@ export default function Home() {
           );
         });
       }
-      setDataList(
-        result.slice(result.length - parseInt(state.limit), result.length)
-      );
-      setShowList(
-        result.slice(result.length - parseInt(state.limit), result.length)
-      );
+      let start = result.length - state.limit;
+      setDataList(result.slice(start < 0 ? 0 : start, result.length));
+      setShowList(result.slice(start < 0 ? 0 : start, result.length));
       setLoading(false);
     });
     db.on("child_changed", (snapshot) => {
