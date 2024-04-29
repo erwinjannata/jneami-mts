@@ -1,7 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import {
-  Button,
   Card,
   Col,
   Container,
@@ -9,7 +8,6 @@ import {
   Form,
   Placeholder,
   Row,
-  Spinner,
   Table,
 } from "react-bootstrap";
 import Menu from "../components/menu";
@@ -21,13 +19,7 @@ import "moment/dist/locale/id";
 import { useNavigate } from "react-router-dom";
 import { UseAuth } from "../config/authContext";
 import { FaTruckLoading, FaBoxes } from "react-icons/fa";
-import {
-  FaTruckPlane,
-  FaPlaneCircleCheck,
-  FaEye,
-  FaEyeSlash,
-} from "react-icons/fa6";
-import PieChart from "../components/pieChart";
+import { FaTruckPlane, FaPlaneCircleCheck } from "react-icons/fa6";
 
 export default function Home() {
   const auth = UseAuth();
@@ -47,7 +39,6 @@ export default function Home() {
     currentFilter: "",
     origin: "All Cabang",
     destination: "All Cabang",
-    showChart: false,
   });
   const [loading, setLoading] = useState(true);
 
@@ -566,44 +557,7 @@ export default function Home() {
               </Form.Select>
             </FloatingLabel>
           </Col>
-          <Col>
-            <Button
-              variant="outline-dark"
-              onClick={() =>
-                setState({ ...state, showChart: !state.showChart })
-              }
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              {state.showChart ? (
-                <FaEyeSlash
-                  style={{
-                    marginRight: "5px",
-                  }}
-                />
-              ) : (
-                <FaEye
-                  style={{
-                    marginRight: "5px",
-                  }}
-                />
-              )}{" "}
-              {state.showChart ? " Hide Chart" : " Show Chart"}
-            </Button>
-          </Col>
         </Row>
-        {state.showChart ? (
-          <Row>
-            {windowSize.width >= 768 ? null : <Col></Col>}
-            <Col xs={windowSize.width >= 768 ? "" : 0}>
-              <PieChart data={dataList} />
-            </Col>
-            <Col></Col>
-          </Row>
-        ) : null}
       </Container>
     </div>
   );

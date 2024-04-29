@@ -1,5 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Button, Col, Container, Row, Table } from "react-bootstrap";
+import {
+  Button,
+  Col,
+  Container,
+  FloatingLabel,
+  Form,
+  Row,
+  Table,
+} from "react-bootstrap";
 import Menu from "../components/menu";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -12,18 +20,53 @@ import { utils, writeFile } from "xlsx";
 import { MdFileDownload } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { UseAuth } from "../config/authContext";
+import PieChart from "../components/pieChart";
+import { FaEye, FaEyeSlash } from "react-icons/fa6";
 
 export default function Penarikan() {
   const d = new Date();
-  let auth = UseAuth();
+  const auth = UseAuth();
   let navigate = useNavigate();
   const [state, setState] = useState({
     start: moment(d).locale("en-ca").format("L"),
     end: moment(d).locale("en-ca").format("L"),
+    showChart: false,
+    origin: "",
+    destination: "",
   });
   let db = firebase.database().ref("manifestTransit");
   const [dataList, setDataList] = useState([]);
   const [show, setShow] = useState(false);
+  const [windowSize, setWindowSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
+
+  let cabangList = [
+    { id: "0", name: "ALAS" },
+    { id: "1", name: "BIMA" },
+    { id: "2", name: "BOLO" },
+    { id: "3", name: "DOMPU" },
+    { id: "4", name: "EMPANG" },
+    { id: "5", name: "MANGGELEWA" },
+    { id: "6", name: "MATARAM" },
+    { id: "7", name: "PADOLO" },
+    { id: "8", name: "PLAMPANG" },
+    { id: "9", name: "PRAYA" },
+    { id: "10", name: "SELONG" },
+    { id: "11", name: "SUMBAWA" },
+    { id: "12", name: "TALIWANG" },
+    { id: "13", name: "TANJUNG" },
+    { id: "14", name: "UTAN" },
+  ];
+
+  const handleChange = (e) => {
+    const value = e.target.value;
+    setState({
+      ...state,
+      [e.target.name]: value,
+    });
+  };
 
   const handleSubmit = () => {
     db.orderByChild("approvedDate")
@@ -56,7 +99,25 @@ export default function Penarikan() {
             bagList: childSnapshot.val().bagList,
           });
         });
-        setDataList(data);
+
+        var result = data;
+        if (state.origin == "" && state.destination != "") {
+          result = data.filter((datalist) => {
+            return datalist["destination"] == state.destination;
+          });
+        } else if (state.origin != "" && state.destination == "") {
+          result = data.filter((datalist) => {
+            return datalist["origin"] == state.origin;
+          });
+        } else if (state.origin != "" && state.destination != "") {
+          result = data.filter((datalist) => {
+            return (
+              datalist["origin"] == state.origin &&
+              datalist["destination"] == state.destination
+            );
+          });
+        }
+        setDataList(result);
       });
     setShow(true);
   };
@@ -148,6 +209,20 @@ export default function Penarikan() {
     if (auth.origin == "VENDOR") {
       navigate("/vendor");
     }
+
+    const handleResize = () => {
+      setWindowSize({
+        ...windowSize,
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
   }, [auth.origin]);
 
   return (
@@ -156,6 +231,42 @@ export default function Penarikan() {
       <Container>
         <h2>Penarikan Data</h2>
         <hr />
+        <Row className="mb-4">
+          <Col>
+            <FloatingLabel controlId="floatingSelectData" label="Origin">
+              <Form.Select
+                aria-label="Origin"
+                name="origin"
+                onChange={handleChange}
+                value={state.origin}
+              >
+                <option value="">All Cabang</option>
+                {cabangList.map((item, id) => (
+                  <option key={id} value={item.name}>
+                    {item.name}
+                  </option>
+                ))}
+              </Form.Select>
+            </FloatingLabel>
+          </Col>
+          <Col>
+            <FloatingLabel controlId="floatingSelectData" label="Destination">
+              <Form.Select
+                aria-label="Destination"
+                name="destination"
+                onChange={handleChange}
+                value={state.destination}
+              >
+                <option value="">All Cabang</option>
+                {cabangList.map((item, id) => (
+                  <option key={id} value={item.name}>
+                    {item.name}
+                  </option>
+                ))}
+              </Form.Select>
+            </FloatingLabel>
+          </Col>
+        </Row>
         <Row>
           <Col>
             <label htmlFor="startDate" className="mx-2">
@@ -193,9 +304,13 @@ export default function Penarikan() {
             />
           </Col>
         </Row>
-        <Row className="mt-2">
+        <Row className="mt-4">
           <Col>
-            <Button variant="primary" className="mx-2" onClick={handleSubmit}>
+            <Button
+              variant="primary"
+              className={windowSize.width >= 768 ? "mx-2" : "mx-0"}
+              onClick={handleSubmit}
+            >
               Go
             </Button>
             {dataList.length == 0 ? null : (
@@ -209,18 +324,68 @@ export default function Penarikan() {
                 </Button>
                 <Button
                   variant="outline-secondary"
-                  className="mx-2"
+                  className="mx-0"
                   onClick={() => {
-                    setDataList([]), setShow(false);
+                    setDataList([]);
+                    setShow(false);
+                    setState({
+                      ...state,
+                      origin: "",
+                      destination: "",
+                      showChart: false,
+                    });
                   }}
                 >
                   Clear
                 </Button>
+                <div
+                  className={windowSize.width >= 768 ? "float-end" : " mt-2"}
+                >
+                  <Button
+                    variant="outline-dark"
+                    onClick={() =>
+                      setState({ ...state, showChart: !state.showChart })
+                    }
+                    style={{
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    {state.showChart ? (
+                      <FaEyeSlash
+                        style={{
+                          marginRight: "5px",
+                        }}
+                      />
+                    ) : (
+                      <FaEye
+                        style={{
+                          marginRight: "5px",
+                        }}
+                      />
+                    )}{" "}
+                    {state.showChart ? " Hide Chart" : " Show Chart"}
+                  </Button>
+                </div>
               </>
             )}
           </Col>
         </Row>
         <hr />
+        {state.showChart ? (
+          <>
+            <Row>
+              <Col xs={windowSize.width >= 768 ? 4 : 0}>
+                <PieChart type="status" data={dataList} />
+              </Col>
+              <Col xs={windowSize.width >= 768 ? 5 : 0}>
+                {windowSize.width >= 768 ? null : <hr />}
+                <PieChart type="destination" data={dataList} />
+              </Col>
+            </Row>
+            <hr />
+          </>
+        ) : null}
         {show ? (
           <div
             style={{
@@ -246,7 +411,7 @@ export default function Penarikan() {
                 {dataList.length == 0 ? (
                   <>
                     <tr>
-                      <td colSpan={6} align="center">
+                      <td colSpan={8} align="center">
                         <i>Data tidak ditemukan</i>
                       </td>
                     </tr>
