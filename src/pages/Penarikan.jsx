@@ -30,6 +30,7 @@ export default function Penarikan() {
   const [state, setState] = useState({
     start: moment(d).locale("en-ca").format("L"),
     end: moment(d).locale("en-ca").format("L"),
+    query: "approvedDate",
     showChart: false,
     origin: "",
     destination: "",
@@ -60,6 +61,13 @@ export default function Penarikan() {
     { id: "14", name: "UTAN" },
   ];
 
+  let radioList = [
+    { label: "Approved Date", value: "approvedDate" },
+    { label: "Departure Date", value: "departureDate" },
+    { label: "Arrival Date", value: "arrivalDate" },
+    { label: "Received Date", value: "receivedDate" },
+  ];
+
   const handleChange = (e) => {
     const value = e.target.value;
     setState({
@@ -69,7 +77,7 @@ export default function Penarikan() {
   };
 
   const handleSubmit = () => {
-    db.orderByChild("approvedDate")
+    db.orderByChild(state.query)
       .startAt(state.start)
       .endAt(state.end)
       .on("value", (snapshot) => {
@@ -206,10 +214,6 @@ export default function Penarikan() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    if (auth.origin == "VENDOR") {
-      navigate("/vendor");
-    }
-
     const handleResize = () => {
       setWindowSize({
         ...windowSize,
@@ -232,39 +236,22 @@ export default function Penarikan() {
         <h2>Penarikan Data</h2>
         <hr />
         <Row className="mb-4">
+          <h4>Query : </h4>
           <Col>
-            <FloatingLabel controlId="floatingSelectData" label="Origin">
-              <Form.Select
-                aria-label="Origin"
-                name="origin"
-                onChange={handleChange}
-                value={state.origin}
-              >
-                <option value="">All Cabang</option>
-                {cabangList.map((item, id) => (
-                  <option key={id} value={item.name}>
-                    {item.name}
-                  </option>
-                ))}
-              </Form.Select>
-            </FloatingLabel>
-          </Col>
-          <Col>
-            <FloatingLabel controlId="floatingSelectData" label="Destination">
-              <Form.Select
-                aria-label="Destination"
-                name="destination"
-                onChange={handleChange}
-                value={state.destination}
-              >
-                <option value="">All Cabang</option>
-                {cabangList.map((item, id) => (
-                  <option key={id} value={item.name}>
-                    {item.name}
-                  </option>
-                ))}
-              </Form.Select>
-            </FloatingLabel>
+            <Form className="mt-2">
+              {radioList.map((item, idx) => (
+                <Form.Check
+                  key={idx}
+                  inline
+                  defaultChecked={idx == 0 ? true : false}
+                  label={item.label}
+                  type="radio"
+                  name="query"
+                  value={item.value}
+                  onChange={handleChange}
+                />
+              ))}
+            </Form>
           </Col>
         </Row>
         <Row>
@@ -302,6 +289,42 @@ export default function Penarikan() {
                 })
               }
             />
+          </Col>
+        </Row>
+        <Row className="mt-4">
+          <Col>
+            <FloatingLabel controlId="floatingSelectData" label="Origin">
+              <Form.Select
+                aria-label="Origin"
+                name="origin"
+                onChange={handleChange}
+                value={state.origin}
+              >
+                <option value="">All Cabang</option>
+                {cabangList.map((item, id) => (
+                  <option key={id} value={item.name}>
+                    {item.name}
+                  </option>
+                ))}
+              </Form.Select>
+            </FloatingLabel>
+          </Col>
+          <Col>
+            <FloatingLabel controlId="floatingSelectData" label="Destination">
+              <Form.Select
+                aria-label="Destination"
+                name="destination"
+                onChange={handleChange}
+                value={state.destination}
+              >
+                <option value="">All Cabang</option>
+                {cabangList.map((item, id) => (
+                  <option key={id} value={item.name}>
+                    {item.name}
+                  </option>
+                ))}
+              </Form.Select>
+            </FloatingLabel>
           </Col>
         </Row>
         <Row className="mt-4">
@@ -372,7 +395,7 @@ export default function Penarikan() {
           </Col>
         </Row>
         <hr />
-        {state.showChart ? (
+        {state.showChart && dataList.length != 0 ? (
           <>
             <Row>
               <Col xs={windowSize.width >= 768 ? 4 : 0}>
@@ -387,14 +410,8 @@ export default function Penarikan() {
           </>
         ) : null}
         {show ? (
-          <div
-            style={{
-              maxHeight: "500px",
-              display: "block",
-              overflowY: "scroll",
-            }}
-          >
-            <Table responsive hover>
+          <div className="tableData">
+            <Table responsive hover striped>
               <thead>
                 <tr>
                   <th>No. Surat</th>
@@ -403,15 +420,17 @@ export default function Penarikan() {
                   <th>Status</th>
                   <th>Koli</th>
                   <th>Weight</th>
-                  <th>Approved at</th>
-                  <th>Received at</th>
+                  <th>Approved Date</th>
+                  <th>Departure Date</th>
+                  <th>Arrival Date</th>
+                  <th>Received Date</th>
                 </tr>
               </thead>
               <tbody>
                 {dataList.length == 0 ? (
                   <>
                     <tr>
-                      <td colSpan={8} align="center">
+                      <td colSpan={10} align="center">
                         <i>Data tidak ditemukan</i>
                       </td>
                     </tr>
@@ -439,6 +458,16 @@ export default function Penarikan() {
                             }, 0) + " kg"}
                           </td>
                           <td>{`${item.approvedDate} ${item.approvedTime}`}</td>
+                          <td>
+                            {item.departureDateDate == ""
+                              ? "-"
+                              : `${item.departureDate} ${item.departureTime}`}
+                          </td>
+                          <td>
+                            {item.arrivalDate == ""
+                              ? "-"
+                              : `${item.arrivalDate} ${item.arrivalTime}`}
+                          </td>
                           <td>
                             {item.receivedDate == ""
                               ? "-"

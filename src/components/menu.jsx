@@ -73,6 +73,13 @@ export default function NavMenu() {
       req: 1,
       icon: <MdHomeFilled size={20} />,
     },
+    {
+      id: "1",
+      nama: "Penarikan Data",
+      link: "/get",
+      req: 1,
+      icon: <HiDocumentArrowDown size={20} />,
+    },
   ];
 
   const [windowSize, setWindowSize] = useState({

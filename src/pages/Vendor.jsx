@@ -21,8 +21,12 @@ export default function Vendor() {
   const [state, setState] = useState({
     searched: "",
     limit: 50,
+    filtered: false,
+    currentFilter: "",
+    origin: "",
+    destination: "",
   });
-  const [data, setData] = useState([]);
+  const [list, setData] = useState([]);
   const [showList, setShowList] = useState([]);
   let db = firebase.database().ref("manifestTransit/");
   let navigate = useNavigate();
@@ -31,6 +35,24 @@ export default function Vendor() {
     height: window.innerHeight,
   });
 
+  let cabangList = [
+    { id: "0", name: "ALAS" },
+    { id: "1", name: "BIMA" },
+    { id: "2", name: "BOLO" },
+    { id: "3", name: "DOMPU" },
+    { id: "4", name: "EMPANG" },
+    { id: "5", name: "MANGGELEWA" },
+    { id: "6", name: "MATARAM" },
+    { id: "7", name: "PADOLO" },
+    { id: "8", name: "PLAMPANG" },
+    { id: "9", name: "PRAYA" },
+    { id: "10", name: "SELONG" },
+    { id: "11", name: "SUMBAWA" },
+    { id: "12", name: "TALIWANG" },
+    { id: "13", name: "TANJUNG" },
+    { id: "14", name: "UTAN" },
+  ];
+
   let cardsCategories = [
     {
       id: "0",
@@ -38,7 +60,7 @@ export default function Vendor() {
       bg: "dark",
       textColor: "white",
       title: "Received",
-      text: data.reduce(
+      text: list.reduce(
         (counter, obj) =>
           obj.status == "Received" || obj.status == "Received*"
             ? (counter += 1)
@@ -53,7 +75,7 @@ export default function Vendor() {
       bg: "primary",
       textColor: "white",
       title: "Sampai Tujuan",
-      text: data.reduce(
+      text: list.reduce(
         (counter, obj) =>
           obj.status == "Sampai Tujuan" ? (counter += 1) : counter,
         0
@@ -66,7 +88,7 @@ export default function Vendor() {
       bg: "warning",
       textColor: "dark",
       title: "Dalam Perjalanan",
-      text: data.reduce(
+      text: list.reduce(
         (counter, obj) =>
           obj.status == "Dalam Perjalanan" ? (counter += 1) : counter,
         0
@@ -79,7 +101,7 @@ export default function Vendor() {
       bg: "danger",
       textColor: "white",
       title: "Menunggu Vendor",
-      text: data.reduce(
+      text: list.reduce(
         (counter, obj) =>
           obj.status == "Menunggu Vendor" ? (counter += 1) : counter,
         0
@@ -97,8 +119,8 @@ export default function Vendor() {
     e.preventDefault();
     const searchResult =
       state.searched == ""
-        ? data
-        : data.filter((datalist) =>
+        ? list
+        : list.filter((datalist) =>
             datalist.noSurat.toUpperCase().includes(state.searched)
           );
     setShowList(searchResult);
@@ -106,12 +128,22 @@ export default function Vendor() {
 
   const handleFilter = (status) => {
     if (state.filtered == true && state.currentFilter == status) {
-      setShowList(data);
+      setShowList(list);
       setState({ ...state, filtered: false, currentFilter: "" });
     } else {
-      setShowList(data.filter((datalist) => datalist.status.includes(status)));
+      setShowList(list.filter((datalist) => datalist.status.includes(status)));
       setState({ ...state, filtered: true, currentFilter: status });
     }
+  };
+
+  const handleCabang = (e) => {
+    const value = e.target.value;
+    setState({
+      ...state,
+      [e.target.name]: value,
+      filtered: false,
+      currentFilter: "",
+    });
   };
 
   useEffect(() => {
@@ -126,10 +158,31 @@ export default function Vendor() {
           destination: childSnapshot.val().destination,
           status: childSnapshot.val().status,
           bagList: childSnapshot.val().bagList,
+          approvedDate: childSnapshot.val().approvedDate,
+          approvedTime: childSnapshot.val().approvedTime,
+          departureDate: childSnapshot.val().departureDate,
+          departureTime: childSnapshot.val().departureTime,
         });
       });
-      setData(list);
-      setShowList(list);
+      var result = list;
+      if (state.origin == "" && state.destination != "") {
+        result = list.filter((datalist) => {
+          return datalist["destination"] == state.destination;
+        });
+      } else if (state.origin != "" && state.destination == "") {
+        result = list.filter((datalist) => {
+          return datalist["origin"] == state.origin;
+        });
+      } else if (state.origin != "" && state.destination != "") {
+        result = list.filter((datalist) => {
+          return (
+            datalist["origin"] == state.origin &&
+            datalist["destination"] == state.destination
+          );
+        });
+      }
+      setData(result);
+      setShowList(result);
     });
 
     const handleResize = () => {
@@ -145,7 +198,14 @@ export default function Vendor() {
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, [auth.origin, auth.name, auth.level, state.limit]);
+  }, [
+    auth.origin,
+    auth.name,
+    auth.level,
+    state.limit,
+    state.origin,
+    state.destination,
+  ]);
 
   return (
     <div className="screen">
@@ -193,6 +253,42 @@ export default function Vendor() {
             </Col>
           ))}
         </Row>
+        <Row className="mt-4">
+          <Col>
+            <FloatingLabel controlId="floatingSelectData" label="Origin">
+              <Form.Select
+                aria-label="Origin"
+                name="origin"
+                onChange={handleCabang}
+                value={state.origin}
+              >
+                <option value="">ALL DATA</option>
+                {cabangList.map((item, id) => (
+                  <option key={id} value={item.name}>
+                    {item.name}
+                  </option>
+                ))}
+              </Form.Select>
+            </FloatingLabel>
+          </Col>
+          <Col>
+            <FloatingLabel controlId="floatingSelectData" label="Destination">
+              <Form.Select
+                aria-label="Destination"
+                name="destination"
+                onChange={handleCabang}
+                value={state.destination}
+              >
+                <option value="">ALL DATA</option>
+                {cabangList.map((item, id) => (
+                  <option key={id} value={item.name}>
+                    {item.name}
+                  </option>
+                ))}
+              </Form.Select>
+            </FloatingLabel>
+          </Col>
+        </Row>
         <hr />
         <Row className="mb-3">
           <Col>
@@ -224,13 +320,15 @@ export default function Vendor() {
                 <th>Koli</th>
                 <th>Weight</th>
                 <th>Status Manifest</th>
+                <th>Approved Date</th>
+                <th>Departure Date</th>
               </tr>
             </thead>
             <tbody>
               {showList.length == 0 ? (
                 <>
                   <tr>
-                    <td colSpan={6} align="center">
+                    <td colSpan={8} align="center">
                       <i>Data tidak ditemukan</i>
                     </td>
                   </tr>
@@ -257,6 +355,12 @@ export default function Vendor() {
                           }, 0) + " kg"}
                         </td>
                         <td>{item.status}</td>
+                        <td>{`${item.approvedDate} ${item.approvedTime}`}</td>
+                        <td>
+                          {item.departureDate == ""
+                            ? "-"
+                            : `${item.departureDate} ${item.departureTime}`}
+                        </td>
                       </tr>
                     ))
                     .reverse()}
