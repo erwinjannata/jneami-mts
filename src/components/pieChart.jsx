@@ -8,13 +8,6 @@ const PieChart = (data) => {
   let type = data.type;
   let dataList = data.data;
 
-  const randomBetween = (min, max) =>
-    min + Math.floor(Math.random() * (max - min + 1));
-  const r = randomBetween(0, 255);
-  const g = randomBetween(0, 255);
-  const b = randomBetween(0, 255);
-  const rgba = `rgba(${r},${g},${b}), 0.8`;
-
   let statusList = [
     { name: "Received", color: "rgba(33, 37, 41, 0.8)" },
     { name: "Sampai Tujuan", color: "rgba(13, 110, 253, 0.8)" },
@@ -38,6 +31,13 @@ const PieChart = (data) => {
     { id: "12", name: "TALIWANG", color: "#ffd600" },
     { id: "13", name: "TANJUNG", color: "#fff3e0" },
     { id: "14", name: "UTAN", color: "#ff5722" },
+  ];
+
+  let waktuList = [
+    { name: "Tepat Waktu", color: "rgba(13, 110, 253, 0.8)" },
+    { name: "Terlambat", color: "rgba(220, 53, 69, 0.8)" },
+    { name: "Lebih Awal", color: "rgba(25, 135, 84, 0.8)" },
+    { name: "Dalam Perjalanan", color: "rgba(108, 117, 125, 0.8)" },
   ];
 
   let statusData = [
@@ -75,19 +75,42 @@ const PieChart = (data) => {
     ];
   });
 
+  let waktuData = waktuList.map((item) => {
+    return [
+      (
+        (dataList.reduce(
+          (counter, obj) =>
+            obj.statusWaktu == item.name ? (counter += 1) : counter,
+          0
+        ) /
+          dataList.length) *
+        100
+      ).toFixed(2),
+    ];
+  });
+
   const chartData = {
     labels:
       type == "status"
         ? statusList.map((item) => item.name)
-        : cabangList.map((item) => item.name),
+        : type == "destination"
+        ? cabangList.map((item) => item.name)
+        : waktuList.map((item) => item.name),
     datasets: [
       {
-        label: " Surat Manifest",
-        data: type == "status" ? statusData : cabangData,
+        label: type == "waktu" ? " Persentase (%)" : " Surat Manifest",
+        data:
+          type == "status"
+            ? statusData
+            : type == "destination"
+            ? cabangData
+            : waktuData,
         backgroundColor:
           type == "status"
             ? statusList.map((item) => item.color)
-            : cabangList.map((item) => item.color),
+            : type == "destination"
+            ? cabangList.map((item) => item.color)
+            : waktuList.map((item) => item.color),
         borderColor: "white",
         borderWidth: 3,
       },
@@ -105,7 +128,9 @@ const PieChart = (data) => {
             text:
               type == "status"
                 ? "Status Surat Manifest"
-                : "Surat Manifest per Destinasi",
+                : type == "destination"
+                ? "Surat Manifest per Destinasi"
+                : "Persentase Ketepatan Waktu",
           },
           legend: {
             position: "bottom",

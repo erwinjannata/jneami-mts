@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unknown-property */
 /* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import {
@@ -20,6 +21,8 @@ import { useNavigate } from "react-router-dom";
 import { UseAuth } from "../config/authContext";
 import { FaTruckLoading, FaBoxes } from "react-icons/fa";
 import { FaTruckPlane, FaPlaneCircleCheck } from "react-icons/fa6";
+import { cutOffTime } from "../components/cutOffTime";
+import ToastWarning from "../components/toastWarning";
 
 export default function Home() {
   const auth = UseAuth();
@@ -39,6 +42,7 @@ export default function Home() {
     currentFilter: "",
     origin: "All Cabang",
     destination: "All Cabang",
+    warningItem: 0,
   });
   const [loading, setLoading] = useState(true);
 
@@ -188,6 +192,20 @@ export default function Home() {
       let data = [];
 
       snapshot.forEach((childSnapshot) => {
+        // let cot =
+        //   cutOffTime.find(
+        //     (data) =>
+        //       data.origin == childSnapshot.val().origin &&
+        //       data.destination == childSnapshot.val().destination
+        //   ) || "";
+
+        // if (
+        //   childSnapshot.val().durasi != undefined &&
+        //   childSnapshot.val().durasi.split(" ")[0] > cot
+        // ) {
+        //   setState({ ...state, warningItem: state.warningItem + 1 });
+        // }
+
         if (auth.origin == "MATARAM") {
           data.push({
             key: childSnapshot.key,
@@ -317,6 +335,7 @@ export default function Home() {
     state.origin,
     state.destination,
     state.showed,
+    // state.warningItem,
     Notification,
   ]);
 
@@ -558,6 +577,7 @@ export default function Home() {
             </FloatingLabel>
           </Col>
         </Row>
+        {/* <ToastWarning item={state.warningItem} /> */}
       </Container>
     </div>
   );

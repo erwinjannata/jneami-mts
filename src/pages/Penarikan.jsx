@@ -22,6 +22,7 @@ import { useNavigate } from "react-router-dom";
 import { UseAuth } from "../config/authContext";
 import PieChart from "../components/pieChart";
 import { FaEye, FaEyeSlash } from "react-icons/fa6";
+import { cutOffTime } from "../components/cutOffTime";
 
 export default function Penarikan() {
   const d = new Date();
@@ -68,6 +69,24 @@ export default function Penarikan() {
     { label: "Received Date", value: "receivedDate" },
   ];
 
+  // let cotList = [
+  //   { origin: "MATARAM", destination: "ALAS", cot: 5 },
+  //   { origin: "MATARAM", destination: "BIMA", cot: 16 },
+  //   { origin: "MATARAM", destination: "BOLO", cot: 12 },
+  //   { origin: "MATARAM", destination: "DOMPU", cot: 10 },
+  //   { origin: "MATARAM", destination: "EMPANG", cot: 10 },
+  //   { origin: "MATARAM", destination: "MANGGELEWA", cot: 14 },
+  //   { origin: "MATARAM", destination: "MATARAM", cot: 0 },
+  //   { origin: "MATARAM", destination: "PADOLO", cot: 13 },
+  //   { origin: "MATARAM", destination: "PLAMPANG", cot: 15 },
+  //   { origin: "MATARAM", destination: "PRAYA", cot: 2 },
+  //   { origin: "MATARAM", destination: "SELONG", cot: 2 },
+  //   { origin: "MATARAM", destination: "SUMBAWA", cot: 8 },
+  //   { origin: "MATARAM", destination: "TALIWANG", cot: 5 },
+  //   { origin: "MATARAM", destination: "TANJUNG", cot: 2 },
+  //   { origin: "MATARAM", destination: "UTAN", cot: 8 },
+  // ];
+
   const handleChange = (e) => {
     const value = e.target.value;
     setState({
@@ -84,6 +103,12 @@ export default function Penarikan() {
         let data = [];
 
         snapshot.forEach((childSnapshot) => {
+          let cot =
+            cutOffTime.find(
+              (data) =>
+                data.origin == childSnapshot.val().origin &&
+                data.destination == childSnapshot.val().destination
+            ) || "";
           data.push({
             key: childSnapshot.key,
             noSurat: childSnapshot.val().noSurat,
@@ -105,6 +130,14 @@ export default function Penarikan() {
             status: childSnapshot.val().status,
             driver: childSnapshot.val().driver,
             bagList: childSnapshot.val().bagList,
+            statusWaktu:
+              childSnapshot.val().durasi == undefined
+                ? "Dalam Perjalanan"
+                : childSnapshot.val().durasi.split(" ")[0] == cot.cot
+                ? "Tepat Waktu"
+                : childSnapshot.val().durasi.split(" ")[0] > cot.cot
+                ? "Terlambat"
+                : "Lebih Awal",
           });
         });
 
@@ -150,20 +183,48 @@ export default function Penarikan() {
           destination: row.destination,
           status: row.status,
           preparedBy: row.preparedBy,
-          approvedDate: new Date(row.approvedDate),
-          approvedTime: row.approvedTime,
+          approvedDate: new Date(
+            new Date(row.approvedDate).setHours(
+              row.approvedTime.split(":")[0],
+              row.approvedTime.split(":")[1],
+              0
+            )
+          ),
           receivedBy: row.receivedBy,
           receivedDate:
-            row.receivedDate == "" ? "" : new Date(row.receivedDate),
-          receivedTime: row.receivedTime,
+            row.receivedDate == ""
+              ? ""
+              : new Date(
+                  new Date(row.receivedDate).setHours(
+                    row.receivedTime.split(":")[0],
+                    row.receivedTime.split(":")[1],
+                    0
+                  )
+                ),
           departureDate:
-            row.departureDate == "" ? "" : new Date(row.departureDate),
-          departureTime: row.departureTime,
-          arrivalDate: row.arrivalDate == "" ? "" : new Date(row.arrivalDate),
-          arrivalTime: row.arrivalTime,
+            row.departureDate == ""
+              ? ""
+              : new Date(
+                  new Date(row.departureDate).setHours(
+                    row.departureTime.split(":")[0],
+                    row.departureTime.split(":")[1],
+                    0
+                  )
+                ),
+          arrivalDate:
+            row.arrivalDate == ""
+              ? ""
+              : new Date(
+                  new Date(row.arrivalDate).setHours(
+                    row.arrivalTime.split(":")[0],
+                    row.arrivalTime.split(":")[1],
+                    0
+                  )
+                ),
           durasi: row.durasi,
           noPolisi: row.noPolisi,
           driver: row.driver,
+          statusWaktu: row.statusWaktu,
         });
       }
     });
@@ -187,17 +248,14 @@ export default function Penarikan() {
           "Status Manifest",
           "Approved by",
           "Approved Date",
-          "Approved Time",
           "Received by",
           "Received Date",
-          "Received Time",
           "Tanggal Keberangkatan",
-          "Waktu Keberangkatan",
           "Tanggal Kedatangan",
-          "Waktu Kedatangan",
           "Durasi Perjalanan",
           "No. Polisi Kendaraan",
           "Driver",
+          "Status Waktu",
         ],
       ],
       { origin: "A1" }
@@ -401,7 +459,10 @@ export default function Penarikan() {
               <Col xs={windowSize.width >= 768 ? 4 : 0}>
                 <PieChart type="status" data={dataList} />
               </Col>
-              <Col xs={windowSize.width >= 768 ? 5 : 0}>
+              <Col xs={windowSize.width >= 768 ? 4 : 0}>
+                <PieChart type="waktu" data={dataList} />
+              </Col>
+              <Col xs={windowSize.width >= 768 ? 4 : 0}>
                 {windowSize.width >= 768 ? null : <hr />}
                 <PieChart type="destination" data={dataList} />
               </Col>
@@ -424,13 +485,15 @@ export default function Penarikan() {
                   <th>Departure Date</th>
                   <th>Arrival Date</th>
                   <th>Received Date</th>
+                  <th>Durasi Perjalanan</th>
+                  <th>Status Waktu</th>
                 </tr>
               </thead>
               <tbody>
                 {dataList.length == 0 ? (
                   <>
                     <tr>
-                      <td colSpan={10} align="center">
+                      <td colSpan={12} align="center">
                         <i>Data tidak ditemukan</i>
                       </td>
                     </tr>
@@ -473,6 +536,8 @@ export default function Penarikan() {
                               ? "-"
                               : `${item.receivedDate} ${item.receivedTime}`}
                           </td>
+                          <td>{item.durasi}</td>
+                          <td>{item.statusWaktu}</td>
                         </tr>
                       ))
                       .reverse()}
