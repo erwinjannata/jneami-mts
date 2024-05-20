@@ -37,7 +37,6 @@ const PieChart = (data) => {
     { name: "Tepat Waktu", color: "rgba(13, 110, 253, 0.8)" },
     { name: "Terlambat", color: "rgba(220, 53, 69, 0.8)" },
     { name: "Lebih Awal", color: "rgba(25, 135, 84, 0.8)" },
-    { name: "Dalam Perjalanan", color: "rgba(108, 117, 125, 0.8)" },
   ];
 
   let statusData = [

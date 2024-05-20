@@ -4,7 +4,7 @@ export default function ToastWarning(item) {
   return (
     <ToastContainer
       className="p-3 position-fixed"
-      position="top-end"
+      position="bottom-end"
       style={{ zIndex: 1 }}
     >
       <Toast show={true} bg="dark">

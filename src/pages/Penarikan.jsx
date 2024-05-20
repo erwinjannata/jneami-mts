@@ -69,24 +69,6 @@ export default function Penarikan() {
     { label: "Received Date", value: "receivedDate" },
   ];
 
-  // let cotList = [
-  //   { origin: "MATARAM", destination: "ALAS", cot: 5 },
-  //   { origin: "MATARAM", destination: "BIMA", cot: 16 },
-  //   { origin: "MATARAM", destination: "BOLO", cot: 12 },
-  //   { origin: "MATARAM", destination: "DOMPU", cot: 10 },
-  //   { origin: "MATARAM", destination: "EMPANG", cot: 10 },
-  //   { origin: "MATARAM", destination: "MANGGELEWA", cot: 14 },
-  //   { origin: "MATARAM", destination: "MATARAM", cot: 0 },
-  //   { origin: "MATARAM", destination: "PADOLO", cot: 13 },
-  //   { origin: "MATARAM", destination: "PLAMPANG", cot: 15 },
-  //   { origin: "MATARAM", destination: "PRAYA", cot: 2 },
-  //   { origin: "MATARAM", destination: "SELONG", cot: 2 },
-  //   { origin: "MATARAM", destination: "SUMBAWA", cot: 8 },
-  //   { origin: "MATARAM", destination: "TALIWANG", cot: 5 },
-  //   { origin: "MATARAM", destination: "TANJUNG", cot: 2 },
-  //   { origin: "MATARAM", destination: "UTAN", cot: 8 },
-  // ];
-
   const handleChange = (e) => {
     const value = e.target.value;
     setState({
@@ -103,6 +85,25 @@ export default function Penarikan() {
         let data = [];
 
         snapshot.forEach((childSnapshot) => {
+          let berangkat = childSnapshot.val().departureDate
+            ? `${moment(childSnapshot.val().departureDate)
+                .locale("id")
+                .format("L")} ${childSnapshot.val().departureTime}:00`
+            : "";
+          let tiba = childSnapshot.val().arrivalDate
+            ? `${moment(childSnapshot.val().arrivalDate)
+                .locale("id")
+                .format("L")} ${childSnapshot.val().arrivalTime}:00`
+            : `${moment(d).locale("id").format("L")} ${moment(d)
+                .locale("id")
+                .format("LT")}:00`;
+          let dura = childSnapshot.val().departureDate
+            ? moment(tiba, "DD/MM/YYYY HH:mm:ss").diff(
+                moment(berangkat, "DD/MM/YYYY HH:mm:ss")
+              )
+            : 0;
+          let durasi = moment.duration(dura).asHours();
+
           let cot =
             cutOffTime.find(
               (data) =>
@@ -124,6 +125,7 @@ export default function Penarikan() {
             arrivalDate: childSnapshot.val().arrivalDate,
             arrivalTime: childSnapshot.val().arrivalTime,
             durasi: childSnapshot.val().durasi,
+            durasiJam: durasi.toFixed(1),
             departureDate: childSnapshot.val().departureDate,
             departureTime: childSnapshot.val().departureTime,
             receivedBy: childSnapshot.val().receivedBy,
@@ -131,13 +133,13 @@ export default function Penarikan() {
             driver: childSnapshot.val().driver,
             bagList: childSnapshot.val().bagList,
             statusWaktu:
-              childSnapshot.val().durasi == undefined
-                ? "Dalam Perjalanan"
-                : childSnapshot.val().durasi.split(" ")[0] == cot.cot
-                ? "Tepat Waktu"
-                : childSnapshot.val().durasi.split(" ")[0] > cot.cot
+              durasi < cot.cot
+                ? durasi < cot.cot - 1
+                  ? "Lebih Awal"
+                  : "Tepat Waktu"
+                : durasi > cot.cot + 1
                 ? "Terlambat"
-                : "Lebih Awal",
+                : "Tepat Waktu",
           });
         });
 
@@ -221,7 +223,7 @@ export default function Penarikan() {
                     0
                   )
                 ),
-          durasi: row.durasi,
+          durasi: parseFloat(row.durasiJam),
           noPolisi: row.noPolisi,
           driver: row.driver,
           statusWaktu: row.statusWaktu,
@@ -252,7 +254,7 @@ export default function Penarikan() {
           "Received Date",
           "Tanggal Keberangkatan",
           "Tanggal Kedatangan",
-          "Durasi Perjalanan",
+          "Durasi Perjalanan (Jam)",
           "No. Polisi Kendaraan",
           "Driver",
           "Status Waktu",
