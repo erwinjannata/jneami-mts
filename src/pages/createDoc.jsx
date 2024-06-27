@@ -224,6 +224,10 @@ export default function Create() {
       alert("Origin kosong, harap refresh halaman, atau login ulang");
     } else if (state.preparedBy == "") {
       alert("Nama checker kosong, harap refresh halaman, atau login ulang");
+    } else if (state.noSurat == "") {
+      alert(
+        "No. Surat tidak terbaca, silahkan refresh halaman, atau login ulang"
+      );
     } else if (bagList.length == 0) {
       alert("Tidak ada data Manifest");
     } else {

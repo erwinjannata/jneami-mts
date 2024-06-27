@@ -187,7 +187,7 @@ export default function Home() {
       state.showed == "all"
         ? db
         : db.orderByChild(`${state.showed}`).equalTo(auth.origin);
-    filters.limitToLast(1000).on("value", (snapshot) => {
+    filters.limitToLast(250).on("value", (snapshot) => {
       let data = [];
 
       snapshot.forEach((childSnapshot) => {
@@ -204,7 +204,7 @@ export default function Home() {
             status: childSnapshot.val().status,
             durasi: childSnapshot.val().durasi,
             noPolisi: childSnapshot.val().noPolisi,
-            bagList: childSnapshot.val().bagList,
+            // bagList: childSnapshot.val().bagList,
           });
         } else {
           if (
@@ -223,7 +223,7 @@ export default function Home() {
               status: childSnapshot.val().status,
               durasi: childSnapshot.val().durasi,
               noPolisi: childSnapshot.val().noPolisi,
-              bagList: childSnapshot.val().bagList,
+              // bagList: childSnapshot.val().bagList,
             });
           }
         }
@@ -322,6 +322,7 @@ export default function Home() {
     state.destination,
     state.showed,
     Notification,
+    loading,
   ]);
 
   return (
@@ -456,8 +457,8 @@ export default function Home() {
                 <th>Origin</th>
                 <th>Destination</th>
                 <th>Status</th>
-                <th>Koli</th>
-                <th>Weight</th>
+                {/* <th>Koli</th>
+                <th>Weight</th> */}
                 <th>Waktu Keberangkatan</th>
                 <th>Waktu Kedatangan</th>
                 <th>Durasi Perjalanan</th>
@@ -504,18 +505,18 @@ export default function Home() {
                           <td>{item.origin}</td>
                           <td>{item.destination}</td>
                           <td>{item.status}</td>
-                          <td>
+                          {/* <td>
                             {item.bagList
                               .reduce((prev, next) => {
                                 return prev + parseInt(next.koli);
                               }, 0)
                               .toString()}
-                          </td>
-                          <td>
+                          </td> */}
+                          {/* <td>
                             {item.bagList.reduce((prev, next) => {
                               return prev + parseInt(next.kg);
                             }, 0) + " kg"}
-                          </td>
+                          </td> */}
                           <td>
                             {item.departureDate == ""
                               ? "-"
@@ -556,8 +557,6 @@ export default function Home() {
                 <option value="50">50</option>
                 <option value="100">100</option>
                 <option value="250">250</option>
-                <option value="500">500</option>
-                <option value="1000">1000</option>
               </Form.Select>
             </FloatingLabel>
           </Col>
