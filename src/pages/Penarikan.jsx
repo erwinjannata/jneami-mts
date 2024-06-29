@@ -81,6 +81,7 @@ export default function Penarikan() {
     db.orderByChild(state.query)
       .startAt(state.start)
       .endAt(state.end)
+      .limitToLast(150)
       .on("value", (snapshot) => {
         let data = [];
 

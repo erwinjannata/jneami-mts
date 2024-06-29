@@ -51,6 +51,7 @@ export default function Create() {
   let navigate = new useNavigate();
   const [loading, setLoading] = useState(false);
   const [n, setN] = useState("");
+  const [collectionLength, setCollectionLength] = useState(0);
 
   const [bagList, setBagList] = useState([]);
   const [state, setState] = useState({
@@ -280,6 +281,7 @@ export default function Create() {
                     count: 0,
                   })
                   .then(() => {
+                    db.ref("status/collectionLength").set(collectionLength);
                     setLoading(false);
                     alert("Approved");
                     localStorage.removeItem("bagList");
@@ -312,19 +314,15 @@ export default function Create() {
     if (auth.origin == "VENDOR") {
       navigate("/vendor");
     }
-    db.ref("manifestTransit/").on("value", (snapshot) => {
-      let count = 0;
-      snapshot.forEach((childSnapshot) => {
-        if (!childSnapshot.val().noSurat.includes("_")) {
-          count++;
-        }
-      });
+    db.ref("status").on("value", (snapshot) => {
+      let count = parseInt(snapshot.child("collectionLength").val());
       let zerofilled = ("00000" + (count + 1)).slice(-5);
       setState({
         ...state,
         noSurat: `AMI/MTM/${year}/${zerofilled}`,
       });
       setN(zerofilled);
+      setCollectionLength(count + 1);
     });
     const handleResize = () => {
       setWindowSize({

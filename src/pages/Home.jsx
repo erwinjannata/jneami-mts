@@ -187,7 +187,7 @@ export default function Home() {
       state.showed == "all"
         ? db
         : db.orderByChild(`${state.showed}`).equalTo(auth.origin);
-    filters.limitToLast(250).on("value", (snapshot) => {
+    filters.limitToLast(150).on("value", (snapshot) => {
       let data = [];
 
       snapshot.forEach((childSnapshot) => {
@@ -468,7 +468,7 @@ export default function Home() {
             {loading ? (
               <tbody>
                 <tr>
-                  <td colSpan={10}>
+                  <td colSpan={8}>
                     <Placeholder animation="wave">
                       <Placeholder xs={12} bg="secondary" size="lg" />
                     </Placeholder>
@@ -485,7 +485,7 @@ export default function Home() {
                   <>
                     <tr>
                       <td
-                        colSpan={windowSize.width > "768" ? 10 : 6}
+                        colSpan={windowSize.width > "768" ? 8 : 6}
                         align="center"
                       >
                         <i>Data tidak ditemukan</i>
@@ -556,7 +556,7 @@ export default function Home() {
               >
                 <option value="50">50</option>
                 <option value="100">100</option>
-                <option value="250">250</option>
+                <option value="150">150</option>
               </Form.Select>
             </FloatingLabel>
           </Col>
