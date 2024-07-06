@@ -39,6 +39,7 @@ export default function Penarikan() {
   let db = firebase.database().ref("manifestTransit");
   const [dataList, setDataList] = useState([]);
   const [show, setShow] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
@@ -78,92 +79,100 @@ export default function Penarikan() {
   };
 
   const handleSubmit = () => {
-    db.orderByChild(state.query)
-      .startAt(state.start)
-      .endAt(state.end)
-      .limitToLast(150)
-      .on("value", (snapshot) => {
-        let data = [];
+    var delta = Math.abs(new Date(state.start) - new Date(state.end)) / 1000;
+    var days = Math.floor(delta / 86400);
+    if (days <= 7) {
+      setLoading(true);
+      db.orderByChild(state.query)
+        .limitToLast(1000)
+        .startAt(state.start)
+        .endAt(state.end)
+        .on("value", (snapshot) => {
+          let data = [];
 
-        snapshot.forEach((childSnapshot) => {
-          let berangkat = childSnapshot.val().departureDate
-            ? `${moment(childSnapshot.val().departureDate)
-                .locale("id")
-                .format("L")} ${childSnapshot.val().departureTime}:00`
-            : "";
-          let tiba = childSnapshot.val().arrivalDate
-            ? `${moment(childSnapshot.val().arrivalDate)
-                .locale("id")
-                .format("L")} ${childSnapshot.val().arrivalTime}:00`
-            : `${moment(d).locale("id").format("L")} ${moment(d)
-                .locale("id")
-                .format("LT")}:00`;
-          let dura = childSnapshot.val().departureDate
-            ? moment(tiba, "DD/MM/YYYY HH:mm:ss").diff(
-                moment(berangkat, "DD/MM/YYYY HH:mm:ss")
-              )
-            : 0;
-          let durasi = moment.duration(dura).asHours();
+          snapshot.forEach((childSnapshot) => {
+            let berangkat = childSnapshot.val().departureDate
+              ? `${moment(childSnapshot.val().departureDate)
+                  .locale("id")
+                  .format("L")} ${childSnapshot.val().departureTime}:00`
+              : "";
+            let tiba = childSnapshot.val().arrivalDate
+              ? `${moment(childSnapshot.val().arrivalDate)
+                  .locale("id")
+                  .format("L")} ${childSnapshot.val().arrivalTime}:00`
+              : `${moment(d).locale("id").format("L")} ${moment(d)
+                  .locale("id")
+                  .format("LT")}:00`;
+            let dura = childSnapshot.val().departureDate
+              ? moment(tiba, "DD/MM/YYYY HH:mm:ss").diff(
+                  moment(berangkat, "DD/MM/YYYY HH:mm:ss")
+                )
+              : 0;
+            let durasi = moment.duration(dura).asHours();
 
-          let cot =
-            cutOffTime.find(
-              (data) =>
-                data.origin == childSnapshot.val().origin &&
-                data.destination == childSnapshot.val().destination
-            ) || "";
-          data.push({
-            key: childSnapshot.key,
-            noSurat: childSnapshot.val().noSurat,
-            noRef: childSnapshot.val().noRef,
-            noPolisi: childSnapshot.val().noPolisi,
-            origin: childSnapshot.val().origin,
-            destination: childSnapshot.val().destination,
-            preparedBy: childSnapshot.val().preparedBy,
-            approvedDate: childSnapshot.val().approvedDate,
-            approvedTime: childSnapshot.val().approvedTime,
-            receivedDate: childSnapshot.val().receivedDate,
-            receivedTime: childSnapshot.val().receivedTime,
-            arrivalDate: childSnapshot.val().arrivalDate,
-            arrivalTime: childSnapshot.val().arrivalTime,
-            durasi: childSnapshot.val().durasi,
-            durasiJam: durasi.toFixed(1),
-            departureDate: childSnapshot.val().departureDate,
-            departureTime: childSnapshot.val().departureTime,
-            receivedBy: childSnapshot.val().receivedBy,
-            status: childSnapshot.val().status,
-            driver: childSnapshot.val().driver,
-            bagList: childSnapshot.val().bagList,
-            statusWaktu:
-              durasi < cot.cot
-                ? durasi < cot.cot - 1
-                  ? "Lebih Awal"
-                  : "Tepat Waktu"
-                : durasi > cot.cot + 1
-                ? "Terlambat"
-                : "Tepat Waktu",
+            let cot =
+              cutOffTime.find(
+                (data) =>
+                  data.origin == childSnapshot.val().origin &&
+                  data.destination == childSnapshot.val().destination
+              ) || "";
+            data.push({
+              key: childSnapshot.key,
+              noSurat: childSnapshot.val().noSurat,
+              noRef: childSnapshot.val().noRef,
+              noPolisi: childSnapshot.val().noPolisi,
+              origin: childSnapshot.val().origin,
+              destination: childSnapshot.val().destination,
+              preparedBy: childSnapshot.val().preparedBy,
+              approvedDate: childSnapshot.val().approvedDate,
+              approvedTime: childSnapshot.val().approvedTime,
+              receivedDate: childSnapshot.val().receivedDate,
+              receivedTime: childSnapshot.val().receivedTime,
+              arrivalDate: childSnapshot.val().arrivalDate,
+              arrivalTime: childSnapshot.val().arrivalTime,
+              durasi: childSnapshot.val().durasi,
+              durasiJam: durasi.toFixed(1),
+              departureDate: childSnapshot.val().departureDate,
+              departureTime: childSnapshot.val().departureTime,
+              receivedBy: childSnapshot.val().receivedBy,
+              status: childSnapshot.val().status,
+              driver: childSnapshot.val().driver,
+              bagList: childSnapshot.val().bagList,
+              statusWaktu:
+                durasi < cot.cot
+                  ? durasi < cot.cot - 1
+                    ? "Lebih Awal"
+                    : "Tepat Waktu"
+                  : durasi > cot.cot + 1
+                  ? "Terlambat"
+                  : "Tepat Waktu",
+            });
           });
+
+          var result = data;
+          if (state.origin == "" && state.destination != "") {
+            result = data.filter((datalist) => {
+              return datalist["destination"] == state.destination;
+            });
+          } else if (state.origin != "" && state.destination == "") {
+            result = data.filter((datalist) => {
+              return datalist["origin"] == state.origin;
+            });
+          } else if (state.origin != "" && state.destination != "") {
+            result = data.filter((datalist) => {
+              return (
+                datalist["origin"] == state.origin &&
+                datalist["destination"] == state.destination
+              );
+            });
+          }
+          setDataList(result);
+          setShow(true);
+          setLoading(false);
         });
-
-        var result = data;
-        if (state.origin == "" && state.destination != "") {
-          result = data.filter((datalist) => {
-            return datalist["destination"] == state.destination;
-          });
-        } else if (state.origin != "" && state.destination == "") {
-          result = data.filter((datalist) => {
-            return datalist["origin"] == state.origin;
-          });
-        } else if (state.origin != "" && state.destination != "") {
-          result = data.filter((datalist) => {
-            return (
-              datalist["origin"] == state.origin &&
-              datalist["destination"] == state.destination
-            );
-          });
-        }
-        setDataList(result);
-      });
-    setShow(true);
+    } else {
+      alert("Penarikan data dibatasi maksimum 7 hari");
+    }
   };
 
   const handleDownload = () => {
@@ -394,8 +403,9 @@ export default function Penarikan() {
               variant="primary"
               className={windowSize.width >= 768 ? "mx-2" : "mx-0"}
               onClick={handleSubmit}
+              disabled={loading}
             >
-              Go
+              {loading ? "Loading..." : "Go"}
             </Button>
             {dataList.length == 0 ? null : (
               <>
