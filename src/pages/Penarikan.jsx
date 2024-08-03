@@ -22,7 +22,7 @@ import { useNavigate } from "react-router-dom";
 import { UseAuth } from "../config/authContext";
 import PieChart from "../components/pieChart";
 import { FaEye, FaEyeSlash } from "react-icons/fa6";
-import { cutOffTime } from "../components/cutOffTime";
+// import { cutOffTime } from "../components/cutOffTime";
 
 export default function Penarikan() {
   const d = new Date();
@@ -110,12 +110,12 @@ export default function Penarikan() {
               : 0;
             let durasi = moment.duration(dura).asHours();
 
-            let cot =
-              cutOffTime.find(
-                (data) =>
-                  data.origin == childSnapshot.val().origin &&
-                  data.destination == childSnapshot.val().destination
-              ) || "";
+            // let cot =
+            //   cutOffTime.find(
+            //     (data) =>
+            //       data.origin == childSnapshot.val().origin &&
+            //       data.destination == childSnapshot.val().destination
+            //   ) || "";
             data.push({
               key: childSnapshot.key,
               noSurat: childSnapshot.val().noSurat,
@@ -138,14 +138,14 @@ export default function Penarikan() {
               status: childSnapshot.val().status,
               driver: childSnapshot.val().driver,
               bagList: childSnapshot.val().bagList,
-              statusWaktu:
-                durasi < cot.cot
-                  ? durasi < cot.cot - 1
-                    ? "Lebih Awal"
-                    : "Tepat Waktu"
-                  : durasi > cot.cot + 1
-                  ? "Terlambat"
-                  : "Tepat Waktu",
+              // statusWaktu:
+              //   durasi < cot.cot
+              //     ? durasi < cot.cot - 1
+              //       ? "Lebih Awal"
+              //       : "Tepat Waktu"
+              //     : durasi > cot.cot + 1
+              //     ? "Terlambat"
+              //     : "Tepat Waktu",
             });
           });
 
@@ -236,7 +236,7 @@ export default function Penarikan() {
           durasi: parseFloat(row.durasiJam),
           noPolisi: row.noPolisi,
           driver: row.driver,
-          statusWaktu: row.statusWaktu,
+          // statusWaktu: row.statusWaktu,
         });
       }
     });
@@ -267,7 +267,7 @@ export default function Penarikan() {
           "Durasi Perjalanan (Jam)",
           "No. Polisi Kendaraan",
           "Driver",
-          "Status Waktu",
+          // "Status Waktu",
         ],
       ],
       { origin: "A1" }
@@ -472,9 +472,9 @@ export default function Penarikan() {
               <Col xs={windowSize.width >= 768 ? 4 : 0}>
                 <PieChart type="status" data={dataList} />
               </Col>
-              <Col xs={windowSize.width >= 768 ? 4 : 0}>
+              {/* <Col xs={windowSize.width >= 768 ? 4 : 0}>
                 <PieChart type="waktu" data={dataList} />
-              </Col>
+              </Col> */}
               <Col xs={windowSize.width >= 768 ? 4 : 0}>
                 {windowSize.width >= 768 ? null : <hr />}
                 <PieChart type="destination" data={dataList} />
@@ -499,18 +499,16 @@ export default function Penarikan() {
                   <th>Arrival Date</th>
                   <th>Received Date</th>
                   <th>Durasi Perjalanan</th>
-                  <th>Status Waktu</th>
+                  {/* <th>Status Waktu</th> */}
                 </tr>
               </thead>
               <tbody>
                 {dataList.length == 0 ? (
-                  <>
-                    <tr>
-                      <td colSpan={12} align="center">
-                        <i>Data tidak ditemukan</i>
-                      </td>
-                    </tr>
-                  </>
+                  <tr>
+                    <td colSpan={12} align="center">
+                      <i>Data tidak ditemukan</i>
+                    </td>
+                  </tr>
                 ) : (
                   <>
                     {dataList
@@ -550,7 +548,7 @@ export default function Penarikan() {
                               : `${item.receivedDate} ${item.receivedTime}`}
                           </td>
                           <td>{item.durasi}</td>
-                          <td>{item.statusWaktu}</td>
+                          {/* <td>{item.statusWaktu}</td> */}
                         </tr>
                       ))
                       .reverse()}

@@ -9,6 +9,7 @@ import Penarikan from "./pages/Penarikan";
 import AddUser from "./pages/addUser";
 import DamageReport from "./pages/damageReport";
 import Vendor from "./pages/Vendor";
+import FindManifestNumber from "./pages/findManifest";
 
 function App() {
   return (
@@ -61,6 +62,14 @@ function App() {
           element={
             <PrivateRoute>
               <AddUser />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/find"
+          element={
+            <PrivateRoute>
+              <FindManifestNumber />
             </PrivateRoute>
           }
         />

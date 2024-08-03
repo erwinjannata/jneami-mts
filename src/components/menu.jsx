@@ -12,6 +12,7 @@ import { Button, Form, Offcanvas } from "react-bootstrap";
 import { MdHomeFilled } from "react-icons/md";
 import { HiDocumentPlus } from "react-icons/hi2";
 import { HiDocumentArrowDown } from "react-icons/hi2";
+import { BiSearchAlt } from "react-icons/bi";
 import { CgDanger } from "react-icons/cg";
 import { RiUserAddFill } from "react-icons/ri";
 import { FaPlane } from "react-icons/fa6";
@@ -51,13 +52,20 @@ export default function NavMenu() {
     },
     {
       id: "4",
+      nama: "Cari No. Manifest",
+      link: "/find",
+      req: 1,
+      icon: <BiSearchAlt size={20} />,
+    },
+    {
+      id: "5",
       nama: "Vendor",
       link: "/vendor",
       req: 5,
       icon: <FaPlane size={20} />,
     },
     {
-      id: "5",
+      id: "6",
       nama: "New User",
       link: "/add",
       req: 5,

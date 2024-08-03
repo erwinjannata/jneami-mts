@@ -54,8 +54,8 @@ td{
 .tableData{
   max-height: 375px;
   max-width: 1200px;
-  overflow: scroll;
-  /* display: flex; */
+  /* overflow: scroll; */
+  display: flex;
 }
 
 @media only screen and (max-width: 1024px) {
