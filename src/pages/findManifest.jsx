@@ -3,6 +3,11 @@ import { useEffect, useState } from "react";
 import { UseAuth } from "../config/authContext";
 import Menu from "../components/menu";
 import firebase from "./../config/firebase";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import moment from "moment";
+import "moment/locale/en-ca";
+import "moment/locale/id";
 import {
   Button,
   Col,
@@ -12,17 +17,19 @@ import {
   Row,
   Table,
 } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
 export default function FindManifestNumber() {
   const auth = UseAuth();
-  let db = firebase
-    .database()
-    .ref("manifestTransit")
-    .orderByChild("bagList/manifestsNo");
+  let db = firebase.database().ref("manifestTransit/");
+  let navigate = useNavigate();
 
+  const d = new Date();
   const [state, setState] = useState({
     number: "",
     loading: false,
+    show: false,
+    date: moment(d).locale("en-ca").format("L"),
   });
 
   const [dataList, setDataList] = useState([]);
@@ -36,19 +43,31 @@ export default function FindManifestNumber() {
   };
 
   const handleSubmit = () => {
-    db.limitToLast(4000).on("value", (snapshot) => {
-      let data = [];
+    setState({ ...state, loading: true });
+    db.orderByChild("approvedDate")
+      .limitToLast(1000)
+      .equalTo(state.date)
+      .on("value", (snapshot) => {
+        var data = [];
 
-      snapshot.forEach((childSnapshot) => {
-        childSnapshot.val().bagList.forEach((item) => {
-          if (item.manifestNo == state.number) {
-            data.push({ bags: childSnapshot.val().bagList });
-          }
+        snapshot.forEach((childSnapshot) => {
+          childSnapshot.child("bagList").forEach((items) => {
+            let result = items.val().manifestNo.replace(/ /g, "");
+            if (result.includes(state.number)) {
+              data.push({
+                key: childSnapshot.key,
+                manifestNo: items.val().manifestNo,
+                noSurat: childSnapshot.val().noSurat,
+                origin: childSnapshot.val().origin,
+                destination: childSnapshot.val().destination,
+                status: childSnapshot.val().status,
+              });
+            }
+          });
         });
+        setDataList(data);
+        setState({ ...state, show: true, loading: false });
       });
-      setDataList(data);
-    });
-    console.log(dataList);
   };
 
   useEffect(() => {
@@ -66,14 +85,14 @@ export default function FindManifestNumber() {
             <Form>
               <FloatingLabel
                 controlId="floatingInputNo"
-                label="No. Manifest"
+                label="No Manifest/Bag"
                 className="mb-3"
               >
                 <Form.Control
                   type="text"
                   name="number"
                   value={state.number}
-                  placeholder="Cari no. surat"
+                  placeholder={state.number}
                   onChange={handleChange}
                 />
               </FloatingLabel>
@@ -82,26 +101,46 @@ export default function FindManifestNumber() {
         </Row>
         <Row>
           <Col>
+            <label htmlFor="date" className="mx-2">
+              <strong>{`Tanggal Manifest:`}</strong>
+            </label>
+            <DatePicker
+              title="Manifest Date"
+              placeholder="Manifest Date"
+              className="form-control form-control-solid"
+              selected={state.date}
+              onChange={(date) =>
+                setState({
+                  ...state,
+                  date: moment(date).locale("en-ca").format("L"),
+                })
+              }
+            />
+          </Col>
+        </Row>
+        <Row>
+          <Col>
             <Button
               variant="primary"
               onClick={handleSubmit}
               disabled={state.loading}
+              className="mt-2"
             >
-              {state.loading ? "Loading..." : "Go"}
+              {state.loading ? "Loading..." : "Cari"}
             </Button>
           </Col>
         </Row>
         <hr />
-        {/* <Row>
-          <div className="tableData">
-            <Table responsive hover striped>
-              <thead>
+        {state.show ? (
+          <Row>
+            <Table responsive hover borderless>
+              <thead className="table-dark">
                 <tr>
                   <th>No. Manifest</th>
-                  <th>No. Surat</th>
                   <th>Origin</th>
                   <th>Destination</th>
-                  <th>Status Bag</th>
+                  <th>No. Surat</th>
+                  <th>Status Surat Manifest</th>
                 </tr>
               </thead>
               <tbody>
@@ -116,11 +155,14 @@ export default function FindManifestNumber() {
                 ) : (
                   <>
                     {dataList.map((item, key) => (
-                      <tr key={key}>
-                        <td>{item.noSurat}</td>
-                        <td>{item.noSurat}</td>
+                      <tr
+                        key={key}
+                        onClick={() => navigate(`/doc/${item.key}`)}
+                      >
+                        <td>{item.manifestNo}</td>
                         <td>{item.origin}</td>
                         <td>{item.destination}</td>
+                        <td>{item.noSurat}</td>
                         <td>{item.status}</td>
                       </tr>
                     ))}
@@ -128,8 +170,8 @@ export default function FindManifestNumber() {
                 )}
               </tbody>
             </Table>
-          </div>
-        </Row> */}
+          </Row>
+        ) : null}
       </Container>
     </div>
   );

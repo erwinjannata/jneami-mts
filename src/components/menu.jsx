@@ -52,7 +52,7 @@ export default function NavMenu() {
     },
     {
       id: "4",
-      nama: "Cari No. Manifest",
+      nama: "Cari",
       link: "/find",
       req: 1,
       icon: <BiSearchAlt size={20} />,
