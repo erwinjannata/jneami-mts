@@ -10,24 +10,24 @@ import {
   FloatingLabel,
   Spinner,
 } from "react-bootstrap";
-import { passiveSupport } from "passive-events-support/src/utils";
-import NavMenu from "../components/menu";
-import SignatureModal from "../components/signatureModal";
-import firebase from "../config/firebase";
 import {
   getStorage,
   ref,
   uploadString,
   getDownloadURL,
 } from "firebase/storage";
+import { passiveSupport } from "passive-events-support/src/utils";
 import { FaRegTrashAlt } from "react-icons/fa";
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { UseAuth } from "../../config/authContext";
 import moment from "moment";
+import firebase from "./../../config/firebase";
 import "moment/dist/locale/en-sg";
 import "moment/dist/locale/en-ca";
 import "moment/dist/locale/id";
-import { UseAuth } from "../config/authContext";
+import NavMenu from "../../components/partials/navbarMenu";
+import SignatureModal from "../../components/partials/signatureModal";
 
 passiveSupport({
   events: ["touchstart", "touchmove"],

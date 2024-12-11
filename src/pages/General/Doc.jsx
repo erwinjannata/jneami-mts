@@ -12,10 +12,6 @@ import {
   Spinner,
   Table,
 } from "react-bootstrap";
-import NavMenu from "../components/menu";
-import RemarkModal from "../components/remarkModal";
-import SignatureModal from "../components/signatureModal";
-import firebase from "../config/firebase";
 import {
   getStorage,
   ref,
@@ -24,14 +20,18 @@ import {
 } from "firebase/storage";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { UseAuth } from "../config/authContext";
-import { utils, writeFile } from "xlsx";
+import { UseAuth } from "../../config/authContext";
+import { PDFDownloadLink } from "@react-pdf/renderer";
 import moment from "moment";
+import firebase from "./../../config/firebase";
 import "moment/dist/locale/id";
 import "moment/dist/locale/en-ca";
 import "moment/dist/locale/en-sg";
-import { PDFDownloadLink } from "@react-pdf/renderer";
-import Print from "../components/printedDoc";
+import NavMenu from "../../components/partials/navbarMenu";
+import { handleExcel } from "../../components/functions/functions";
+import Print from "../../components/partials/printedDoc";
+import SignatureModal from "../../components/partials/signatureModal";
+import RemarkModal from "../../components/partials/remarkModal";
 
 export default function Doc() {
   const { key } = useParams();
@@ -343,39 +343,6 @@ export default function Doc() {
         }
       }
     }
-  };
-
-  const handleDownload = () => {
-    const processedData = bagList.map((row) => ({
-      manifestNo: row.manifestNo,
-      koli: row.koli,
-      pcs: row.pcs,
-      kg: row.kg,
-      remark: row.remark,
-      status: row.statusBag,
-      noSurat: data.noSurat,
-      statusBag: data.status,
-    }));
-    const worksheet = utils.json_to_sheet(processedData);
-    const workbook = utils.book_new();
-    utils.book_append_sheet(workbook, worksheet, "Sheet1");
-    utils.sheet_add_aoa(
-      worksheet,
-      [
-        [
-          "Manifest Number",
-          "Koli",
-          "Pcs",
-          "Kg / Weight",
-          "Remark",
-          "Status Bag",
-          "No Surat",
-          "Status Manifest",
-        ],
-      ],
-      { origin: "A1" }
-    );
-    writeFile(workbook, `${data.noSurat}.xlsx`);
   };
 
   useEffect(() => {
@@ -726,7 +693,10 @@ export default function Doc() {
                   variant="success"
                   className="mx-2"
                 >
-                  <Dropdown.Item eventKey="1" onClick={handleDownload}>
+                  <Dropdown.Item
+                    eventKey="1"
+                    onClick={() => handleExcel(data, bagList)}
+                  >
                     Excel File (.xlsx)
                   </Dropdown.Item>
                   <hr className="mx-4" />

@@ -1,22 +1,28 @@
 import { Route, Routes } from "react-router-dom";
-import Home from "./pages/Home";
-import Create from "./../src/pages/createDoc";
-import Doc from "./pages/Doc";
-import Login from "./pages/Login";
 import { AuthProvider } from "./config/authContext";
 import { PrivateRoute } from "./config/prirvateRoute";
-import Penarikan from "./pages/Penarikan";
-import AddUser from "./pages/addUser";
-import DamageReport from "./pages/damageReport";
+import Login from "./pages/Guest/Login";
+import Home from "./pages/General/Home";
+import Create from "./pages/General/createDoc";
+import Doc from "./pages/General/Doc";
+import UnreceivedPage from "./pages/General/unreceived";
+import Penarikan from "./pages/General/Penarikan";
+import DamageReport from "./pages/General/damageReport";
 import Vendor from "./pages/Vendor";
-import FindManifestNumber from "./pages/findManifest";
+import VendorDoc from "./pages/Vendor/doc";
+import FindManifestNumber from "./pages/General/findManifest";
+import AddUser from "./pages/Admin/addUser";
 
 function App() {
   return (
     <AuthProvider>
       <Routes>
+        {/* Guest User */}
+        {/* Login Page */}
         <Route path="/login" element={<Login />} />
 
+        {/* JNE User */}
+        {/* Home Page */}
         <Route
           path="/"
           element={
@@ -25,6 +31,7 @@ function App() {
             </PrivateRoute>
           }
         />
+        {/* MTS */}
         <Route
           path="/create"
           element={
@@ -33,6 +40,7 @@ function App() {
             </PrivateRoute>
           }
         />
+        {/* Document Detail */}
         <Route
           path="/doc/:key"
           element={
@@ -41,6 +49,16 @@ function App() {
             </PrivateRoute>
           }
         />
+        {/* Unreceived Page */}
+        <Route
+          path="/unreceived"
+          element={
+            <PrivateRoute>
+              <UnreceivedPage />
+            </PrivateRoute>
+          }
+        />
+        {/* Download Data */}
         <Route
           path="/get"
           element={
@@ -57,14 +75,7 @@ function App() {
             </PrivateRoute>
           }
         />
-        <Route
-          path="/add"
-          element={
-            <PrivateRoute>
-              <AddUser />
-            </PrivateRoute>
-          }
-        />
+        {/* Find Manifest Number */}
         <Route
           path="/find"
           element={
@@ -73,11 +84,34 @@ function App() {
             </PrivateRoute>
           }
         />
+
+        {/* Vendor */}
+        {/* Home Page */}
         <Route
           path="/vendor"
           element={
             <PrivateRoute>
               <Vendor />
+            </PrivateRoute>
+          }
+        />
+        {/* Document Detail */}
+        <Route
+          path="vendor/doc/:key"
+          element={
+            <PrivateRoute>
+              <VendorDoc />
+            </PrivateRoute>
+          }
+        />
+
+        {/* Super Admin */}
+        {/* Register New User */}
+        <Route
+          path="/add"
+          element={
+            <PrivateRoute>
+              <AddUser />
             </PrivateRoute>
           }
         />

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import {
   Button,
@@ -6,28 +7,28 @@ import {
   FloatingLabel,
   Form,
   Row,
-  Table,
 } from "react-bootstrap";
-import Menu from "../components/menu";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import moment from "moment";
-import "moment/locale/en-ca";
-import "moment/locale/id";
-import firebase from "./../config/firebase";
 import { useEffect, useState } from "react";
 import { utils, writeFile } from "xlsx";
 import { MdFileDownload } from "react-icons/md";
-import { useNavigate } from "react-router-dom";
-import { UseAuth } from "../config/authContext";
-import PieChart from "../components/pieChart";
+import { UseAuth } from "../../config/authContext";
 import { FaEye, FaEyeSlash } from "react-icons/fa6";
-// import { cutOffTime } from "../components/cutOffTime";
+import { cutOffTime } from "../../components/data/cutOffTime";
+import { cabangList } from "../../components/data/branchList";
+import "react-datepicker/dist/react-datepicker.css";
+import firebase from "./../../config/firebase";
+import DatePicker from "react-datepicker";
+import NavMenu from "../../components/partials/navbarMenu";
+import PieChart from "../../components/partials/pieChart";
+import PenarikanListTable from "../../components/partials/penarikanListTable";
+import moment from "moment";
+import "moment/locale/en-ca";
+import "moment/locale/id";
+import { handleChange } from "../../components/functions/functions";
 
 export default function Penarikan() {
   const d = new Date();
   const auth = UseAuth();
-  let navigate = useNavigate();
   const [state, setState] = useState({
     start: moment(d).locale("en-ca").format("L"),
     end: moment(d).locale("en-ca").format("L"),
@@ -45,38 +46,12 @@ export default function Penarikan() {
     height: window.innerHeight,
   });
 
-  let cabangList = [
-    { id: "0", name: "ALAS" },
-    { id: "1", name: "BIMA" },
-    { id: "2", name: "BOLO" },
-    { id: "3", name: "DOMPU" },
-    { id: "4", name: "EMPANG" },
-    { id: "5", name: "MANGGELEWA" },
-    { id: "6", name: "MATARAM" },
-    { id: "7", name: "PADOLO" },
-    { id: "8", name: "PLAMPANG" },
-    { id: "9", name: "PRAYA" },
-    { id: "10", name: "SELONG" },
-    { id: "11", name: "SUMBAWA" },
-    { id: "12", name: "TALIWANG" },
-    { id: "13", name: "TANJUNG" },
-    { id: "14", name: "UTAN" },
-  ];
-
   let radioList = [
     { label: "Approved Date", value: "approvedDate" },
     { label: "Departure Date", value: "departureDate" },
     { label: "Arrival Date", value: "arrivalDate" },
     { label: "Received Date", value: "receivedDate" },
   ];
-
-  const handleChange = (e) => {
-    const value = e.target.value;
-    setState({
-      ...state,
-      [e.target.name]: value,
-    });
-  };
 
   const handleSubmit = () => {
     var delta = Math.abs(new Date(state.start) - new Date(state.end)) / 1000;
@@ -110,42 +85,24 @@ export default function Penarikan() {
               : 0;
             let durasi = moment.duration(dura).asHours();
 
-            // let cot =
-            //   cutOffTime.find(
-            //     (data) =>
-            //       data.origin == childSnapshot.val().origin &&
-            //       data.destination == childSnapshot.val().destination
-            //   ) || "";
+            let cot =
+              cutOffTime.find(
+                (data) =>
+                  data.origin == childSnapshot.val().origin &&
+                  data.destination == childSnapshot.val().destination
+              ) || "";
             data.push({
               key: childSnapshot.key,
-              noSurat: childSnapshot.val().noSurat,
-              noRef: childSnapshot.val().noRef,
-              noPolisi: childSnapshot.val().noPolisi,
-              origin: childSnapshot.val().origin,
-              destination: childSnapshot.val().destination,
-              preparedBy: childSnapshot.val().preparedBy,
-              approvedDate: childSnapshot.val().approvedDate,
-              approvedTime: childSnapshot.val().approvedTime,
-              receivedDate: childSnapshot.val().receivedDate,
-              receivedTime: childSnapshot.val().receivedTime,
-              arrivalDate: childSnapshot.val().arrivalDate,
-              arrivalTime: childSnapshot.val().arrivalTime,
-              durasi: childSnapshot.val().durasi,
               durasiJam: durasi.toFixed(1),
-              departureDate: childSnapshot.val().departureDate,
-              departureTime: childSnapshot.val().departureTime,
-              receivedBy: childSnapshot.val().receivedBy,
-              status: childSnapshot.val().status,
-              driver: childSnapshot.val().driver,
-              bagList: childSnapshot.val().bagList,
-              // statusWaktu:
-              //   durasi < cot.cot
-              //     ? durasi < cot.cot - 1
-              //       ? "Lebih Awal"
-              //       : "Tepat Waktu"
-              //     : durasi > cot.cot + 1
-              //     ? "Terlambat"
-              //     : "Tepat Waktu",
+              statusWaktu:
+                durasi < cot.cot
+                  ? durasi < cot.cot - 1
+                    ? "Lebih Awal"
+                    : "Tepat Waktu"
+                  : durasi > cot.cot + 1
+                  ? "Terlambat"
+                  : "Tepat Waktu",
+              ...childSnapshot.val(),
             });
           });
 
@@ -301,7 +258,7 @@ export default function Penarikan() {
 
   return (
     <div className="screen">
-      <Menu />
+      <NavMenu />
       <Container>
         <h2>Penarikan Data</h2>
         <hr />
@@ -318,7 +275,7 @@ export default function Penarikan() {
                   type="radio"
                   name="query"
                   value={item.value}
-                  onChange={handleChange}
+                  onChange={() => handleChange(event, state, setState)}
                 />
               ))}
             </Form>
@@ -367,7 +324,7 @@ export default function Penarikan() {
               <Form.Select
                 aria-label="Origin"
                 name="origin"
-                onChange={handleChange}
+                onChange={() => handleChange(event, state, setState)}
                 value={state.origin}
               >
                 <option value="">All Cabang</option>
@@ -384,7 +341,7 @@ export default function Penarikan() {
               <Form.Select
                 aria-label="Destination"
                 name="destination"
-                onChange={handleChange}
+                onChange={() => handleChange(event, state, setState)}
                 value={state.destination}
               >
                 <option value="">All Cabang</option>
@@ -472,9 +429,9 @@ export default function Penarikan() {
               <Col xs={windowSize.width >= 768 ? 4 : 0}>
                 <PieChart type="status" data={dataList} />
               </Col>
-              {/* <Col xs={windowSize.width >= 768 ? 4 : 0}>
+              <Col xs={windowSize.width >= 768 ? 4 : 0}>
                 <PieChart type="waktu" data={dataList} />
-              </Col> */}
+              </Col>
               <Col xs={windowSize.width >= 768 ? 4 : 0}>
                 {windowSize.width >= 768 ? null : <hr />}
                 <PieChart type="destination" data={dataList} />
@@ -483,81 +440,7 @@ export default function Penarikan() {
             <hr />
           </>
         ) : null}
-        {show ? (
-          <div className="tableData">
-            <Table responsive hover striped>
-              <thead>
-                <tr>
-                  <th>No. Surat</th>
-                  <th>Origin</th>
-                  <th>Destination</th>
-                  <th>Status</th>
-                  <th>Koli</th>
-                  <th>Weight</th>
-                  <th>Approved Date</th>
-                  <th>Departure Date</th>
-                  <th>Arrival Date</th>
-                  <th>Received Date</th>
-                  <th>Durasi Perjalanan</th>
-                  {/* <th>Status Waktu</th> */}
-                </tr>
-              </thead>
-              <tbody>
-                {dataList.length == 0 ? (
-                  <tr>
-                    <td colSpan={12} align="center">
-                      <i>Data tidak ditemukan</i>
-                    </td>
-                  </tr>
-                ) : (
-                  <>
-                    {dataList
-                      .map((item, key) => (
-                        <tr
-                          key={key}
-                          onClick={() => navigate(`/doc/${item.key}`)}
-                        >
-                          <td>{item.noSurat}</td>
-                          <td>{item.origin}</td>
-                          <td>{item.destination}</td>
-                          <td>{item.status}</td>
-                          <td>
-                            {item.bagList.reduce((prev, next) => {
-                              return prev + parseInt(next.koli);
-                            }, 0) + " koli"}
-                          </td>
-                          <td>
-                            {item.bagList.reduce((prev, next) => {
-                              return prev + parseInt(next.kg);
-                            }, 0) + " kg"}
-                          </td>
-                          <td>{`${item.approvedDate} ${item.approvedTime}`}</td>
-                          <td>
-                            {item.departureDateDate == ""
-                              ? "-"
-                              : `${item.departureDate} ${item.departureTime}`}
-                          </td>
-                          <td>
-                            {item.arrivalDate == ""
-                              ? "-"
-                              : `${item.arrivalDate} ${item.arrivalTime}`}
-                          </td>
-                          <td>
-                            {item.receivedDate == ""
-                              ? "-"
-                              : `${item.receivedDate} ${item.receivedTime}`}
-                          </td>
-                          <td>{item.durasi}</td>
-                          {/* <td>{item.statusWaktu}</td> */}
-                        </tr>
-                      ))
-                      .reverse()}
-                  </>
-                )}
-              </tbody>
-            </Table>
-          </div>
-        ) : null}
+        <PenarikanListTable data={dataList} />
       </Container>
     </div>
   );

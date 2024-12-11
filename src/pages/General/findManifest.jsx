@@ -1,13 +1,4 @@
 /* eslint-disable no-unused-vars */
-import { useEffect, useState } from "react";
-import { UseAuth } from "../config/authContext";
-import Menu from "../components/menu";
-import firebase from "./../config/firebase";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import moment from "moment";
-import "moment/locale/en-ca";
-import "moment/locale/id";
 import {
   Button,
   Col,
@@ -18,6 +9,15 @@ import {
   Table,
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { UseAuth } from "../../config/authContext";
+import moment from "moment";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import firebase from "./../../config/firebase";
+import "moment/locale/en-ca";
+import "moment/locale/id";
+import NavMenu from "../../components/partials/navbarMenu";
 
 export default function FindManifestNumber() {
   const auth = UseAuth();
@@ -76,7 +76,7 @@ export default function FindManifestNumber() {
 
   return (
     <div className="screen">
-      <Menu />
+      <NavMenu />
       <Container>
         <h2>Cari No. Manifest</h2>
         <hr />

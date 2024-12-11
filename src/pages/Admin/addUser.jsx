@@ -1,17 +1,19 @@
 /* eslint-disable no-unused-vars */
 import { Button, Container, FloatingLabel, Form } from "react-bootstrap";
-import Menu from "../components/menu";
 import { useEffect, useState } from "react";
-import firebase from "./../config/firebase";
-import { UseAuth } from "../config/authContext";
 import { useNavigate } from "react-router-dom";
+import { UseAuth } from "../../config/authContext";
+import firebase from "./../../config/firebase";
+import NavMenu from "../../components/partials/navbarMenu";
+import { cabangList } from "../../components/data/branchList";
 
 export default function AddUser() {
   const auth = UseAuth();
+  const dbRef = firebase.database();
   let navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const [creds, setCreds] = useState({
     email: "",
-    password: "",
     name: "",
     origin: "MATARAM",
     level: 1,
@@ -28,12 +30,12 @@ export default function AddUser() {
   const handleSubmit = (e, name, email, password, origin, level) => {
     if (name != "") {
       e.preventDefault();
-      let db = firebase.database();
+      setLoading(true);
       firebase
         .auth()
         .createUserWithEmailAndPassword(email, password)
         .then(async (data) => {
-          await db
+          await dbRef
             .ref(`users/${data.user.uid}`)
             .set({
               name: name,
@@ -41,13 +43,13 @@ export default function AddUser() {
               permissionLevel: level,
             })
             .then(() => {
+              setLoading(false);
               alert("Registered");
             });
           setCreds({
             ...creds,
             name: "",
             email: "",
-            password: "",
             origin: "MATARAM",
             level: 1,
           });
@@ -62,24 +64,6 @@ export default function AddUser() {
     }
   };
 
-  let listCabang = [
-    { id: "0", name: "ALAS" },
-    { id: "1", name: "BIMA" },
-    { id: "2", name: "BOLO" },
-    { id: "3", name: "DOMPU" },
-    { id: "4", name: "EMPANG" },
-    { id: "5", name: "MANGGELEWA" },
-    { id: "6", name: "MATARAM" },
-    { id: "7", name: "PADOLO" },
-    { id: "8", name: "PLAMPANG" },
-    { id: "9", name: "PRAYA" },
-    { id: "10", name: "SELONG" },
-    { id: "11", name: "SUMBAWA" },
-    { id: "12", name: "TALIWANG" },
-    { id: "13", name: "TANJUNG" },
-    { id: "14", name: "UTAN" },
-  ];
-
   useEffect(() => {
     window.scrollTo(0, 0);
     if (auth.level < 5) {
@@ -89,7 +73,7 @@ export default function AddUser() {
 
   return (
     <div className="screen">
-      <Menu />
+      <NavMenu />
       <Container>
         <h2>Add User</h2>
         <hr />
@@ -119,21 +103,6 @@ export default function AddUser() {
             />
           </FloatingLabel>
           <FloatingLabel
-            controlId="floatingPassword"
-            label="Password"
-            className="mb-3"
-          >
-            <Form.Control
-              type="password"
-              name="password"
-              placeholder="Password"
-              autoComplete="off"
-              value={creds.password}
-              onChange={handleChange}
-              required
-            />
-          </FloatingLabel>
-          <FloatingLabel
             controlId="floatingCabang"
             label="Cabang / Agen"
             className="mb-3"
@@ -144,7 +113,7 @@ export default function AddUser() {
               name="origin"
               value={creds.origin}
             >
-              {listCabang.map((item, id) => (
+              {cabangList.map((item, id) => (
                 <option key={id} value={item.name}>
                   {item.name}
                 </option>
@@ -170,21 +139,25 @@ export default function AddUser() {
             </Form.Select>
           </FloatingLabel>
         </Form>
-        <Button
-          variant="primary"
-          onClick={(e) =>
-            handleSubmit(
-              e,
-              creds.name,
-              creds.email,
-              creds.password,
-              creds.origin,
-              creds.level
-            )
-          }
-        >
-          Add User
-        </Button>
+        {loading ? (
+          <Button variant="primary">Loading...</Button>
+        ) : (
+          <Button
+            variant="primary"
+            onClick={(e) =>
+              handleSubmit(
+                e,
+                creds.name,
+                creds.email,
+                "12345678",
+                creds.origin,
+                creds.level
+              )
+            }
+          >
+            Add User
+          </Button>
+        )}
       </Container>
     </div>
   );

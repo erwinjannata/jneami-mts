@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { useEffect, useState } from "react";
-import { UseAuth } from "../config/authContext";
+import { UseAuth } from "../../config/authContext";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Button,
@@ -9,8 +9,8 @@ import {
   Form,
   Spinner,
 } from "react-bootstrap";
-import logo from "./../images/jne_brand.png";
-import "./../styles/login.css";
+import logo from "./../../images/jne_brand.png";
+import "./../../styles/login.css";
 import { MdArrowBackIos, MdArrowForwardIos } from "react-icons/md";
 
 export default function Login() {

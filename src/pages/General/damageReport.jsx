@@ -7,9 +7,9 @@ import {
   Form,
   Row,
 } from "react-bootstrap";
-import Menu from "../components/menu";
 import { useState } from "react";
-import firebase from "./../config/firebase";
+import firebase from "./../../config/firebase";
+import NavMenu from "../../components/partials/navbarMenu";
 
 export default function DamageReport() {
   let db = firebase.database().ref("damageReport");
@@ -35,7 +35,7 @@ export default function DamageReport() {
 
   return (
     <div className="screen">
-      <Menu />
+      <NavMenu />
       <Container className="mt-4">
         <Row>
           <Col>

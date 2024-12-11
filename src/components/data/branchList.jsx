@@ -1,0 +1,17 @@
+export const cabangList = [
+  { name: "ALAS" },
+  { name: "BIMA" },
+  { name: "BOLO" },
+  { name: "DOMPU" },
+  { name: "EMPANG" },
+  { name: "MANGGELEWA" },
+  { name: "MATARAM" },
+  { name: "PADOLO" },
+  { name: "PLAMPANG" },
+  { name: "PRAYA" },
+  { name: "SELONG" },
+  { name: "SUMBAWA" },
+  { name: "TALIWANG" },
+  { name: "TANJUNG" },
+  { name: "UTAN" },
+];

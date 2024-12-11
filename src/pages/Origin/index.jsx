@@ -1,5 +1,6 @@
-/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-unused-vars */
 import {
+  Button,
   Card,
   Col,
   Container,
@@ -8,16 +9,20 @@ import {
   Row,
   Table,
 } from "react-bootstrap";
-import NavMenu from "../components/menu";
+import NavMenu from "../../components/menu";
+import moment from "moment";
 import { useEffect, useState } from "react";
-import firebase from "./../config/firebase";
-import { UseAuth } from "../config/authContext";
-import { useNavigate } from "react-router-dom";
-import { FaPlaneCircleCheck, FaTruckPlane } from "react-icons/fa6";
+import { UseAuth } from "../../config/authContext";
+import firebase from "./../../config/firebase";
 import { FaBoxes, FaTruckLoading } from "react-icons/fa";
+import { FaPlaneCircleCheck, FaTruckPlane } from "react-icons/fa6";
+import { cabangList } from "../../components/branchList";
+import { useNavigate } from "react-router-dom";
 
-export default function Vendor() {
+function OriginIndex() {
   const auth = UseAuth();
+  const navigate = useNavigate();
+  const dbRef = firebase.database().ref("manifestTransit");
   const [state, setState] = useState({
     searched: "",
     limit: 50,
@@ -26,32 +31,11 @@ export default function Vendor() {
     origin: "",
     destination: "",
   });
-  const [list, setData] = useState([]);
-  const [showList, setShowList] = useState([]);
-  let db = firebase.database().ref("manifestTransit/");
-  let navigate = useNavigate();
-  const [windowSize, setWindowSize] = useState({
+  const [data, setData] = useState([]);
+  const [windowSize, setWindowsSize] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
   });
-
-  let cabangList = [
-    { id: "0", name: "ALAS" },
-    { id: "1", name: "BIMA" },
-    { id: "2", name: "BOLO" },
-    { id: "3", name: "DOMPU" },
-    { id: "4", name: "EMPANG" },
-    { id: "5", name: "MANGGELEWA" },
-    { id: "6", name: "MATARAM" },
-    { id: "7", name: "PADOLO" },
-    { id: "8", name: "PLAMPANG" },
-    { id: "9", name: "PRAYA" },
-    { id: "10", name: "SELONG" },
-    { id: "11", name: "SUMBAWA" },
-    { id: "12", name: "TALIWANG" },
-    { id: "13", name: "TANJUNG" },
-    { id: "14", name: "UTAN" },
-  ];
 
   let cardsCategories = [
     {
@@ -60,7 +44,7 @@ export default function Vendor() {
       bg: "dark",
       textColor: "white",
       title: "Received",
-      text: list.reduce(
+      text: data.reduce(
         (counter, obj) =>
           obj.status == "Received" || obj.status == "Received*"
             ? (counter += 1)
@@ -75,7 +59,7 @@ export default function Vendor() {
       bg: "primary",
       textColor: "white",
       title: "Sampai Tujuan",
-      text: list.reduce(
+      text: data.reduce(
         (counter, obj) =>
           obj.status == "Sampai Tujuan" ? (counter += 1) : counter,
         0
@@ -88,7 +72,7 @@ export default function Vendor() {
       bg: "warning",
       textColor: "dark",
       title: "Dalam Perjalanan",
-      text: list.reduce(
+      text: data.reduce(
         (counter, obj) =>
           obj.status == "Dalam Perjalanan" ? (counter += 1) : counter,
         0
@@ -101,7 +85,7 @@ export default function Vendor() {
       bg: "danger",
       textColor: "white",
       title: "Menunggu Vendor",
-      text: list.reduce(
+      text: data.reduce(
         (counter, obj) =>
           obj.status == "Menunggu Vendor" ? (counter += 1) : counter,
         0
@@ -111,100 +95,38 @@ export default function Vendor() {
   ];
 
   const handleChange = (e) => {
-    let value = e.target.value;
-    setState({ ...state, [e.target.name]: value });
-  };
-
-  const handleSearch = (e) => {
     e.preventDefault();
-    const searchResult =
-      state.searched == ""
-        ? list
-        : list.filter((datalist) =>
-            datalist.noSurat.toUpperCase().includes(state.searched)
-          );
-    setShowList(searchResult);
-  };
-
-  const handleFilter = (status) => {
-    if (state.filtered == true && state.currentFilter == status) {
-      setShowList(list);
-      setState({ ...state, filtered: false, currentFilter: "" });
-    } else {
-      setShowList(list.filter((datalist) => datalist.status.includes(status)));
-      setState({ ...state, filtered: true, currentFilter: status });
-    }
-  };
-
-  const handleCabang = (e) => {
     const value = e.target.value;
     setState({
       ...state,
       [e.target.name]: value,
-      filtered: false,
-      currentFilter: "",
     });
+  };
+
+  const navToDetail = (id, origin, destination) => {
+    navigate(`doc/${id}`);
   };
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    db.limitToLast(parseInt(state.limit)).on("value", (snapshot) => {
-      let list = [];
-      snapshot.forEach((childSnapshot) => {
-        list.push({
-          key: childSnapshot.key,
-          noSurat: childSnapshot.val().noSurat,
-          origin: childSnapshot.val().origin,
-          destination: childSnapshot.val().destination,
-          status: childSnapshot.val().status,
-          bagList: childSnapshot.val().bagList,
-          approvedDate: childSnapshot.val().approvedDate,
-          approvedTime: childSnapshot.val().approvedTime,
-          departureDate: childSnapshot.val().departureDate,
-          departureTime: childSnapshot.val().departureTime,
+    dbRef.limitToLast(parseInt(state.limit)).on("value", (snapshot) => {
+      //   let lists = [];
+
+      snapshot.forEach((item) => {
+        setData({
+          key: item.key,
+          ...item.val(),
         });
       });
-      var result = list;
-      if (state.origin == "" && state.destination != "") {
-        result = list.filter((datalist) => {
-          return datalist["destination"] == state.destination;
-        });
-      } else if (state.origin != "" && state.destination == "") {
-        result = list.filter((datalist) => {
-          return datalist["origin"] == state.origin;
-        });
-      } else if (state.origin != "" && state.destination != "") {
-        result = list.filter((datalist) => {
-          return (
-            datalist["origin"] == state.origin &&
-            datalist["destination"] == state.destination
-          );
-        });
-      }
-      setData(result);
-      setShowList(result);
     });
-
-    const handleResize = () => {
-      setWindowSize({
-        ...windowSize,
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
-    };
-
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
   }, [
-    auth.origin,
     auth.name,
+    auth.origin,
     auth.level,
     state.limit,
     state.origin,
     state.destination,
+    dbRef,
   ]);
 
   return (
@@ -232,7 +154,7 @@ export default function Vendor() {
                 }
                 border={category.bg}
                 className="mb-2 user-select-none"
-                onClick={() => handleFilter(category.title)}
+                // onClick={() => handleFilter(category.title)}
               >
                 <Card.Body>
                   <Row>
@@ -259,7 +181,7 @@ export default function Vendor() {
               <Form.Select
                 aria-label="Origin"
                 name="origin"
-                onChange={handleCabang}
+                // onChange={handleCabang}
                 value={state.origin}
               >
                 <option value="">ALL DATA</option>
@@ -276,7 +198,7 @@ export default function Vendor() {
               <Form.Select
                 aria-label="Destination"
                 name="destination"
-                onChange={handleCabang}
+                // onChange={handleCabang}
                 value={state.destination}
               >
                 <option value="">ALL DATA</option>
@@ -292,7 +214,7 @@ export default function Vendor() {
         <hr />
         <Row className="mb-3">
           <Col>
-            <Form onSubmit={handleSearch}>
+            <Form>
               <FloatingLabel
                 controlId="floatingInput"
                 label="No. Surat Manifest"
@@ -325,7 +247,7 @@ export default function Vendor() {
               </tr>
             </thead>
             <tbody>
-              {showList.length == 0 ? (
+              {data.length == 0 ? (
                 <>
                   <tr>
                     <td colSpan={8} align="center">
@@ -335,11 +257,13 @@ export default function Vendor() {
                 </>
               ) : (
                 <>
-                  {showList
+                  {data
                     .map((item, idx) => (
                       <tr
                         key={idx}
-                        onClick={() => navigate(`/doc/${item.key}`)}
+                        onClick={() =>
+                          navToDetail(item.key, item.origin, item.destination)
+                        }
                       >
                         <td>{item.noSurat}</td>
                         <td>{item.origin}</td>
@@ -392,3 +316,5 @@ export default function Vendor() {
     </div>
   );
 }
+
+export default OriginIndex;

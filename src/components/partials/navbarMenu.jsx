@@ -1,18 +1,18 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
+import "./../../index.css";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
-import logo from "./../images/jne_brand.png";
-import logoWhite from "./../images/jne_brand_white.png";
-import "./../index.css";
+import logo from "./../../images/jne_brand.png";
+import logoWhite from "./../../images/jne_brand_white.png";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { UseAuth } from "./../config/authContext";
+import { UseAuth } from "../../config/authContext";
 import { Button, Form, Offcanvas } from "react-bootstrap";
 import { MdHomeFilled } from "react-icons/md";
 import { HiDocumentPlus } from "react-icons/hi2";
 import { HiDocumentArrowDown } from "react-icons/hi2";
-import { BiSearchAlt } from "react-icons/bi";
+import { BiSearchAlt, BiError } from "react-icons/bi";
 import { CgDanger } from "react-icons/cg";
 import { RiUserAddFill } from "react-icons/ri";
 import { FaPlane } from "react-icons/fa6";
@@ -23,50 +23,49 @@ import { useEffect, useState } from "react";
 export default function NavMenu() {
   let menu = [
     {
-      id: "0",
-      nama: "Dashboard",
+      label: "Dashboard",
       link: "/",
       req: 1,
       icon: <MdHomeFilled size={20} />,
     },
     {
-      id: "1",
-      nama: "Manifest Transit",
+      label: "Manifest Transit",
       link: "/create",
       req: 1,
       icon: <HiDocumentPlus size={20} />,
     },
     {
-      id: "2",
-      nama: "Damage Report",
+      label: "Unreceived",
+      link: "/unreceived",
+      req: 1,
+      icon: <BiError size={20} />,
+    },
+    {
+      label: "Damage Report",
       link: "/damage/new",
       req: 5,
       icon: <CgDanger size={20} />,
     },
     {
-      id: "3",
-      nama: "Penarikan Data",
+      label: "Penarikan Data",
       link: "/get",
       req: 2,
       icon: <HiDocumentArrowDown size={20} />,
     },
     {
-      id: "4",
-      nama: "Cari",
+      label: "Cari",
       link: "/find",
       req: 1,
       icon: <BiSearchAlt size={20} />,
     },
     {
-      id: "5",
-      nama: "Vendor",
+      label: "Vendor",
       link: "/vendor",
       req: 5,
       icon: <FaPlane size={20} />,
     },
     {
-      id: "6",
-      nama: "New User",
+      label: "New User",
       link: "/add",
       req: 5,
       icon: <RiUserAddFill size={20} />,
@@ -75,15 +74,13 @@ export default function NavMenu() {
 
   let vendorMenu = [
     {
-      id: "0",
-      nama: "Dashboard",
+      label: "Dashboard",
       link: "/vendor",
       req: 1,
       icon: <MdHomeFilled size={20} />,
     },
     {
-      id: "1",
-      nama: "Penarikan Data",
+      label: "Penarikan Data",
       link: "/get",
       req: 1,
       icon: <HiDocumentArrowDown size={20} />,
@@ -175,10 +172,10 @@ export default function NavMenu() {
               <hr className="mx-3" style={{ color: "#e9f5f9" }} />
               {auth.origin == "VENDOR" ? (
                 <>
-                  {vendorMenu.map((m) =>
+                  {vendorMenu.map((m, index) =>
                     auth.level >= m.req ? (
                       <MenuItem
-                        key={m.id}
+                        key={index}
                         component={<Link to={m.link} />}
                         icon={m.icon}
                         style={{
@@ -188,17 +185,17 @@ export default function NavMenu() {
                           color: "#e9f5f9",
                         }}
                       >
-                        {m.nama}
+                        {m.label}
                       </MenuItem>
                     ) : null
                   )}
                 </>
               ) : (
                 <>
-                  {menu.map((m) =>
+                  {menu.map((m, index) =>
                     auth.level >= m.req ? (
                       <MenuItem
-                        key={m.id}
+                        key={index}
                         component={<Link to={m.link} />}
                         icon={m.icon}
                         style={{
@@ -208,7 +205,7 @@ export default function NavMenu() {
                           alignItems: "center",
                         }}
                       >
-                        {m.nama}
+                        {m.label}
                       </MenuItem>
                     ) : null
                   )}
@@ -267,8 +264,8 @@ export default function NavMenu() {
               <Offcanvas.Body>
                 {auth.origin == "VENDOR" ? (
                   <Nav className="me-auto my-2 my-lg-0">
-                    {vendorMenu.map((m) => (
-                      <Nav key={m.id}>
+                    {vendorMenu.map((m, index) => (
+                      <Nav key={index}>
                         {auth.level >= m.req ? (
                           <Navbar.Text>
                             <NavLink
@@ -277,7 +274,7 @@ export default function NavMenu() {
                                 color: isActive ? "lightblue" : "white",
                               })}
                             >
-                              {m.nama}
+                              {m.label}
                             </NavLink>
                           </Navbar.Text>
                         ) : null}
@@ -286,8 +283,8 @@ export default function NavMenu() {
                   </Nav>
                 ) : (
                   <Nav className="me-auto my-2 my-lg-0">
-                    {menu.map((m) => (
-                      <Nav key={m.id}>
+                    {menu.map((m, index) => (
+                      <Nav key={index}>
                         {auth.level >= m.req ? (
                           <Navbar.Text>
                             <NavLink
@@ -296,7 +293,7 @@ export default function NavMenu() {
                                 color: isActive ? "lightblue" : "white",
                               })}
                             >
-                              {m.nama}
+                              {m.label}
                             </NavLink>
                           </Navbar.Text>
                         ) : null}
