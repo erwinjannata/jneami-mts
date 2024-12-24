@@ -22,30 +22,33 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { UseAuth } from "../../config/authContext";
 import { PDFDownloadLink } from "@react-pdf/renderer";
-import moment from "moment";
+import {
+  handleChange,
+  handleExcel,
+} from "../../components/functions/functions";
 import firebase from "./../../config/firebase";
+import moment from "moment";
 import "moment/dist/locale/id";
 import "moment/dist/locale/en-ca";
 import "moment/dist/locale/en-sg";
 import NavMenu from "../../components/partials/navbarMenu";
-import { handleExcel } from "../../components/functions/functions";
-import Print from "../../components/partials/printedDoc";
 import SignatureModal from "../../components/partials/signatureModal";
 import RemarkModal from "../../components/partials/remarkModal";
+import PrintFn from "../../components/partials/print";
 
 export default function Doc() {
   const { key } = useParams();
   const auth = UseAuth();
   const [d, setD] = useState(new Date());
-  let year = d.getFullYear().toString().substring(2, 4);
-  const [loading, setLoading] = useState(false);
-  const tanggal = moment(d).locale("en-ca").format("L");
-  const jam = moment(d).locale("en-sg").format("LT");
   const [img64, setImg64] = useState("");
+  const [loading, setLoading] = useState(false);
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
   });
+  let year = d.getFullYear().toString().substring(2, 4);
+  const tanggal = moment(d).locale("en-ca").format("L");
+  const jam = moment(d).locale("en-sg").format("LT");
 
   let db = firebase.database().ref(`/manifestTransit`);
   const [data, setData] = useState([]);
@@ -58,17 +61,8 @@ export default function Doc() {
   const [currentFocus, setCurrentFocus] = useState();
   const [remark, setRemark] = useState("");
   const [zerofilled, setZeroFilled] = useState("");
+  const [checkedIndex, setCheckedIndex] = useState([]);
   let navigate = useNavigate();
-
-  let totalKoli = bagList.reduce((prev, next) => {
-    return prev + parseInt(next.koli);
-  }, 0);
-  let totalPcs = bagList.reduce((prev, next) => {
-    return prev + parseInt(next.pcs);
-  }, 0);
-  let totalWeight = bagList.reduce((prev, next) => {
-    return prev + parseInt(next.kg);
-  }, 0);
 
   let berangkat = `${moment(data.departureDate).locale("id").format("L")} ${
     data.departureTime
@@ -85,13 +79,104 @@ export default function Doc() {
     Math.floor(durasi.minutes() <= 0) ? "" : `${durasi.minutes()} menit`,
   ].join(Math.floor(durasi.asHours()) <= 0 ? "" : " ");
 
-  //Functions
-  const handleChange = (e) => {
-    const value = e.target.value;
-    setData({ ...data, [e.target.name]: value });
-  };
+  const dataDisplay = [
+    [
+      { label: "No. Surat", value: data.noSurat },
+      { label: "Status", value: data.status },
+    ],
+    [
+      { label: "Origin", value: data.origin },
+      { label: "Destination", value: data.destination },
+    ],
+    [
+      { label: "Approved by", value: data.preparedBy },
+      {
+        label: "Received by",
+        value: data.isReceived ? `${data.receivedBy}` : "-",
+      },
+    ],
+    [
+      {
+        label: "Approved at",
+        value: `${moment(data.approvedDate).locale("id").format("LL")} ${
+          data.approvedTime
+        }`,
+      },
+      {
+        label: "Received at",
+        value: data.isReceived
+          ? `${moment(data.receivedDate).locale("id").format("LL")} ${
+              data.receivedTime
+            }`
+          : "-",
+      },
+    ],
+  ];
 
-  const handleSubmit = () => {
+  const vendorInfoCol = [
+    {
+      id: "floatingNoRef",
+      name: "noRef",
+      value: data.noRef,
+      placeholder: "No. Ref. Vendor",
+    },
+    {
+      id: "floatingNoPolisi",
+      name: "noPolisi",
+      value: data.noPolisi,
+      placeholder: "No. Polisi Kendaraan",
+    },
+    {
+      id: "floatingDriver",
+      name: "driver",
+      value: data.driver,
+      placeholder: "Nama Driver",
+    },
+  ];
+
+  const suratInfo = [
+    {
+      label: "Total Koli",
+      value: `${bagList.reduce((prev, next) => {
+        return prev + parseInt(next.koli);
+      }, 0)} koli`,
+    },
+    {
+      label: "Total Pcs",
+      value: `${bagList.reduce((prev, next) => {
+        return prev + parseInt(next.pcs);
+      }, 0)} pcs`,
+    },
+    {
+      label: "Total Weight",
+      value: `${bagList.reduce((prev, next) => {
+        return prev + parseInt(next.kg);
+      }, 0)} Kg`,
+    },
+  ];
+
+  const signatures = [
+    {
+      label: "Prepared by",
+      source: data.checkerSign,
+      alts: "Prepared by",
+      name: data.preparedBy,
+    },
+    {
+      label: "Driver",
+      source: data.vendorSign || "",
+      alts: "Driver Sign",
+      name: data.driver,
+    },
+    {
+      label: "Received by",
+      source: data.receiverSign,
+      alts: "Received by",
+      name: data.receivedBy,
+    },
+  ];
+
+  const handleSubmitRemark = () => {
     setBagList(
       bagList.map((lists, index) => {
         if (index === currentFocus) {
@@ -165,6 +250,40 @@ export default function Doc() {
     setChangedItem(changedItem + 1);
   };
 
+  const handleReceiveChecked = () => {
+    let changed = 0;
+    checkedIndex.forEach((element) => {
+      if (
+        bagList[element].statusBag != "Missing" &&
+        bagList[element].statusBag != "Unreceived" &&
+        bagList[element].statusBag != "Received"
+      ) {
+        bagList[element] = {
+          ...bagList[element],
+          statusBag: "Received",
+        };
+        changed++;
+        setChangedItem(changedItem + changed);
+      }
+    });
+    setCheckedIndex([]);
+  };
+
+  const handleUnreceiveChecked = () => {
+    let changed = 0;
+    checkedIndex.forEach((element) => {
+      if (bagList[element].statusBag != "Unreceived") {
+        bagList[element] = {
+          ...bagList[element],
+          statusBag: "Unreceived",
+        };
+        changed++;
+      }
+    });
+    setChangedItem(changedItem + changed);
+    setCheckedIndex([]);
+  };
+
   const handleCancel = (idx, manifestNo) => {
     setBagList(
       bagList.map((lists, index) => {
@@ -187,6 +306,30 @@ export default function Doc() {
       );
     }
     setChangedItem(changedItem - 1);
+  };
+
+  const handleRemark = (index) => {
+    setShow(true), setCurrentFocus(index), setRemark("");
+  };
+
+  const handleCheck = (e, item) => {
+    if (e.target.checked) {
+      setCheckedIndex([...checkedIndex, item]);
+    } else {
+      setCheckedIndex((prev) =>
+        prev.filter((currentItem) => currentItem != item)
+      );
+    }
+  };
+
+  const handleCheckAll = (event) => {
+    if (event.target.checked) {
+      bagList.forEach((item, index) => {
+        checkedIndex.push(index);
+      });
+    } else {
+      setCheckedIndex([]);
+    }
   };
 
   const handleApproval = () => {
@@ -390,154 +533,76 @@ export default function Doc() {
       <NavMenu />
       <Container>
         <div className="mt-4">
-          <Row>
-            <Col>
-              <strong>No. Surat </strong> <br />
-              {data.noSurat}
-            </Col>
-            <Col>
-              <strong>Status</strong> <br /> {data.status}
-            </Col>
-          </Row>
-          <hr />
-          <Row>
-            <Col>
-              <strong>Origin </strong> <br />
-              {data.origin}
-            </Col>
-            <Col>
-              <strong>Destination </strong> <br />
-              {data.destination}
-            </Col>
-          </Row>
-          <hr />
-          <Row>
-            <Col>
-              <strong>Approved by </strong> <br />
-              {data.preparedBy}
-            </Col>
-            <Col>
-              <strong>Received by </strong> <br />{" "}
-              {data.isReceived ? `${data.receivedBy}` : "-"}
-            </Col>
-          </Row>
-          <hr />
-          <Row>
-            <Col>
-              <strong>Approved at</strong> <br />
-              {`${moment(data.approvedDate).locale("id").format("LL")} ${
-                data.approvedTime
-              }`}
-            </Col>
-            <Col>
-              <strong>Received at </strong> <br />{" "}
-              {data.isReceived
-                ? `${moment(data.receivedDate).locale("id").format("LL")} ${
-                    data.receivedTime
-                  }`
-                : "-"}
-            </Col>
-          </Row>
-          <hr />
-          <Row>
-            <Col>
-              <strong>Waktu Keberangkatan</strong> <br />
-              {data.departureDate == ""
-                ? "-"
-                : `${moment(data.departureDate).locale("id").format("LL")} ${
-                    data.departureTime
-                  }`}
-            </Col>
-            <Col>
-              <strong>Waktu Kedatangan </strong> <br />{" "}
-              {data.arrivalDate == ""
-                ? "-"
-                : `${moment(data.arrivalDate).locale("id").format("LL")} ${
-                    data.arrivalTime
-                  }`}
-            </Col>
-          </Row>
-          <hr />
+          {dataDisplay.map((display, index) => (
+            <div key={index}>
+              <Row>
+                <Col>
+                  <strong>{display[0].label}</strong> <br />
+                  {display[0].value}
+                </Col>
+                <Col>
+                  <strong>{display[1].label}</strong> <br />
+                  {display[1].value}
+                </Col>
+              </Row>
+              <hr />
+            </div>
+          ))}
           {auth.origin != data.origin &&
           auth.origin != data.destination ? null : (
             <Row>
-              <Col xs={windowSize.width >= 768 ? "" : "0"}>
-                <Form.Floating className="mb-3">
-                  <Form.Control
-                    id="flotaingNoRef"
-                    type="text"
-                    name="noRef"
-                    value={data.noRef || ""}
-                    placeholder="No. Ref. Vendor"
-                    onChange={auth.origin == data.origin ? handleChange : null}
-                    disabled={
-                      data.isArrived ||
-                      data.status == "Dalam Perjalanan" ||
-                      auth.origin == data.destination
-                        ? true
-                        : false
-                    }
-                  ></Form.Control>
-                  <label htmlFor="floatingNoRef">No. Ref. Vendor</label>
-                </Form.Floating>
-              </Col>
-              <Col xs={windowSize.width >= 768 ? "" : "0"}>
-                <Form.Floating className="mb-3">
-                  <Form.Control
-                    id="flotaingNoPolisi"
-                    type="text"
-                    name="noPolisi"
-                    value={data.noPolisi || ""}
-                    placeholder="No. Polisi Kendaraan"
-                    onChange={auth.origin == data.origin ? handleChange : null}
-                    disabled={
-                      data.isArrived ||
-                      data.status == "Dalam Perjalanan" ||
-                      auth.origin == data.destination
-                        ? true
-                        : false
-                    }
-                  ></Form.Control>
-                  <label htmlFor="floatingNoPolisi">No. Polisi Kendaraan</label>
-                </Form.Floating>
-              </Col>
-              <Col xs={windowSize.width >= 768 ? "" : "0"}>
-                <Form.Floating className="mb-3">
-                  <Form.Control
-                    id="flotaingDriver"
-                    type="text"
-                    name="driver"
-                    value={data.driver || ""}
-                    placeholder="Nama Driver"
-                    onChange={auth.origin == data.origin ? handleChange : null}
-                    disabled={
-                      data.isArrived ||
-                      data.status == "Dalam Perjalanan" ||
-                      auth.origin == data.destination
-                        ? true
-                        : false
-                    }
-                  ></Form.Control>
-                  <label htmlFor="floatingDriver">Nama Driver</label>
-                </Form.Floating>
-              </Col>
+              {vendorInfoCol.map((item, index) => (
+                <Col xs={windowSize.width >= 768 ? "" : "0"} key={index}>
+                  <Form.Floating
+                    className={windowSize.width >= 768 ? "" : "mb-2"}
+                  >
+                    <Form.Control
+                      id={item.id}
+                      type="text"
+                      name={item.name}
+                      value={item.value || ""}
+                      placeholder={item.placeholder}
+                      onChange={
+                        auth.origin == data.origin
+                          ? () => handleChange(event, data, setData)
+                          : null
+                      }
+                      disabled={
+                        data.isArrived ||
+                        data.status == "Dalam Perjalanan" ||
+                        auth.origin == data.destination
+                          ? true
+                          : false
+                      }
+                    ></Form.Control>
+                    <label htmlFor={item.id}>{item.placeholder}</label>
+                  </Form.Floating>
+                </Col>
+              ))}
             </Row>
           )}
         </div>
         <hr />
-        <div
-          style={{ maxHeight: "364px", overflowY: "scroll", display: "block" }}
-        >
-          <Table responsive striped>
-            <thead>
+        <div>
+          <Table responsive striped id="tableData">
+            <thead id="stickyHead">
               <tr>
-                <th>No.</th>
-                <th>Manifest No.</th>
-                <th>Koli</th>
-                <th>Pcs</th>
-                <th>Kg</th>
-                <th>Status Bag</th>
-                <th>Remark</th>
+                <th>
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    onChange={(e) => handleCheckAll(e)}
+                    checked={checkedIndex.length == 0 ? false : true}
+                  />
+                </th>
+                <th className="w-auto">No.</th>
+                <th className="w-25">Manifest No.</th>
+                <th className="w-auto">Koli</th>
+                <th className="w-auto">Pcs</th>
+                <th className="w-auto">Kg</th>
+                <th className="w-25">Status Bag</th>
+                <th className="w-75">Remark</th>
+                <th className="w-75"></th>
               </tr>
             </thead>
             <tbody>
@@ -545,6 +610,16 @@ export default function Doc() {
                 ? null
                 : bagList.map((item, index) => (
                     <tr key={index}>
+                      <td>
+                        <input
+                          className="form-check-input"
+                          type="checkbox"
+                          onChange={(e) => handleCheck(e, index)}
+                          checked={
+                            checkedIndex.indexOf(index) > -1 ? true : false
+                          }
+                        />
+                      </td>
                       <td>{index + 1}</td>
                       <td>{item.manifestNo}</td>
                       <td>{item.koli == undefined ? "-" : item.koli}</td>
@@ -555,30 +630,27 @@ export default function Doc() {
                       {(auth.origin == data.origin &&
                         data.status == "Menunggu Vendor") ||
                       (auth.origin == data.destination &&
-                        data.status == "Sampai Tujuan") ? (
+                        data.status == "Sampai Tujuan" &&
+                        data.isReceived == false) ? (
                         <td>
-                          {(auth.origin == data.origin &&
-                            data.status == "Menunggu Vendor") ||
-                          (auth.origin == data.destination &&
-                            data.isArrived == true &&
-                            data.isReceived == false) ? (
+                          {(auth.origin == data.destination &&
+                            item.statusBag == "Received") ||
+                          item.statusBag == "Unreceived" ||
+                          (auth.origin == data.origin &&
+                            item.statusBag != "Menunggu Vendor") ? (
+                            <Button
+                              variant="danger"
+                              className="m-2"
+                              onClick={() =>
+                                handleCancel(index, item.manifestNo)
+                              }
+                              disabled={loading ? true : false}
+                            >
+                              Batalkan
+                            </Button>
+                          ) : (
                             <>
-                              {(auth.origin == data.destination &&
-                                item.statusBag == "Received") ||
-                              item.statusBag == "Unreceived" ||
-                              (auth.origin == data.origin &&
-                                item.statusBag != "Menunggu Vendor") ? (
-                                <Button
-                                  variant="danger"
-                                  className="m-2"
-                                  onClick={() =>
-                                    handleCancel(index, item.manifestNo)
-                                  }
-                                  disabled={loading ? true : false}
-                                >
-                                  Batalkan
-                                </Button>
-                              ) : (
+                              {checkedIndex.length != 0 ? null : (
                                 <div className="d-flex">
                                   <Button
                                     variant="primary"
@@ -604,11 +676,7 @@ export default function Doc() {
                                   <Button
                                     variant="warning"
                                     className="m-2"
-                                    onClick={() => {
-                                      setShow(true),
-                                        setCurrentFocus(index),
-                                        setRemark("");
-                                    }}
+                                    onClick={() => handleRemark(index)}
                                     disabled={loading ? true : false}
                                   >
                                     Remark
@@ -626,7 +694,7 @@ export default function Doc() {
                                 </div>
                               )}
                             </>
-                          ) : null}
+                          )}
                         </td>
                       ) : null}
                     </tr>
@@ -634,31 +702,43 @@ export default function Doc() {
             </tbody>
           </Table>
         </div>
+        {(auth.origin == data.origin && data.status == "Menunggu Vendor") ||
+        (auth.origin == data.destination && data.status == "Sampai Tujuan") ? (
+          <Row>
+            {checkedIndex.length == 0 ? null : (
+              <Col>
+                <Button
+                  className="m-2"
+                  variant="primary"
+                  onClick={() => handleReceiveChecked()}
+                >
+                  Received
+                </Button>
+                <Button
+                  className="m-2"
+                  variant="secondary"
+                  onClick={() => handleUnreceiveChecked()}
+                >
+                  Unreceived
+                </Button>
+                <Button className="m-2" variant="outline-danger">
+                  Overload
+                </Button>
+              </Col>
+            )}
+          </Row>
+        ) : null}
         <Row className="mt-4">
-          <Col>
-            <p>
-              <strong>
-                Total Koli <br />
-              </strong>{" "}
-              {`${totalKoli} koli`}
-            </p>
-          </Col>
-          <Col>
-            <p>
-              <strong>
-                Total Pcs <br />
-              </strong>{" "}
-              {`${totalPcs} pcs`}
-            </p>
-          </Col>
-          <Col>
-            <p>
-              <strong>
-                Total Weight <br />
-              </strong>{" "}
-              {`${totalWeight} kg`}
-            </p>
-          </Col>
+          {suratInfo.map((item, index) => (
+            <Col key={index}>
+              <p>
+                <strong>
+                  {item.label} <br />
+                </strong>{" "}
+                {`${item.value}`}
+              </p>
+            </Col>
+          ))}
         </Row>
         <Row>
           <Col>
@@ -702,33 +782,7 @@ export default function Doc() {
                   <hr className="mx-4" />
                   <PDFDownloadLink
                     className="mx-3"
-                    document={
-                      <Print
-                        data={bagList}
-                        noSurat={data.noSurat}
-                        noRef={data.noRef}
-                        date1={`${moment(data.approvedDate)
-                          .locale("id")
-                          .format("LL")} ${data.approvedTime}`}
-                        date2={
-                          data.receivedDate == ""
-                            ? "-"
-                            : `${moment(data.receivedDate)
-                                .locale("id")
-                                .format("LL")} ${data.receivedTime}`
-                        }
-                        origin={data.origin}
-                        destination={data.destination}
-                        checkerSign={data.checkerSign}
-                        vendorSign={data.vendorSign}
-                        receiverSign={data.receiverSign}
-                        checkerName={data.preparedBy}
-                        receiverName={data.receivedBy}
-                        driverName={data.driver}
-                        status={data.status}
-                        noPolisi={data.noPolisi}
-                      />
-                    }
+                    document={<PrintFn bagList={bagList} data={data} />}
                     fileName={`${data.noSurat}.pdf`}
                     style={{ color: "black" }}
                   >
@@ -748,7 +802,7 @@ export default function Doc() {
           }}
           getvalue={setRemark}
           getfocus={setCurrentFocus}
-          setvalue={handleSubmit}
+          setvalue={handleSubmitRemark}
         />
         <hr />
         <SignatureModal
@@ -758,47 +812,23 @@ export default function Doc() {
           onSubmit={approve}
         />
         <Row>
-          <Col className="signatures">
-            <p>
-              <strong>Prepared by</strong>
-            </p>
-            <img
-              className="signature"
-              src={data.checkerSign}
-              alt="Prepared by"
-            />
-            <p>{data.preparedBy}</p>
-          </Col>
-          <Col className="signatures">
-            <p>
-              <strong>Received by</strong>
-            </p>
-            {data.vendorSign == "" ? null : (
-              <>
-                <img
-                  className="signature"
-                  src={data.vendorSign}
-                  alt="Received by"
-                />
-                <p>{data.driver}</p>
-              </>
-            )}
-          </Col>
-          <Col className="signatures">
-            <p>
-              <strong>Received by</strong>
-            </p>
-            {data.receivedBy == "" ? null : (
-              <>
-                <img
-                  className="signature"
-                  src={data.receiverSign}
-                  alt="Prepared by"
-                />
-                <p>{data.receivedBy}</p>
-              </>
-            )}
-          </Col>
+          {signatures.map((item, index) => (
+            <Col className="signatures" key={index}>
+              <p>
+                <strong>{item.label}</strong>
+              </p>
+              {item.source == "" ? null : (
+                <>
+                  <img
+                    className="signature"
+                    src={item.source}
+                    alt={item.alts}
+                  />
+                  <p>{item.name}</p>
+                </>
+              )}
+            </Col>
+          ))}
         </Row>
       </Container>
     </div>

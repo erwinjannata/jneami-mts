@@ -28,6 +28,8 @@ import "moment/dist/locale/en-ca";
 import "moment/dist/locale/id";
 import NavMenu from "../../components/partials/navbarMenu";
 import SignatureModal from "../../components/partials/signatureModal";
+import { cabangList } from "../../components/data/branchList";
+import { handleChange } from "../../components/functions/functions";
 
 passiveSupport({
   events: ["touchstart", "touchmove"],
@@ -68,17 +70,26 @@ export default function Create() {
     checkerSign: "",
   });
 
-  let totalKoli = bagList.reduce((prev, next) => {
-    return prev + parseInt(next.koli);
-  }, 0);
-
-  let totalPcs = bagList.reduce((prev, next) => {
-    return prev + parseInt(next.pcs);
-  }, 0);
-
-  let totalWeight = bagList.reduce((prev, next) => {
-    return prev + parseInt(next.kg);
-  }, 0);
+  const suratInfo = [
+    {
+      label: "Total Koli",
+      value: `${bagList.reduce((prev, next) => {
+        return prev + parseInt(next.koli);
+      }, 0)} koli`,
+    },
+    {
+      label: "Total Pcs",
+      value: `${bagList.reduce((prev, next) => {
+        return prev + parseInt(next.pcs);
+      }, 0)} pcs`,
+    },
+    {
+      label: "Total Weight",
+      value: `${bagList.reduce((prev, next) => {
+        return prev + parseInt(next.kg);
+      }, 0)} Kg`,
+    },
+  ];
 
   let formsList = [
     {
@@ -122,33 +133,6 @@ export default function Create() {
       value: state.remark,
     },
   ];
-
-  let destList = [
-    { id: "0", name: "ALAS" },
-    { id: "1", name: "BIMA" },
-    { id: "2", name: "BOLO" },
-    { id: "3", name: "DOMPU" },
-    { id: "4", name: "EMPANG" },
-    { id: "5", name: "MANGGELEWA" },
-    { id: "6", name: "MATARAM" },
-    { id: "7", name: "PADOLO" },
-    { id: "8", name: "PLAMPANG" },
-    { id: "9", name: "PRAYA" },
-    { id: "10", name: "SELONG" },
-    { id: "11", name: "SUMBAWA" },
-    { id: "12", name: "TALIWANG" },
-    { id: "13", name: "TANJUNG" },
-    { id: "14", name: "UTAN" },
-  ];
-
-  // Handler Untuk App
-  const handleChange = (e) => {
-    const value = e.target.value;
-    setState({
-      ...state,
-      [e.target.name]: value,
-    });
-  };
 
   const handleSubmit = (e, index) => {
     e.preventDefault();
@@ -249,13 +233,13 @@ export default function Create() {
 
         const storageRef = ref(
           storage,
-          `signatures/${year}-${n}/checkerSign.png`
+          `test/signatures/${year}-${n}/checkerSign.png`
         );
         try {
           uploadString(storageRef, img64, "data_url", metaData).then(
             (snapshot) => {
               getDownloadURL(snapshot.ref).then(async (url) => {
-                db.ref("manifestTransit/")
+                db.ref("test/manifestTransit/")
                   .push({
                     noSurat: state.noSurat,
                     noRef: state.noRef,
@@ -281,7 +265,8 @@ export default function Create() {
                     count: 0,
                   })
                   .then(() => {
-                    db.ref("status/collectionLength").set(collectionLength);
+                    // db.ref("status/collectionLength").set(collectionLength);
+                    db.ref("test/collectionLength").set(collectionLength);
                     setLoading(false);
                     alert("Approved");
                     localStorage.removeItem("bagList");
@@ -314,7 +299,8 @@ export default function Create() {
     if (auth.origin == "VENDOR") {
       navigate("/vendor");
     }
-    db.ref("status").on("value", (snapshot) => {
+    // db.ref("status").on("value", (snapshot) => {
+    db.ref("test").on("value", (snapshot) => {
       let count = parseInt(snapshot.child("collectionLength").val());
       let zerofilled = ("00000" + (count + 1)).slice(-5);
       setState({
@@ -395,12 +381,12 @@ export default function Create() {
               <Form.Select
                 aria-label="Destination Label"
                 name="destination"
-                onChange={handleChange}
+                onChange={() => handleChange(event, state, setState)}
                 value={state.destination || ""}
                 disabled={loading ? true : false}
               >
                 <option value="">-Pilih Destination-</option>
-                {destList.map((item, id) =>
+                {cabangList.map((item, id) =>
                   auth.origin == item.name ? null : (
                     <option key={id} value={item.name}>
                       {item.name}
@@ -423,7 +409,7 @@ export default function Create() {
                     name={item.name}
                     value={item.value}
                     placeholder={item.text}
-                    onChange={handleChange}
+                    onChange={() => handleChange(event, state, setState)}
                     disabled={loading ? true : false}
                   ></Form.Control>
                   <label htmlFor="floatingInput">{item.text}</label>
@@ -448,7 +434,7 @@ export default function Create() {
         <hr />
         <div style={{ maxHeight: "300px", overflowY: "auto" }}>
           <Table responsive striped>
-            <thead style={{ position: "sticky", top: "0" }}>
+            <thead style={{ position: "sticky", top: "0", zIndex: "1" }}>
               <tr>
                 <th>No.</th>
                 <th>Manifest No.</th>
@@ -485,18 +471,19 @@ export default function Create() {
           </Table>
         </div>
         <hr />
+        <Row className="mt-4">
+          {suratInfo.map((item, index) => (
+            <Col key={index}>
+              <p>
+                <strong>
+                  {item.label} <br />
+                </strong>{" "}
+                {`${item.value}`}
+              </p>
+            </Col>
+          ))}
+        </Row>
         <Row>
-          <Col>
-            <p>
-              <strong>Total Koli</strong> : {totalKoli}
-            </p>
-            <p>
-              <strong>Total Pcs</strong> : {totalPcs}
-            </p>
-            <p>
-              <strong>Total Kg</strong> : {totalWeight}
-            </p>
-          </Col>
           <Col>
             {loading ? (
               <Spinner animation="grow" size="sm" />

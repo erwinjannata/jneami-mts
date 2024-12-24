@@ -1,6 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
-import "./../../index.css";
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
   Button,
   ButtonGroup,
@@ -11,34 +10,34 @@ import {
   Row,
   Spinner,
 } from "react-bootstrap";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import { handleExcel } from "../../components/functions/functions";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { UseAuth } from "../../config/authContext";
 import {
   handleApproval,
+  handleArrive,
   handleCancel,
   handleCheck,
   handleCheckAll,
-  handleOverload,
   handleReceive,
   handleReceiveChecked,
   handleUnreceive,
   handleUnreceiveChecked,
 } from "./partials/functions";
-import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { UseAuth } from "./../../config/authContext";
-import { handleExcel } from "../../components/functions/functions";
-import { PDFDownloadLink } from "@react-pdf/renderer";
-import firebase from "./../../config/firebase";
 import NavMenu from "../../components/partials/navbarMenu";
-import BagTableOrigin from "./partials/bagTable";
+import firebase from "./../../config/firebase";
+import SignatureModal from "../../components/partials/signatureModal";
+import BagTableDestination from "./partials/bagTable";
 import PrintFn from "../../components/partials/print";
 import RemarkModal from "../../components/partials/remarkModal";
-import SignatureModal from "../../components/partials/signatureModal";
-import Signatures from "../../components/partials/Document Details/signatures";
-import BagInfo from "../../components/partials/Document Details/bagInfo";
 import DocumentInfo from "../../components/partials/Document Details/documentInfo";
 import VendorInfo from "../../components/partials/Document Details/vendorInfo";
+import BagInfo from "../../components/partials/Document Details/bagInfo";
+import Signatures from "../../components/partials/Document Details/signatures";
 
-function OriginDoc() {
+function DestinationDoc() {
   const { key } = useParams();
   const auth = UseAuth();
   const navigate = useNavigate();
@@ -47,15 +46,13 @@ function OriginDoc() {
   const [data, setData] = useState([]);
   const [bagList, setBagList] = useState([]);
   const [checkedIndex, setCheckedIndex] = useState([]);
-  const [overloadedItem, setOverloadedItem] = useState([]);
-  const [selected, setSelected] = useState([]);
   const [changedItem, setChangedItem] = useState(0);
-  const [currentFocus, setCurrentFocus] = useState();
   const [loading, setLoading] = useState(false);
   const [show, setShow] = useState(false);
   const [showSignature, setShowSignature] = useState(false);
-  const [remark, setRemark] = useState("");
+  const [currentFocus, setCurrentFocus] = useState();
   const [img64, setImg64] = useState("");
+  const [remark, setRemark] = useState("");
   const [zerofilled, setZeroFilled] = useState("");
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
@@ -79,16 +76,14 @@ function OriginDoc() {
   };
 
   const handleApprove = () => {
-    if (auth.name === "") {
-      alert("Nama receiver kosong!");
-    } else if (auth.origin !== data.origin) {
+    if (auth.name === "" || auth.origin === "") {
+      alert(
+        "Data user tidak ditemukan, silahkan refresh halaman, atau login ulang"
+      );
+    } else if (auth.origin !== data.destination) {
       alert("User tidak memiliki akses untuk memproses");
-    } else if (data.noRef === "") {
-      alert("No. Referensi Vendor kosong");
     } else if (changedItem !== bagList.length) {
       alert("Periksa kembali bag yang belum diterima");
-    } else if (overloadedItem.length === bagList.length) {
-      alert("Semua bag tidak diangkut vendor, konfirmasi ulang data bag");
     } else {
       setShowSignature(true);
     }
@@ -97,9 +92,13 @@ function OriginDoc() {
   useEffect(() => {
     window.scrollTo(0, 0);
     setLoading(true);
+    // Fetch Data
     dbRef.child(key).on("value", (snapshot) => {
       if (snapshot.exists()) {
-        setData(snapshot.val());
+        setData({
+          key: snapshot.key,
+          ...snapshot.val(),
+        });
         setBagList(snapshot.val().bagList);
         setZeroFilled(snapshot.val().noSurat.split("/")[3]);
         setLoading(false);
@@ -148,27 +147,23 @@ function OriginDoc() {
           />
         </div>
         <hr />
-        <BagTableOrigin
+        <BagTableDestination
           data={data}
           bagList={bagList}
           setterBagList={setBagList}
-          loading={loading}
-          checkedIndex={checkedIndex}
-          setterCheckedIndex={setCheckedIndex}
           changedItem={changedItem}
           setterChangedItem={setChangedItem}
-          setterOverloadedItem={setOverloadedItem}
-          setterSelected={setSelected}
+          checkedIndex={checkedIndex}
+          setterCheckedIndex={setCheckedIndex}
+          loading={loading}
+          oncheck={handleCheck}
+          oncheckAll={handleCheckAll}
           onReceive={handleReceive}
           onUnreceive={handleUnreceive}
           onRemarks={handleRemark}
           onCancel={handleCancel}
-          onOverload={handleOverload}
-          oncheck={handleCheck}
-          oncheckAll={handleCheckAll}
-          selected={selected}
         />
-        {auth.origin === data.origin && data.status === "Menunggu Vendor" ? (
+        {auth.origin === data.destination && data.status === "Sampai Tujuan" ? (
           <Row>
             {checkedIndex.length == 0 ? null : (
               <Col>
@@ -212,8 +207,24 @@ function OriginDoc() {
             <Spinner animation="grow" size="sm" />
           ) : (
             <Col>
-              {data.status === "Menunggu Vendor" &&
-              auth.origin === data.origin ? (
+              {auth.origin === data.destination &&
+              data.status === "Dalam Perjalanan" ? (
+                <Button
+                  variant="outline-primary"
+                  onClick={() =>
+                    handleArrive({
+                      dbRef: dbRef,
+                      data: data,
+                      setterChangedItem: setChangedItem,
+                      setterLoading: setLoading,
+                    })
+                  }
+                >
+                  Arrived
+                </Button>
+              ) : null}
+              {auth.origin === data.destination &&
+              data.status === "Sampai Tujuan" ? (
                 <Button variant="primary" onClick={handleApprove}>
                   Approve
                 </Button>
@@ -266,16 +277,14 @@ function OriginDoc() {
           onChange={setImg64}
           onSubmit={() =>
             handleApproval({
-              key: key,
-              data: data,
-              bagList: bagList,
+              username: auth.name,
               dbRef: dbRef,
               docNumber: zerofilled,
-              overloadedItem: overloadedItem,
+              data: data,
+              bagList: bagList,
               signatureImage: img64,
               setterLoading: setLoading,
               setterChangedItem: setChangedItem,
-              setterOverloadedItem: setOverloadedItem,
             })
           }
         />
@@ -285,4 +294,4 @@ function OriginDoc() {
   );
 }
 
-export default OriginDoc;
+export default DestinationDoc;

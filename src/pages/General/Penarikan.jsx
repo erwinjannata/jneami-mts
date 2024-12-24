@@ -24,7 +24,10 @@ import PenarikanListTable from "../../components/partials/penarikanListTable";
 import moment from "moment";
 import "moment/locale/en-ca";
 import "moment/locale/id";
-import { handleChange } from "../../components/functions/functions";
+import {
+  handleChange,
+  handleDownload,
+} from "../../components/functions/functions";
 
 export default function Penarikan() {
   const d = new Date();
@@ -46,11 +49,24 @@ export default function Penarikan() {
     height: window.innerHeight,
   });
 
-  let radioList = [
+  const radioList = [
     { label: "Approved Date", value: "approvedDate" },
     { label: "Departure Date", value: "departureDate" },
     { label: "Arrival Date", value: "arrivalDate" },
     { label: "Received Date", value: "receivedDate" },
+  ];
+
+  const branchSelection = [
+    {
+      label: "Origin",
+      name: "origin",
+      value: state.origin,
+    },
+    {
+      label: "Destination",
+      name: "destination",
+      value: state.destination,
+    },
   ];
 
   const handleSubmit = () => {
@@ -132,113 +148,6 @@ export default function Penarikan() {
     }
   };
 
-  const handleDownload = () => {
-    let processedData = [];
-    dataList.map((row, idx) => {
-      for (let i = 0; i < dataList[idx].bagList.length; i++) {
-        processedData.push({
-          noManifest: dataList[idx].bagList[i].manifestNo,
-          koli:
-            dataList[idx].bagList[i].koli == undefined
-              ? "-"
-              : parseFloat(dataList[idx].bagList[i].koli),
-          pcs: parseFloat(dataList[idx].bagList[i].pcs),
-          kg: parseFloat(dataList[idx].bagList[i].kg),
-          remark: dataList[idx].bagList[i].remark,
-          statusBag: dataList[idx].bagList[i].statusBag,
-          noSurat: row.noSurat,
-          noRef: row.noRef,
-          origin: row.origin,
-          destination: row.destination,
-          status: row.status,
-          preparedBy: row.preparedBy,
-          approvedDate: new Date(
-            new Date(row.approvedDate).setHours(
-              row.approvedTime.split(":")[0],
-              row.approvedTime.split(":")[1],
-              0
-            )
-          ),
-          receivedBy: row.receivedBy,
-          receivedDate:
-            row.receivedDate == ""
-              ? ""
-              : new Date(
-                  new Date(row.receivedDate).setHours(
-                    row.receivedTime.split(":")[0],
-                    row.receivedTime.split(":")[1],
-                    0
-                  )
-                ),
-          departureDate:
-            row.departureDate == ""
-              ? ""
-              : new Date(
-                  new Date(row.departureDate).setHours(
-                    row.departureTime.split(":")[0],
-                    row.departureTime.split(":")[1],
-                    0
-                  )
-                ),
-          arrivalDate:
-            row.arrivalDate == ""
-              ? ""
-              : new Date(
-                  new Date(row.arrivalDate).setHours(
-                    row.arrivalTime.split(":")[0],
-                    row.arrivalTime.split(":")[1],
-                    0
-                  )
-                ),
-          durasi: parseFloat(row.durasiJam),
-          noPolisi: row.noPolisi,
-          driver: row.driver,
-          // statusWaktu: row.statusWaktu,
-        });
-      }
-    });
-    const worksheet = utils.json_to_sheet(processedData.reverse());
-    const workbook = utils.book_new();
-    utils.book_append_sheet(workbook, worksheet, "Data List");
-    utils.sheet_add_aoa(
-      worksheet,
-      [
-        [
-          "No. Manifest",
-          "Koli",
-          "Pcs",
-          "Kg",
-          "Remark",
-          "Status Bag",
-          "No. Surat Manifest",
-          "No. Referensi Vendor",
-          "Origin",
-          "Destination",
-          "Status Manifest",
-          "Approved by",
-          "Approved Date",
-          "Received by",
-          "Received Date",
-          "Tanggal Keberangkatan",
-          "Tanggal Kedatangan",
-          "Durasi Perjalanan (Jam)",
-          "No. Polisi Kendaraan",
-          "Driver",
-          // "Status Waktu",
-        ],
-      ],
-      { origin: "A1" }
-    );
-    writeFile(
-      workbook,
-      `MTM ${moment(state.start).locale("id").format("LL")} - ${moment(
-        state.end
-      )
-        .locale("id")
-        .format("LL")}.xlsx`
-    );
-  };
-
   useEffect(() => {
     window.scrollTo(0, 0);
     const handleResize = () => {
@@ -287,6 +196,7 @@ export default function Penarikan() {
               <strong>{`Dari :`}</strong>
             </label>
             <DatePicker
+              portalId="root-portal"
               title="Start Date"
               placeholder="Start Date"
               className="form-control form-control-solid"
@@ -304,6 +214,7 @@ export default function Penarikan() {
               <strong>{`Hingga :`}</strong>
             </label>
             <DatePicker
+              portalId="root-portal"
               id="endDate"
               title="End Date"
               placeholder="End Date"
@@ -319,40 +230,25 @@ export default function Penarikan() {
           </Col>
         </Row>
         <Row className="mt-4">
-          <Col>
-            <FloatingLabel controlId="floatingSelectData" label="Origin">
-              <Form.Select
-                aria-label="Origin"
-                name="origin"
-                onChange={() => handleChange(event, state, setState)}
-                value={state.origin}
-              >
-                <option value="">All Cabang</option>
-                {cabangList.map((item, id) => (
-                  <option key={id} value={item.name}>
-                    {item.name}
-                  </option>
-                ))}
-              </Form.Select>
-            </FloatingLabel>
-          </Col>
-          <Col>
-            <FloatingLabel controlId="floatingSelectData" label="Destination">
-              <Form.Select
-                aria-label="Destination"
-                name="destination"
-                onChange={() => handleChange(event, state, setState)}
-                value={state.destination}
-              >
-                <option value="">All Cabang</option>
-                {cabangList.map((item, id) => (
-                  <option key={id} value={item.name}>
-                    {item.name}
-                  </option>
-                ))}
-              </Form.Select>
-            </FloatingLabel>
-          </Col>
+          {branchSelection.map((item, index) => (
+            <Col key={index}>
+              <FloatingLabel controlId="floatingSelectData" label={item.label}>
+                <Form.Select
+                  aria-label={item.label}
+                  name={item.name}
+                  onChange={() => handleChange(event, state, setState)}
+                  value={item.value}
+                >
+                  <option value="">All Cabang</option>
+                  {cabangList.map((item, id) => (
+                    <option key={id} value={item.name}>
+                      {item.name}
+                    </option>
+                  ))}
+                </Form.Select>
+              </FloatingLabel>
+            </Col>
+          ))}
         </Row>
         <Row className="mt-4">
           <Col>
@@ -369,7 +265,9 @@ export default function Penarikan() {
                 <Button
                   variant="success"
                   className="mx-2"
-                  onClick={handleDownload}
+                  onClick={() =>
+                    handleDownload(dataList, state.start, state.end)
+                  }
                 >
                   <MdFileDownload /> Download
                 </Button>
@@ -440,7 +338,7 @@ export default function Penarikan() {
             <hr />
           </>
         ) : null}
-        <PenarikanListTable data={dataList} />
+        {show ? <PenarikanListTable data={dataList} /> : null}
       </Container>
     </div>
   );

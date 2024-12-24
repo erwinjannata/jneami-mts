@@ -7,11 +7,12 @@ import Create from "./pages/General/createDoc";
 import Doc from "./pages/General/Doc";
 import UnreceivedPage from "./pages/General/unreceived";
 import Penarikan from "./pages/General/Penarikan";
-import DamageReport from "./pages/General/damageReport";
 import Vendor from "./pages/Vendor";
 import VendorDoc from "./pages/Vendor/doc";
 import FindManifestNumber from "./pages/General/findManifest";
 import AddUser from "./pages/Admin/addUser";
+import OriginDoc from "./pages/Origin/doc";
+import DestinationDoc from "./pages/Destination/doc";
 
 function App() {
   return (
@@ -40,12 +41,30 @@ function App() {
             </PrivateRoute>
           }
         />
-        {/* Document Detail */}
+        {/* Document Detail : General (Read Only) */}
         <Route
           path="/doc/:key"
           element={
             <PrivateRoute>
               <Doc />
+            </PrivateRoute>
+          }
+        />
+        {/* Document Detail : ORIGIN */}
+        <Route
+          path="/origin/doc/:key"
+          element={
+            <PrivateRoute>
+              <OriginDoc />
+            </PrivateRoute>
+          }
+        />
+        {/* Document Detail : DESTINATION */}
+        <Route
+          path="/destination/doc/:key"
+          element={
+            <PrivateRoute>
+              <DestinationDoc />
             </PrivateRoute>
           }
         />
@@ -64,14 +83,6 @@ function App() {
           element={
             <PrivateRoute>
               <Penarikan />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/damage/new"
-          element={
-            <PrivateRoute>
-              <DamageReport />
             </PrivateRoute>
           }
         />

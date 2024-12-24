@@ -1,150 +1,102 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
+import "./../../index.css";
 import { useState, useEffect } from "react";
 import { UseAuth } from "../../config/authContext";
 import {
+  Button,
   ButtonGroup,
   Col,
   Container,
   Dropdown,
   DropdownButton,
-  Form,
   Row,
   Table,
 } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
-import moment from "moment";
 import firebase from "./../../config/firebase";
 import NavMenu from "../../components/partials/navbarMenu";
-import {
-  handleDownloadPDF,
-  handleExcel,
-} from "../../components/functions/functions";
+import { handleExcel } from "../../components/functions/functions";
 import { PDFDownloadLink } from "@react-pdf/renderer";
+import PrintFn from "../../components/partials/print";
+import RemarkModal from "../../components/partials/remarkModal";
+import DocumentInfo from "../../components/partials/Document Details/documentInfo";
+import VendorInfo from "../../components/partials/Document Details/vendorInfo";
+import BagInfo from "../../components/partials/Document Details/bagInfo";
+import Signatures from "../../components/partials/Document Details/signatures";
 
 function VendorDoc() {
   const { key } = useParams();
   const auth = UseAuth();
-  const dbRef = firebase.database().ref("manifestTransit");
+  // const dbRef = firebase.database().ref("manifestTransit");
+  const dbRef = firebase.database().ref("test/manifestTransit");
   const [data, setData] = useState([]);
   const [bagList, setBagList] = useState([]);
+  const [remark, setRemark] = useState("");
+  const [show, setShow] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [currentFocus, setCurrentFocus] = useState();
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
   });
   let navigate = useNavigate();
 
-  const handleChange = (e) => {
-    const value = e.target.value;
-    setData({
-      ...data,
-      [e.target.name]: value,
-    });
+  const handleSubmitRemark = () => {
+    setBagList(
+      bagList.map((lists, index) => {
+        if (index === currentFocus) {
+          if (lists.remark.includes("MERPATI:")) {
+            return {
+              ...lists,
+              remark: `${lists.remark}, ${remark}`,
+            };
+          } else {
+            return {
+              ...lists,
+              remark:
+                lists.remark == ""
+                  ? `${lists.remark}MERPATI: ${remark}`
+                  : `${lists.remark} | MERPATI: ${remark}`,
+            };
+          }
+        } else {
+          return lists;
+        }
+      })
+    );
   };
 
-  const dataDisplay = [
-    [
-      { label: "No. Surat", value: data.noSurat },
-      { label: "Status", value: data.status },
-    ],
-    [
-      { label: "Origin", value: data.origin },
-      { label: "Destination", value: data.destination },
-    ],
-    [
-      { label: "Approved by", value: data.preparedBy },
-      {
-        label: "Received by",
-        value: data.isReceived ? `${data.receivedBy}` : "-",
-      },
-    ],
-    [
-      {
-        label: "Approved at",
-        value: `${moment(data.approvedDate).locale("id").format("LL")} ${
-          data.approvedTime
-        }`,
-      },
-      {
-        label: "Received at",
-        value: data.isReceived
-          ? `${moment(data.receivedDate).locale("id").format("LL")} ${
-              data.receivedTime
-            }`
-          : "-",
-      },
-    ],
-  ];
-
-  const vendorInfoCol = [
-    {
-      id: "floatingNoRef",
-      name: "noRef",
-      value: data.noRef,
-      placeholder: "No. Ref. Vendor",
-    },
-    {
-      id: "floatingNoPolisi",
-      name: "noPolisi",
-      value: data.noPolisi,
-      placeholder: "No. Polisi Kendaraan",
-    },
-    {
-      id: "floatingDriver",
-      name: "driver",
-      value: data.driver,
-      placeholder: "Nama Driver",
-    },
-  ];
-
-  const suratInfo = [
-    {
-      label: "Total Koli",
-      value: `${bagList.reduce((prev, next) => {
-        return prev + parseInt(next.koli);
-      }, 0)} koli`,
-    },
-    {
-      label: "Total Pcs",
-      value: `${bagList.reduce((prev, next) => {
-        return prev + parseInt(next.pcs);
-      }, 0)} pcs`,
-    },
-    {
-      label: "Total Weight",
-      value: `${bagList.reduce((prev, next) => {
-        return prev + parseInt(next.kg);
-      }, 0)} Kg`,
-    },
-  ];
-
-  const signatures = [
-    {
-      label: "Prepared by",
-      source: data.checkerSign,
-      alts: "Prepared by",
-      name: data.preparedBy,
-    },
-    {
-      label: "Driver",
-      source: data.vendorSign || "",
-      alts: "Driver Sign",
-      name: data.driver,
-    },
-    {
-      label: "Received by",
-      source: data.receiverSign,
-      alts: "Received by",
-      name: data.receivedBy,
-    },
-  ];
+  const handleApprove = async () => {
+    if (auth.origin === "VENDOR") {
+      if (confirm("Konfirmasi update data?") === true) {
+        setLoading(true);
+        await dbRef
+          .child(key)
+          .update({
+            bagList: bagList,
+          })
+          .then(() => {
+            setLoading(false);
+            alert("Berhasil update remarks");
+            window.scrollTo(0, 0);
+          })
+          .catch((error) => {
+            setLoading(false);
+            alert(error.error);
+          });
+      }
+    }
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    setLoading(true);
     dbRef.child(key).on("value", (snapshot) => {
       if (snapshot.exists()) {
         setData(snapshot.val());
         setBagList(snapshot.val().bagList);
+        setLoading(false);
       } else {
         navigate("/");
       }
@@ -182,130 +134,114 @@ function VendorDoc() {
       <NavMenu />
       <Container>
         <div className="mt-4">
-          {dataDisplay.map((display, index) => (
-            <div key={index}>
-              <Row>
-                <Col>
-                  <strong>{display[0].label}</strong> <br />
-                  {display[0].value}
-                </Col>
-                <Col>
-                  <strong>{display[1].label}</strong> <br />
-                  {display[1].value}
-                </Col>
-              </Row>
-              <hr />
-            </div>
-          ))}
-          <Row>
-            {vendorInfoCol.map((info, index) => (
-              <Col xs={windowSize.width >= 768 ? "" : "0"} key={index}>
-                <Form.Floating
-                  className={windowSize.width >= 768 ? "" : "mb-2"}
-                >
-                  <Form.Control
-                    id={info.id}
-                    type="text"
-                    name={info.name}
-                    value={info.value || ""}
-                    placeholder={info.placeholder}
-                    disabled
-                  ></Form.Control>
-                  <label htmlFor={info.id}>{info.placeholder}</label>
-                </Form.Floating>
-              </Col>
-            ))}
-          </Row>
+          <DocumentInfo data={data} />
+          <VendorInfo
+            data={data}
+            setterData={setData}
+            windowSize={windowSize}
+          />
         </div>
         <hr />
-        <div
-          style={{ maxHeight: "364px", overflowY: "scroll", display: "block" }}
-        >
-          <Table responsive striped>
-            <thead>
-              <tr>
-                <th>No.</th>
-                <th>Manifest No.</th>
-                <th>Koli</th>
-                <th>Pcs</th>
-                <th>Kg</th>
-                <th>Status Bag</th>
-                <th>Remark</th>
-              </tr>
-            </thead>
-            <tbody>
-              {bagList.map((item, index) => (
-                <tr key={index}>
-                  <td>{index + 1}</td>
-                  <td>{item.manifestNo}</td>
-                  <td>{item.koli}</td>
-                  <td>{item.pcs}</td>
-                  <td>{item.kg}</td>
-                  <td>{item.statusBag}</td>
-                  <td>{item.remark}</td>
+        <Row>
+          <div>
+            <Table responsive striped id="tableData">
+              <thead id="stickyHead">
+                <tr>
+                  <th className="w-auto">No.</th>
+                  <th className="w-25">Manifest No.</th>
+                  <th className="w-auto">Koli</th>
+                  <th className="w-auto">Pcs</th>
+                  <th className="w-auto">Kg</th>
+                  <th className="w-25">Status Bag</th>
+                  <th className="w-50">Remark</th>
                 </tr>
-              ))}
-            </tbody>
-          </Table>
-        </div>
-        <Row className="mt-4">
-          {suratInfo.map((info, index) => (
-            <Col key={index}>
-              <p>
-                <strong>{info.label}</strong>
-                <br />
-                {info.value}
-              </p>
-            </Col>
-          ))}
+              </thead>
+              <tbody>
+                {bagList.map((item, index) => (
+                  <tr key={index} className="position-relative">
+                    <td>{index + 1}</td>
+                    <td>{item.manifestNo}</td>
+                    <td>{item.koli}</td>
+                    <td>{item.pcs}</td>
+                    <td>{item.kg}</td>
+                    <td>{item.statusBag}</td>
+                    <td>{item.remark}</td>
+                    <td>
+                      {data.status === "Dalam Perjalanan" ? (
+                        <Button
+                          variant="warning"
+                          className="m-2"
+                          disabled={loading}
+                          onClick={() => {
+                            setShow(true);
+                            setCurrentFocus(index);
+                            setRemark("");
+                          }}
+                        >
+                          Remark
+                        </Button>
+                      ) : null}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </div>
         </Row>
+        <BagInfo bagList={bagList} />
         <Row>
-          <ButtonGroup>
-            <DropdownButton
-              as={ButtonGroup}
-              title="Download File"
-              id="bg-nested-dropdown"
-              variant="success"
-              className="mx-2"
-            >
-              <Dropdown.Item
-                eventKey="1"
-                onClick={() => handleExcel(data, bagList)}
+          <Col>
+            {data.status === "Dalam Perjalanan" ? (
+              <Button
+                variant="outline-primary"
+                disabled={loading}
+                onClick={() => handleApprove()}
               >
-                Excel File (.xlsx)
-              </Dropdown.Item>
-              <hr className="mx-4" />
-              <PDFDownloadLink
-                className="mx-3"
-                document={handleDownloadPDF(data, bagList)}
-                fileName={`${data.noSurat}.pdf`}
-                style={{ color: "black" }}
+                Submit
+              </Button>
+            ) : null}
+            <ButtonGroup>
+              <DropdownButton
+                as={ButtonGroup}
+                title="Download File"
+                id="bg-nested-dropdown"
+                variant="success"
+                className="mx-2"
+                disabled={loading}
               >
-                {({ loading }) => (loading ? "Loading..." : "PDF File (.pdf)")}
-              </PDFDownloadLink>
-            </DropdownButton>
-          </ButtonGroup>
+                <Dropdown.Item
+                  eventKey="1"
+                  onClick={() => handleExcel(data, bagList)}
+                >
+                  Excel File (.xlsx)
+                </Dropdown.Item>
+                <hr className="mx-4" />
+                <PDFDownloadLink
+                  className="mx-3"
+                  document={<PrintFn bagList={bagList} data={data} />}
+                  fileName={`${data.noSurat}.pdf`}
+                  style={{ color: "black" }}
+                >
+                  {({ loading }) =>
+                    loading ? "Loading..." : "PDF File (.pdf)"
+                  }
+                </PDFDownloadLink>
+              </DropdownButton>
+            </ButtonGroup>
+          </Col>
         </Row>
         <hr />
-        <Row>
-          {signatures.map((item, index) => (
-            <Col className="signatures" key={index}>
-              <p>
-                <strong>{item.label}</strong>
-              </p>
-              {item.source == "" ? null : (
-                <div>
-                  <img
-                    className="signature"
-                    src={item.source}
-                    alt={item.alts}
-                  />
-                  <p>{item.name}</p>
-                </div>
-              )}
-            </Col>
-          ))}
-        </Row>
+        <Signatures data={data} />
+        <RemarkModal
+          show={show}
+          onHide={() => {
+            setShow(false);
+            setCurrentFocus();
+          }}
+          getvalue={setRemark}
+          getfocus={setCurrentFocus}
+          setvalue={handleSubmitRemark}
+        />
       </Container>
     </div>
   );

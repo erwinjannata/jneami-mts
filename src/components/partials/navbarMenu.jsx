@@ -41,12 +41,6 @@ export default function NavMenu() {
       icon: <BiError size={20} />,
     },
     {
-      label: "Damage Report",
-      link: "/damage/new",
-      req: 5,
-      icon: <CgDanger size={20} />,
-    },
-    {
       label: "Penarikan Data",
       link: "/get",
       req: 2,

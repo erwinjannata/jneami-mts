@@ -2,22 +2,14 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import "./../../index.css";
+import { Col, Container, FloatingLabel, Form, Row } from "react-bootstrap";
 import {
-  Card,
-  Col,
-  Container,
-  FloatingLabel,
-  Form,
-  Placeholder,
-  Row,
-  Table,
-} from "react-bootstrap";
+  handleCabang,
+  handleChange,
+} from "../../components/functions/functions";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { UseAuth } from "../../config/authContext";
-import { FaTruckLoading, FaBoxes } from "react-icons/fa";
-import { FaTruckPlane, FaPlaneCircleCheck } from "react-icons/fa6";
-import { handleCabang } from "../../components/functions/functions";
 import { cabangList } from "../../components/data/branchList";
 import firebase from "../../config/firebase";
 import NavMenu from "../../components/partials/navbarMenu";
@@ -26,26 +18,25 @@ import CategoryCards from "../../components/partials/categoryCards";
 
 export default function Home() {
   const auth = UseAuth();
-  let now = new Date();
-  let db = firebase.database().ref("manifestTransit/");
+  let db = firebase.database().ref("test/manifestTransit");
   let navigate = new useNavigate();
+  const [dataList, setDataList] = useState([]);
+  const [showList, setShowList] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
   });
-  const [dataList, setDataList] = useState([]);
-  const [showList, setShowList] = useState([]);
   const [state, setState] = useState({
     number: "",
     showed: "all",
-    limit: "50",
+    limit: 50,
     filtered: false,
     currentFilter: "",
     origin: "All Cabang",
     destination: "All Cabang",
     warningItem: 0,
   });
-  const [loading, setLoading] = useState(true);
 
   const handleFilter = (status) => {
     if (state.filtered == true && state.currentFilter == status) {
@@ -65,18 +56,6 @@ export default function Home() {
         dataList.filter((datalist) => datalist.status.includes(status))
       );
     }
-  };
-
-  const handleChange = (e) => {
-    const value = e.target.value;
-    setState({
-      ...state,
-      [e.target.name]: value,
-      filtered: false,
-      currentFilter: "",
-      origin: "All Cabang",
-      destination: "All Cabang",
-    });
   };
 
   const handleSearch = (e) => {
@@ -103,7 +82,7 @@ export default function Home() {
       state.showed == "all"
         ? db
         : db.orderByChild(`${state.showed}`).equalTo(auth.origin);
-    filters.limitToLast(150).on("value", (snapshot) => {
+    filters.limitToLast(parseFloat(state.limit)).on("value", (snapshot) => {
       let data = [];
 
       snapshot.forEach((childSnapshot) => {
@@ -148,9 +127,8 @@ export default function Home() {
           );
         });
       }
-      let start = result.length - state.limit;
-      setDataList(result.slice(start < 0 ? 0 : start, result.length));
-      setShowList(result.slice(start < 0 ? 0 : start, result.length));
+      setDataList(result);
+      setShowList(result);
       setLoading(false);
     });
 
@@ -229,7 +207,7 @@ export default function Home() {
         <hr />
         <Row>
           <CategoryCards
-            data={showList}
+            data={dataList}
             windowSize={windowSize}
             state={state}
             handler={handleFilter}
@@ -248,7 +226,7 @@ export default function Home() {
                   name="number"
                   value={state.number}
                   placeholder="Cari no. surat"
-                  onChange={handleChange}
+                  onChange={() => handleChange(event, state, setState)}
                 />
               </FloatingLabel>
             </Form>
@@ -258,7 +236,7 @@ export default function Home() {
               <Form.Select
                 aria-label="Data"
                 name="showed"
-                onChange={handleChange}
+                onChange={() => handleChange(event, state, setState)}
                 value={state.showed}
               >
                 <option value="all">All Data</option>
@@ -310,7 +288,7 @@ export default function Home() {
         </Row>
         <hr />
         <Row>
-          <DocListTable data={showList} windowSize={windowSize} />
+          <DocListTable data={showList} />
         </Row>
         <hr />
         <Row>
@@ -319,7 +297,7 @@ export default function Home() {
               <Form.Select
                 aria-label="Show"
                 name="limit"
-                onChange={handleChange}
+                onChange={() => handleChange(event, state, setState)}
                 value={state.limit}
               >
                 <option value="50">50</option>

@@ -8,6 +8,7 @@ import {
   FloatingLabel,
   Form,
   Row,
+  Spinner,
 } from "react-bootstrap";
 import { useState } from "react";
 import { handleChange } from "../../components/functions/functions";
@@ -25,7 +26,6 @@ function UnreceivedPage() {
   const dbRef = firebase.database().ref("manifestTransit");
 
   const [isLoading, setisLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
   const [state, setState] = useState({
     start: moment(d).locale("en-ca").format("L"),
     end: moment(d).locale("en-ca").format("L"),
@@ -35,6 +35,7 @@ function UnreceivedPage() {
     destination: "",
   });
   const [data, setData] = useState([]);
+  const [bagList, setBagList] = useState([]);
 
   const branchSelection = [
     {
@@ -88,12 +89,36 @@ function UnreceivedPage() {
             });
           }
           setData(result);
-          setisLoading(false);
-          setState({
-            ...state,
-            showTable: true,
+
+          let processedData = [];
+          data.map((row, idx) => {
+            for (let i = 0; i < data[idx].bagList.length; i++) {
+              if (data[idx].bagList[i].statusBag == "Unreceived") {
+                const { bagList, ...rest } = row;
+                processedData.push({
+                  noManifest: data[idx].bagList[i].manifestNo,
+                  koli:
+                    data[idx].bagList[i].koli == undefined
+                      ? "-"
+                      : parseFloat(data[idx].bagList[i].koli),
+                  pcs: parseFloat(data[idx].bagList[i].pcs),
+                  kg: parseFloat(data[idx].bagList[i].kg),
+                  remark: data[idx].bagList[i].remark,
+                  statusBag: data[idx].bagList[i].statusBag,
+                  ...rest,
+                });
+              }
+            }
           });
+          setBagList(processedData);
+        } else {
+          setData([]);
         }
+        setState({
+          ...state,
+          showTable: true,
+        });
+        setisLoading(false);
       });
   };
 
@@ -175,9 +200,13 @@ function UnreceivedPage() {
         </Row>
         <hr />
         {isLoading ? (
-          <CircularProgress variant="primary" disableShrink />
+          <Spinner animation="grow" size="sm" />
         ) : (
-          <Row>{state.showTable ? <BagListTable data={data} /> : null}</Row>
+          <Row>
+            {state.showTable ? (
+              <BagListTable data={data} bagList={bagList} />
+            ) : null}
+          </Row>
         )}
       </Container>
     </div>

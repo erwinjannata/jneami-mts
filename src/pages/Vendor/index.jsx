@@ -14,7 +14,7 @@ import DocListTable from "../../components/partials/documentListTable";
 
 export default function Vendor() {
   const auth = UseAuth();
-  const dbRef = firebase.database().ref("manifestTransit/");
+  const dbRef = firebase.database().ref("test/manifestTransit/");
   const [state, setState] = useState({
     searched: "",
     limit: 50,
@@ -27,15 +27,15 @@ export default function Vendor() {
     width: window.innerWidth,
     height: window.innerHeight,
   });
-  const [list, setData] = useState([]);
+  const [data, setData] = useState([]);
   const [showList, setShowList] = useState([]);
 
   const handleSearch = (e) => {
     e.preventDefault();
     const searchResult =
       state.searched == ""
-        ? list
-        : list.filter((datalist) =>
+        ? data
+        : data.filter((datalist) =>
             datalist.noSurat.toUpperCase().includes(state.searched)
           );
     setShowList(searchResult);
@@ -43,10 +43,10 @@ export default function Vendor() {
 
   const handleFilter = (status) => {
     if (state.filtered == true && state.currentFilter == status) {
-      setShowList(list);
+      setShowList(data);
       setState({ ...state, filtered: false, currentFilter: "" });
     } else {
-      setShowList(list.filter((datalist) => datalist.status.includes(status)));
+      setShowList(data.filter((datalist) => datalist.status.includes(status)));
       setState({ ...state, filtered: true, currentFilter: status });
     }
   };
@@ -111,7 +111,7 @@ export default function Vendor() {
         <hr />
         <Row>
           <CategoryCards
-            data={showList}
+            data={data}
             windowSize={windowSize}
             state={state}
             handler={handleFilter}

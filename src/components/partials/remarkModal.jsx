@@ -2,19 +2,25 @@
 import { useState } from "react";
 import { Button, Form, Modal } from "react-bootstrap";
 
-export default function RemarkModal(props) {
+export default function RemarkModal({
+  show,
+  getvalue,
+  setvalue,
+  getfocus,
+  onHide,
+}) {
   const [remark, setRemark] = useState("");
 
   const handleChange = (e) => {
     setRemark(e.target.value);
-    props.getvalue(e.target.value);
+    getvalue(e.target.value);
   };
 
   const handleSubmit = () => {
-    props.setvalue();
-    props.getfocus("");
+    setvalue(remark);
+    getfocus("");
     setRemark("");
-    props.onHide();
+    onHide();
   };
 
   return (
@@ -23,9 +29,9 @@ export default function RemarkModal(props) {
         centered
         scrollable
         backdrop="static"
-        show={props.show}
+        show={show}
         onHide={() => {
-          setRemark(""), props.onHide();
+          setRemark(""), onHide();
         }}
       >
         <Modal.Header closeButton>
@@ -49,7 +55,7 @@ export default function RemarkModal(props) {
           <Button
             variant="secondary"
             onClick={() => {
-              setRemark(""), props.onHide();
+              setRemark(""), onHide();
             }}
           >
             Close

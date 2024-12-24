@@ -21,7 +21,11 @@ function PenarikanListTable(props) {
     setData(props.data);
   }, [props.data]);
 
-  return (
+  return data.length == 0 ? (
+    <strong>
+      <i>Data tidak ditemukan</i>
+    </strong>
+  ) : (
     <div>
       <Table responsive striped hover id="tableData">
         <thead id="stickyHead">
@@ -41,62 +45,50 @@ function PenarikanListTable(props) {
           </tr>
         </thead>
         <tbody>
-          {data.length == 0 ? (
-            <>
-              <tr>
-                <td colSpan={10} align="center">
-                  <i>Data tidak ditemukan</i>
+          {data
+            .map((item, key) => (
+              <tr
+                key={key}
+                onClick={() =>
+                  navToDetail(item.key, item.origin, item.destination)
+                }
+                className="position-relative user-select-none"
+              >
+                <td>{item.noSurat}</td>
+                <td>{item.origin}</td>
+                <td>{item.destination}</td>
+                <td>{item.status}</td>
+                <td>
+                  {item.bagList.reduce((prev, next) => {
+                    return prev + parseInt(next.koli);
+                  }, 0) + " koli"}
                 </td>
+                <td>
+                  {item.bagList.reduce((prev, next) => {
+                    return prev + parseInt(next.kg);
+                  }, 0) + " kg"}
+                </td>
+                <td>{`${item.approvedDate} ${item.approvedTime}`}</td>
+                <td>
+                  {item.departureDateDate == ""
+                    ? "-"
+                    : `${item.departureDate} ${item.departureTime}`}
+                </td>
+                <td>
+                  {item.arrivalDate == ""
+                    ? "-"
+                    : `${item.arrivalDate} ${item.arrivalTime}`}
+                </td>
+                <td>
+                  {item.receivedDate == ""
+                    ? "-"
+                    : `${item.receivedDate} ${item.receivedTime}`}
+                </td>
+                <td>{item.durasi}</td>
+                <td>{item.statusWaktu}</td>
               </tr>
-            </>
-          ) : (
-            <>
-              {data
-                .map((item, key) => (
-                  <tr
-                    key={key}
-                    onClick={() =>
-                      navToDetail(item.key, item.origin, item.destination)
-                    }
-                    className="position-relative user-select-none"
-                  >
-                    <td>{item.noSurat}</td>
-                    <td>{item.origin}</td>
-                    <td>{item.destination}</td>
-                    <td>{item.status}</td>
-                    <td>
-                      {item.bagList.reduce((prev, next) => {
-                        return prev + parseInt(next.koli);
-                      }, 0) + " koli"}
-                    </td>
-                    <td>
-                      {item.bagList.reduce((prev, next) => {
-                        return prev + parseInt(next.kg);
-                      }, 0) + " kg"}
-                    </td>
-                    <td>{`${item.approvedDate} ${item.approvedTime}`}</td>
-                    <td>
-                      {item.departureDateDate == ""
-                        ? "-"
-                        : `${item.departureDate} ${item.departureTime}`}
-                    </td>
-                    <td>
-                      {item.arrivalDate == ""
-                        ? "-"
-                        : `${item.arrivalDate} ${item.arrivalTime}`}
-                    </td>
-                    <td>
-                      {item.receivedDate == ""
-                        ? "-"
-                        : `${item.receivedDate} ${item.receivedTime}`}
-                    </td>
-                    <td>{item.durasi}</td>
-                    <td>{item.statusWaktu}</td>
-                  </tr>
-                ))
-                .reverse()}
-            </>
-          )}
+            ))
+            .reverse()}
         </tbody>
       </Table>
     </div>

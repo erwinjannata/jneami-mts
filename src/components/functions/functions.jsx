@@ -1,5 +1,4 @@
 import { utils, writeFile } from "xlsx";
-import Print from "./../partials/printedDoc";
 import moment from "moment";
 
 // Handle Changes in Forms
@@ -56,32 +55,108 @@ export const handleExcel = (documentDetails, bagList) => {
   writeFile(workbook, `${documentDetails.noSurat}.xlsx`);
 };
 
-export const handleDownloadPDF = (documentDetails, bagList) => {
-  return (
-    <Print
-      data={bagList}
-      noSurat={document.noSurat}
-      noRef={documentDetails.noRef}
-      date1={`${moment(documentDetails.approvedDate)
-        .locale("id")
-        .format("LL")} ${documentDetails.approvedTime}`}
-      date2={
-        documentDetails.receivedDate == ""
-          ? "-"
-          : `${moment(documentDetails.receivedDate)
-              .locale("id")
-              .format("LL")} ${documentDetails.receivedTime}`
-      }
-      origin={documentDetails.origin}
-      destination={documentDetails.destination}
-      checkerSign={documentDetails.checkerSign}
-      vendorSign={documentDetails.vendorSign}
-      receiverSign={documentDetails.receiverSign}
-      checkerName={documentDetails.preparedBy}
-      receiverName={documentDetails.receivedBy}
-      driverName={documentDetails.driver}
-      status={documentDetails.status}
-      noPolisi={documentDetails.noPolisi}
-    />
+// Handle Download data
+export const handleDownload = (dataList, startDate, endDate) => {
+  let processedData = [];
+  dataList.map((row, idx) => {
+    for (let i = 0; i < dataList[idx].bagList.length; i++) {
+      processedData.push({
+        noManifest: dataList[idx].bagList[i].manifestNo,
+        koli:
+          dataList[idx].bagList[i].koli == undefined
+            ? "-"
+            : parseFloat(dataList[idx].bagList[i].koli),
+        pcs: parseFloat(dataList[idx].bagList[i].pcs),
+        kg: parseFloat(dataList[idx].bagList[i].kg),
+        remark: dataList[idx].bagList[i].remark,
+        statusBag: dataList[idx].bagList[i].statusBag,
+        noSurat: row.noSurat,
+        noRef: row.noRef,
+        origin: row.origin,
+        destination: row.destination,
+        status: row.status,
+        preparedBy: row.preparedBy,
+        approvedDate: new Date(
+          new Date(row.approvedDate).setHours(
+            row.approvedTime.split(":")[0],
+            row.approvedTime.split(":")[1],
+            0
+          )
+        ),
+        receivedBy: row.receivedBy,
+        receivedDate:
+          row.receivedDate == ""
+            ? ""
+            : new Date(
+                new Date(row.receivedDate).setHours(
+                  row.receivedTime.split(":")[0],
+                  row.receivedTime.split(":")[1],
+                  0
+                )
+              ),
+        departureDate:
+          row.departureDate == ""
+            ? ""
+            : new Date(
+                new Date(row.departureDate).setHours(
+                  row.departureTime.split(":")[0],
+                  row.departureTime.split(":")[1],
+                  0
+                )
+              ),
+        arrivalDate:
+          row.arrivalDate == ""
+            ? ""
+            : new Date(
+                new Date(row.arrivalDate).setHours(
+                  row.arrivalTime.split(":")[0],
+                  row.arrivalTime.split(":")[1],
+                  0
+                )
+              ),
+        durasi: parseFloat(row.durasiJam),
+        noPolisi: row.noPolisi,
+        driver: row.driver,
+        // statusWaktu: row.statusWaktu,
+      });
+    }
+  });
+  const worksheet = utils.json_to_sheet(processedData.reverse());
+  const workbook = utils.book_new();
+  utils.book_append_sheet(workbook, worksheet, "Data List");
+  utils.sheet_add_aoa(
+    worksheet,
+    [
+      [
+        "No. Manifest",
+        "Koli",
+        "Pcs",
+        "Kg",
+        "Remark",
+        "Status Bag",
+        "No. Surat Manifest",
+        "No. Referensi Vendor",
+        "Origin",
+        "Destination",
+        "Status Manifest",
+        "Approved by",
+        "Approved Date",
+        "Received by",
+        "Received Date",
+        "Tanggal Keberangkatan",
+        "Tanggal Kedatangan",
+        "Durasi Perjalanan (Jam)",
+        "No. Polisi Kendaraan",
+        "Driver",
+        // "Status Waktu",
+      ],
+    ],
+    { origin: "A1" }
+  );
+  writeFile(
+    workbook,
+    `MTM ${moment(startDate).locale("id").format("LL")} - ${moment(endDate)
+      .locale("id")
+      .format("LL")}.xlsx`
   );
 };
