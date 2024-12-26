@@ -33,13 +33,22 @@ export default function Vendor() {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    const searchResult =
-      state.searched == ""
-        ? data
-        : data.filter((datalist) =>
-            datalist.noSurat.toUpperCase().includes(state.searched)
-          );
-    setShowList(searchResult);
+    let searchResult = [];
+
+    if (state.searched !== "") {
+      data.forEach((item) => {
+        item.bagList.forEach((bag) => {
+          let find = bag.manifestNo.replace(/ /g, "");
+          if (find.includes(state.searched)) {
+            searchResult.push(item);
+          }
+        });
+      });
+      setShowList(searchResult);
+    } else {
+      setShowList(data);
+    }
+    // datalist.noSurat.toUpperCase().includes(state.searched)
   };
 
   const handleFilter = (status) => {
@@ -160,12 +169,12 @@ export default function Vendor() {
             <Form onSubmit={handleSearch}>
               <FloatingLabel
                 controlId="floatingInput"
-                label="No. Surat Manifest"
+                label="No. Manifest / Bag"
               >
                 <Form.Control
                   type="text"
                   name="searched"
-                  placeholder="Cari no. surat manifest"
+                  placeholder="Cari no. manifest / bag"
                   value={state.searched}
                   onChange={() => handleChange(event, state, setState)}
                 />
