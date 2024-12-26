@@ -48,7 +48,6 @@ export default function Vendor() {
     } else {
       setShowList(data);
     }
-    // datalist.noSurat.toUpperCase().includes(state.searched)
   };
 
   const handleFilter = (status) => {
