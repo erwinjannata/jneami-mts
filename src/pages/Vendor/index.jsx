@@ -14,7 +14,8 @@ import DocListTable from "../../components/partials/documentListTable";
 
 export default function Vendor() {
   const auth = UseAuth();
-  const dbRef = firebase.database().ref("test/manifestTransit/");
+  const dbRef = firebase.database().ref("manifestTransit/");
+  // const dbRef = firebase.database().ref("test/manifestTransit/");
   const [state, setState] = useState({
     searched: "",
     limit: 50,

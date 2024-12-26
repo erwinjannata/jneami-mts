@@ -212,7 +212,8 @@ export const handleApproval = async ({
       };
       const storageRef = ref(
         storage,
-        `test/signatures/${year}-${docNumber}/vendorSign.png`
+        // `test/signatures/${year}-${docNumber}/vendorSign.png`
+        `signatures/${year}-${docNumber}/vendorSign.png`
       );
 
       try {

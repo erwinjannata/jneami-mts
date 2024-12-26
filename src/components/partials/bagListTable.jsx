@@ -1,25 +1,14 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
-import React, { useEffect, useState } from "react";
 import { Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
-function BagListTable(props) {
+function BagListTable({ bagList }) {
   const navigate = useNavigate();
-  const [bagList, setBagList] = useState([]);
 
-  const navToDetail = (key, origin, destination) => {
+  const navToDetail = (key) => {
     navigate(`/doc/${key}`);
-    // if (auth.origin == destination) {
-    //   navigate(`/vendor/doc/${key}`);
-    // } else {
-    //   navigate("/find");
-    // }
   };
-
-  useEffect(() => {
-    setBagList(props.bagList);
-  }, [props.bagList]);
 
   return bagList.length == 0 ? (
     <strong>
@@ -49,9 +38,7 @@ function BagListTable(props) {
             .map((item, key) => (
               <tr
                 key={key}
-                onClick={() =>
-                  navToDetail(item.key, item.origin, item.destination)
-                }
+                onClick={() => navToDetail(item.key)}
                 className="position-relative user-select-none"
               >
                 <td>{item.manifestNo}</td>

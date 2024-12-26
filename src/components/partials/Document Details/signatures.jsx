@@ -1,4 +1,5 @@
 /* eslint-disable react/prop-types */
+import "./../../../index.css";
 import { Col, Row } from "react-bootstrap";
 
 function Signatures({ data }) {
@@ -32,7 +33,9 @@ function Signatures({ data }) {
           </p>
           {item.source == "" ? null : (
             <>
-              <img className="signature" src={item.source} alt={item.alts} />
+              <div className="canvas">
+                <img className="signature" src={item.source} alt={item.alts} />
+              </div>
               <p>{item.name}</p>
             </>
           )}

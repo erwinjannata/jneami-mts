@@ -28,8 +28,8 @@ import Signatures from "../../components/partials/Document Details/signatures";
 function VendorDoc() {
   const { key } = useParams();
   const auth = UseAuth();
-  // const dbRef = firebase.database().ref("manifestTransit");
-  const dbRef = firebase.database().ref("test/manifestTransit");
+  const dbRef = firebase.database().ref("manifestTransit");
+  // const dbRef = firebase.database().ref("test/manifestTransit");
   const [data, setData] = useState([]);
   const [bagList, setBagList] = useState([]);
   const [remark, setRemark] = useState("");

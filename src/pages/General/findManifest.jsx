@@ -8,7 +8,6 @@ import {
   Row,
   Table,
 } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { UseAuth } from "../../config/authContext";
 import moment from "moment";
@@ -23,8 +22,7 @@ import BagListTable from "../../components/partials/bagListTable";
 
 export default function FindManifestNumber() {
   const auth = UseAuth();
-  let db = firebase.database().ref("manifestTransit/");
-  let navigate = useNavigate();
+  let db = firebase.database().ref("manifestTransit");
 
   const d = new Date();
   const [state, setState] = useState({
@@ -35,7 +33,6 @@ export default function FindManifestNumber() {
   });
 
   const [dataList, setDataList] = useState([]);
-  const [bagData, setBagData] = useState([]);
 
   const handleSubmit = () => {
     setState({ ...state, loading: true });
@@ -125,7 +122,7 @@ export default function FindManifestNumber() {
         <hr />
         {state.show ? (
           <Row>
-            <BagListTable data={dataList} bagList={dataList} />
+            <BagListTable bagList={dataList} />
           </Row>
         ) : null}
       </Container>

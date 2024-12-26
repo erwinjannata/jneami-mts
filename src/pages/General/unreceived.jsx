@@ -96,7 +96,7 @@ function UnreceivedPage() {
               if (data[idx].bagList[i].statusBag == "Unreceived") {
                 const { bagList, ...rest } = row;
                 processedData.push({
-                  noManifest: data[idx].bagList[i].manifestNo,
+                  manifestNo: data[idx].bagList[i].manifestNo,
                   koli:
                     data[idx].bagList[i].koli == undefined
                       ? "-"
@@ -203,9 +203,7 @@ function UnreceivedPage() {
           <Spinner animation="grow" size="sm" />
         ) : (
           <Row>
-            {state.showTable ? (
-              <BagListTable data={data} bagList={bagList} />
-            ) : null}
+            {state.showTable ? <BagListTable bagList={bagList} /> : null}
           </Row>
         )}
       </Container>

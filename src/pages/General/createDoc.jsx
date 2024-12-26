@@ -233,13 +233,14 @@ export default function Create() {
 
         const storageRef = ref(
           storage,
-          `test/signatures/${year}-${n}/checkerSign.png`
+          `signatures/${year}-${n}/checkerSign.png`
         );
         try {
           uploadString(storageRef, img64, "data_url", metaData).then(
             (snapshot) => {
               getDownloadURL(snapshot.ref).then(async (url) => {
-                db.ref("test/manifestTransit/")
+                // db.ref("test/manifestTransit/")
+                db.ref("manifestTransit")
                   .push({
                     noSurat: state.noSurat,
                     noRef: state.noRef,
@@ -265,8 +266,8 @@ export default function Create() {
                     count: 0,
                   })
                   .then(() => {
-                    // db.ref("status/collectionLength").set(collectionLength);
-                    db.ref("test/collectionLength").set(collectionLength);
+                    // db.ref("test/collectionLength").set(collectionLength);
+                    db.ref("status/collectionLength").set(collectionLength);
                     setLoading(false);
                     alert("Approved");
                     localStorage.removeItem("bagList");
@@ -299,8 +300,8 @@ export default function Create() {
     if (auth.origin == "VENDOR") {
       navigate("/vendor");
     }
-    // db.ref("status").on("value", (snapshot) => {
-    db.ref("test").on("value", (snapshot) => {
+    // db.ref("test").on("value", (snapshot) => {
+    db.ref("status").on("value", (snapshot) => {
       let count = parseInt(snapshot.child("collectionLength").val());
       let zerofilled = ("00000" + (count + 1)).slice(-5);
       setState({

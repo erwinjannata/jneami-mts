@@ -28,7 +28,7 @@ export default function AddUser() {
   };
 
   const handleSubmit = (e, name, email, password, origin, level) => {
-    if (name != "") {
+    if (name !== "" && auth.level === 5) {
       e.preventDefault();
       setLoading(true);
       firebase

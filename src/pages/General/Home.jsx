@@ -18,7 +18,7 @@ import CategoryCards from "../../components/partials/categoryCards";
 
 export default function Home() {
   const auth = UseAuth();
-  let db = firebase.database().ref("test/manifestTransit");
+  let db = firebase.database().ref("manifestTransit");
   let navigate = new useNavigate();
   const [dataList, setDataList] = useState([]);
   const [showList, setShowList] = useState([]);
