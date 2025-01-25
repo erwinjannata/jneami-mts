@@ -1,8 +1,8 @@
-import { Card, Col, Row } from "react-bootstrap";
+import { Card, Col, Placeholder, Row } from "react-bootstrap";
 import { FaBoxes, FaTruckLoading } from "react-icons/fa";
 import { FaPlaneCircleCheck, FaTruckPlane } from "react-icons/fa6";
 
-function CategoryCards(props) {
+function CategoryCards({ data, state, windowSize, handler, loading }) {
   let iconSize = 50;
   let cardsCategories = [
     {
@@ -11,7 +11,7 @@ function CategoryCards(props) {
       bg: "dark",
       textColor: "white",
       title: "Received",
-      text: props.data.reduce(
+      text: data.reduce(
         (counter, obj) =>
           obj.status == "Received" || obj.status == "Received*"
             ? (counter += 1)
@@ -26,7 +26,7 @@ function CategoryCards(props) {
       bg: "primary",
       textColor: "white",
       title: "Sampai Tujuan",
-      text: props.data.reduce(
+      text: data.reduce(
         (counter, obj) =>
           obj.status == "Sampai Tujuan" ? (counter += 1) : counter,
         0
@@ -39,7 +39,7 @@ function CategoryCards(props) {
       bg: "warning",
       textColor: "dark",
       title: "Dalam Perjalanan",
-      text: props.data.reduce(
+      text: data.reduce(
         (counter, obj) =>
           obj.status == "Dalam Perjalanan" ? (counter += 1) : counter,
         0
@@ -52,7 +52,7 @@ function CategoryCards(props) {
       bg: "danger",
       textColor: "white",
       title: "Menunggu Vendor",
-      text: props.data.reduce(
+      text: data.reduce(
         (counter, obj) =>
           obj.status == "Menunggu Vendor" ? (counter += 1) : counter,
         0
@@ -62,24 +62,22 @@ function CategoryCards(props) {
   ];
 
   return cardsCategories.map((category, idx) => (
-    <Col key={idx} xs={props.windowSize.width >= 768 ? "" : "0"}>
+    <Col key={idx} xs={windowSize.width >= 768 ? "" : "0"}>
       <Card
         bg={
-          (props.state.filtered == true) &
-          (props.state.currentFilter == category.title)
+          (state.filtered == true) & (state.currentFilter == category.title)
             ? "white"
             : category.bg
         }
         key={category.key}
         text={
-          (props.state.filtered == true) &
-          (props.state.currentFilter == category.title)
+          (state.filtered == true) & (state.currentFilter == category.title)
             ? category.bg
             : category.textColor
         }
         border={category.bg}
         className="mb-2 user-select-none"
-        onClick={() => props.handler(category.title)}
+        onClick={() => handler(category.title)}
       >
         <Card.Body>
           <Row>
@@ -88,7 +86,13 @@ function CategoryCards(props) {
             </Col>
             <Col xs={9} sm={9} lg={9}>
               <Card.Title className="small">{category.title}</Card.Title>
-              <Card.Text className="display-6">{category.text}</Card.Text>
+              {loading ? (
+                <Placeholder as={Card.Text} animation="glow">
+                  <Placeholder xs={6} />
+                </Placeholder>
+              ) : (
+                <Card.Text className="display-6">{category.text}</Card.Text>
+              )}
             </Col>
           </Row>
         </Card.Body>

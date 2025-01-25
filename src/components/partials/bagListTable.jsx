@@ -7,7 +7,7 @@ function BagListTable({ bagList }) {
   const navigate = useNavigate();
 
   const navToDetail = (key) => {
-    navigate(`/doc/${key}`);
+    navigate(`/d/${key}`);
   };
 
   return bagList.length == 0 ? (

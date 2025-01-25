@@ -39,7 +39,12 @@ function VendorInfo({ data, setterData, windowSize }) {
               placeholder={info.placeholder}
               onChange={
                 auth.origin === data.origin && data.status === "Menunggu Vendor"
-                  ? (event) => handleChange(event, data, setterData)
+                  ? (event) =>
+                      handleChange({
+                        e: event,
+                        state: data,
+                        stateSetter: setterData,
+                      })
                   : () => {}
               }
               disabled={

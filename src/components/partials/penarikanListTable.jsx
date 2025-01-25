@@ -9,12 +9,7 @@ function PenarikanListTable(props) {
   const [data, setData] = useState([]);
 
   const navToDetail = (key, origin, destination) => {
-    navigate(`/doc/${key}`);
-    // if (auth.origin == destination) {
-    //   navigate(`/vendor/doc/${key}`);
-    // } else {
-    //   navigate("/find");
-    // }
+    navigate(`/d/${key}`);
   };
 
   useEffect(() => {

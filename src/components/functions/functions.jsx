@@ -2,7 +2,7 @@ import { utils, writeFile } from "xlsx";
 import moment from "moment";
 
 // Handle Changes in Forms
-export const handleChange = (e, state, stateSetter) => {
+export const handleChange = ({ e, state, stateSetter }) => {
   const value = e.target.value;
   stateSetter({
     ...state,

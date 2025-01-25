@@ -1,131 +1,140 @@
+/* eslint-disable no-unused-vars */
 import { Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./config/authContext";
 import { PrivateRoute } from "./config/prirvateRoute";
 import Login from "./pages/Guest/Login";
-import Home from "./pages/General/Home";
-import Create from "./pages/General/createDoc";
-import Doc from "./pages/General/Doc";
-import UnreceivedPage from "./pages/General/unreceived";
-import Penarikan from "./pages/General/Penarikan";
-import Vendor from "./pages/Vendor";
-import VendorDoc from "./pages/Vendor/doc";
-import FindManifestNumber from "./pages/General/findManifest";
+import Home from "./pages/Last Mile/General/Home";
+import CreateDoc from "./pages/Last Mile/General/createDoc";
+import Doc from "./pages/Last Mile/General/Doc";
+import OriginDoc from "./pages/Last Mile/Origin/doc";
+import DestinationDoc from "./pages/Last Mile/Destination/doc";
+import UnreceivedPage from "./pages/Last Mile/General/unreceived";
+import Penarikan from "./pages/Last Mile/General/Penarikan";
+import FindManifestNumber from "./pages/Last Mile/General/findManifest";
+import AirportHomePage from "./pages/Mid Mile/General/Home";
+import Create from "./pages/Mid Mile/Airport/Create Doc/create";
+import MidMileDoc from "./pages/Mid Mile/Airport/Detail Doc/doc";
+import MidMileFindBag from "./pages/Mid Mile/General/Find Bag/find";
+import Vendor from "./pages/Last Mile/Vendor";
+import VendorDoc from "./pages/Last Mile/Vendor/doc";
 import AddUser from "./pages/Admin/addUser";
-import OriginDoc from "./pages/Origin/doc";
-import DestinationDoc from "./pages/Destination/doc";
+import MidMileInboundDoc from "./pages/Mid Mile/Admin Inbound/Detail Doc/doc";
+import MidMileCreateDoc from "./pages/Mid Mile/Admin Inbound/Create Doc/create";
+import ErrorListPage from "./pages/Admin/errorList";
+import MidMilePrintContent from "./pages/Mid Mile/General/Print Component/print";
 
 function App() {
+  const protectedRoute = [
+    // Last Mile
+    {
+      name: "Home",
+      path: "/",
+      element: <Home />,
+    },
+    {
+      name: "Create Document",
+      path: "/create",
+      element: <CreateDoc />,
+    },
+    {
+      name: "Document Detail (Read Only)",
+      path: "/d/:key",
+      element: <Doc />,
+    },
+    {
+      name: "Document Detail (Origin)",
+      path: "/or/d/:key",
+      element: <OriginDoc />,
+    },
+    {
+      name: "Document Detail (Destination)",
+      path: "/ds/d/:key",
+      element: <DestinationDoc />,
+    },
+    {
+      name: "Unreceived",
+      path: "/unreceived",
+      element: <UnreceivedPage />,
+    },
+    {
+      name: "Penarikan Data",
+      path: "/get",
+      element: <Penarikan />,
+    },
+    {
+      name: "Cari Bag",
+      path: "/find",
+      element: <FindManifestNumber />,
+    },
+
+    // Mid Mile
+    {
+      name: "Home",
+      path: "/mm",
+      element: <AirportHomePage />,
+    },
+    {
+      name: "Create Document",
+      path: "/mm/create",
+      element: <MidMileCreateDoc />,
+    },
+    {
+      name: "Document Detail (Airport)",
+      path: "/mm/a/d/:key",
+      element: <MidMileDoc />,
+    },
+    {
+      name: "Document Detail (Inbound)",
+      path: "/mm/i/d/:key",
+      element: <MidMileInboundDoc />,
+    },
+    {
+      name: "Find Bag",
+      path: "/mm/find",
+      element: <MidMileFindBag />,
+    },
+    {
+      name: "Print Content",
+      path: "/mm/print",
+      element: <MidMilePrintContent />,
+    },
+
+    // Vendor
+    {
+      name: "Home",
+      path: "/v",
+      element: <Vendor />,
+    },
+    {
+      name: "Document Detail (Vendor)",
+      path: "/v/d/:key",
+      element: <VendorDoc />,
+    },
+
+    // Admin
+    {
+      name: "Register User",
+      path: "/add",
+      element: <AddUser />,
+    },
+    {
+      name: "Error List",
+      path: "/error",
+      element: <ErrorListPage />,
+    },
+  ];
+
   return (
     <AuthProvider>
       <Routes>
-        {/* Guest User */}
-        {/* Login Page */}
         <Route path="/login" element={<Login />} />
-
-        {/* JNE User */}
-        {/* Home Page */}
-        <Route
-          path="/"
-          element={
-            <PrivateRoute>
-              <Home />
-            </PrivateRoute>
-          }
-        />
-        {/* MTS */}
-        <Route
-          path="/create"
-          element={
-            <PrivateRoute>
-              <Create />
-            </PrivateRoute>
-          }
-        />
-        {/* Document Detail : General (Read Only) */}
-        <Route
-          path="/doc/:key"
-          element={
-            <PrivateRoute>
-              <Doc />
-            </PrivateRoute>
-          }
-        />
-        {/* Document Detail : ORIGIN */}
-        <Route
-          path="/origin/doc/:key"
-          element={
-            <PrivateRoute>
-              <OriginDoc />
-            </PrivateRoute>
-          }
-        />
-        {/* Document Detail : DESTINATION */}
-        <Route
-          path="/destination/doc/:key"
-          element={
-            <PrivateRoute>
-              <DestinationDoc />
-            </PrivateRoute>
-          }
-        />
-        {/* Unreceived Page */}
-        <Route
-          path="/unreceived"
-          element={
-            <PrivateRoute>
-              <UnreceivedPage />
-            </PrivateRoute>
-          }
-        />
-        {/* Download Data */}
-        <Route
-          path="/get"
-          element={
-            <PrivateRoute>
-              <Penarikan />
-            </PrivateRoute>
-          }
-        />
-        {/* Find Manifest Number */}
-        <Route
-          path="/find"
-          element={
-            <PrivateRoute>
-              <FindManifestNumber />
-            </PrivateRoute>
-          }
-        />
-
-        {/* Vendor */}
-        {/* Home Page */}
-        <Route
-          path="/vendor"
-          element={
-            <PrivateRoute>
-              <Vendor />
-            </PrivateRoute>
-          }
-        />
-        {/* Document Detail */}
-        <Route
-          path="vendor/doc/:key"
-          element={
-            <PrivateRoute>
-              <VendorDoc />
-            </PrivateRoute>
-          }
-        />
-
-        {/* Super Admin */}
-        {/* Register New User */}
-        <Route
-          path="/add"
-          element={
-            <PrivateRoute>
-              <AddUser />
-            </PrivateRoute>
-          }
-        />
+        {protectedRoute.map((route, index) => (
+          <Route
+            key={index}
+            path={route.path}
+            element={<PrivateRoute>{route.element}</PrivateRoute>}
+          />
+        ))}
       </Routes>
     </AuthProvider>
   );

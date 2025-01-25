@@ -8,61 +8,108 @@ import logo from "./../../images/jne_brand.png";
 import logoWhite from "./../../images/jne_brand_white.png";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { UseAuth } from "../../config/authContext";
-import { Button, Form, Offcanvas } from "react-bootstrap";
-import { MdHomeFilled } from "react-icons/md";
+import { Button, NavDropdown, Offcanvas } from "react-bootstrap";
+import { MdHomeFilled, MdNearbyError } from "react-icons/md";
 import { HiDocumentPlus } from "react-icons/hi2";
 import { HiDocumentArrowDown } from "react-icons/hi2";
 import { BiSearchAlt, BiError } from "react-icons/bi";
-import { CgDanger } from "react-icons/cg";
-import { RiUserAddFill } from "react-icons/ri";
+import { RiAdminFill, RiUserAddFill } from "react-icons/ri";
 import { FaPlane } from "react-icons/fa6";
 import { LuLogOut } from "react-icons/lu";
-import { MenuItem, Sidebar, Menu } from "react-pro-sidebar";
+import { MenuItem, Sidebar, Menu, SubMenu } from "react-pro-sidebar";
 import { useEffect, useState } from "react";
+import { FaPlaneArrival, FaWarehouse } from "react-icons/fa";
 
 export default function NavMenu() {
+  const navMenuIconSize = 20;
+  const navSubMenuIconSize = 18;
   let menu = [
     {
-      label: "Dashboard",
-      link: "/",
+      label: "Last Mile",
       req: 1,
-      icon: <MdHomeFilled size={20} />,
+      icon: <FaWarehouse size={navMenuIconSize} />,
+      items: [
+        {
+          label: "Dashboard",
+          link: "/",
+          req: 1,
+          icon: <MdHomeFilled size={navSubMenuIconSize} />,
+        },
+        {
+          label: "Manifest Transit",
+          link: "/create",
+          req: 1,
+          icon: <HiDocumentPlus size={navSubMenuIconSize} />,
+        },
+        {
+          label: "Unreceived",
+          link: "/unreceived",
+          req: 1,
+          icon: <BiError size={navSubMenuIconSize} />,
+        },
+        {
+          label: "Penarikan Data",
+          link: "/get",
+          req: 2,
+          icon: <HiDocumentArrowDown size={navSubMenuIconSize} />,
+        },
+        {
+          label: "Cari",
+          link: "/find",
+          req: 1,
+          icon: <BiSearchAlt size={navSubMenuIconSize} />,
+        },
+      ],
     },
     {
-      label: "Manifest Transit",
-      link: "/create",
-      req: 1,
-      icon: <HiDocumentPlus size={20} />,
-    },
-    {
-      label: "Unreceived",
-      link: "/unreceived",
-      req: 1,
-      icon: <BiError size={20} />,
-    },
-    {
-      label: "Penarikan Data",
-      link: "/get",
+      label: "Mid Mile",
       req: 2,
-      icon: <HiDocumentArrowDown size={20} />,
+      icon: <FaPlaneArrival size={navMenuIconSize} />,
+      items: [
+        {
+          label: "Dashboard",
+          link: "/mm",
+          req: 1,
+          icon: <MdHomeFilled size={navSubMenuIconSize} />,
+        },
+        {
+          label: "Input Data",
+          link: "/mm/create",
+          req: 2,
+          icon: <HiDocumentPlus size={navSubMenuIconSize} />,
+        },
+        {
+          label: "Cari",
+          link: "/mm/find",
+          req: 1,
+          icon: <BiSearchAlt size={navSubMenuIconSize} />,
+        },
+      ],
     },
     {
-      label: "Cari",
-      link: "/find",
-      req: 1,
-      icon: <BiSearchAlt size={20} />,
-    },
-    {
-      label: "Vendor",
-      link: "/vendor",
+      label: "Admin",
       req: 5,
-      icon: <FaPlane size={20} />,
-    },
-    {
-      label: "New User",
-      link: "/add",
-      req: 5,
-      icon: <RiUserAddFill size={20} />,
+      icon: <RiAdminFill size={navMenuIconSize} />,
+      items: [
+        {
+          label: "Vendor",
+          link: "/v",
+          req: 5,
+          icon: <FaPlane size={navSubMenuIconSize} />,
+        },
+        {
+          label: "Error MTS",
+          link: "/error",
+          req: 5,
+          icon: <MdNearbyError size={navSubMenuIconSize} />,
+        },
+        {
+          label: "Registrasi User",
+          link: "/add",
+          req: 5,
+          icon: <RiUserAddFill size={navSubMenuIconSize} />,
+        },
+      ],
     },
   ];
 
@@ -71,16 +118,17 @@ export default function NavMenu() {
       label: "Dashboard",
       link: "/vendor",
       req: 1,
-      icon: <MdHomeFilled size={20} />,
+      icon: <MdHomeFilled size={navMenuIconSize} />,
     },
     {
       label: "Penarikan Data",
       link: "/get",
       req: 1,
-      icon: <HiDocumentArrowDown size={20} />,
+      icon: <HiDocumentArrowDown size={navMenuIconSize} />,
     },
   ];
 
+  const [currentOpen, setCurrentOpen] = useState(null);
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
@@ -118,6 +166,7 @@ export default function NavMenu() {
     <>
       {windowSize.width > "1024" ? (
         <div
+          className="user-select-none"
           style={{
             display: "flex",
             height: "100%",
@@ -130,26 +179,12 @@ export default function NavMenu() {
             collapsed={collapsed}
             transitionDuration={500}
             width="250px"
-            customBreakPoint="1024px"
+            breakPoint="md"
             onBreakPoint={setBroken}
             backgroundColor="#212529"
           >
-            <Menu
-              menuItemStyles={{
-                button: ({ level }) => {
-                  if (level === 0) {
-                    return {
-                      "&:hover": {
-                        backgroundColor: "#31363F !important",
-                        color: "white !important",
-                        fontWeight: "bold !important",
-                      },
-                    };
-                  }
-                },
-              }}
-            >
-              <Link to={auth.origin == "VENDOR" ? "/vendor" : "/"}>
+            <Menu>
+              <Link to="/">
                 <img
                   src={logoWhite}
                   alt="JNE"
@@ -186,21 +221,33 @@ export default function NavMenu() {
                 </>
               ) : (
                 <>
-                  {menu.map((m, index) =>
-                    auth.level >= m.req ? (
-                      <MenuItem
-                        key={index}
-                        component={<Link to={m.link} />}
-                        icon={m.icon}
-                        style={{
-                          color: "#e9f5f9",
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
+                  {menu.map((submenu, subMenuIndex) =>
+                    auth.level >= submenu.req ? (
+                      <SubMenu
+                        key={subMenuIndex}
+                        id="navSubmenu"
+                        label={submenu.label}
+                        icon={submenu.icon}
+                        open={currentOpen === subMenuIndex ? true : false}
+                        onOpenChange={() => {
+                          currentOpen === subMenuIndex
+                            ? setCurrentOpen(null)
+                            : setCurrentOpen(subMenuIndex);
                         }}
                       >
-                        {m.label}
-                      </MenuItem>
+                        {submenu.items.map((menuItem, menuItemIndex) =>
+                          auth.level >= menuItem.req ? (
+                            <MenuItem
+                              key={menuItemIndex}
+                              component={<Link to={menuItem.link} />}
+                              icon={menuItem.icon}
+                              id="navItems"
+                            >
+                              {menuItem.label}
+                            </MenuItem>
+                          ) : null
+                        )}
+                      </SubMenu>
                     ) : null
                   )}
                 </>
@@ -277,19 +324,24 @@ export default function NavMenu() {
                   </Nav>
                 ) : (
                   <Nav className="me-auto my-2 my-lg-0">
-                    {menu.map((m, index) => (
-                      <Nav key={index}>
-                        {auth.level >= m.req ? (
-                          <Navbar.Text>
-                            <NavLink
-                              to={m.link}
-                              style={({ isActive }) => ({
-                                color: isActive ? "lightblue" : "white",
-                              })}
-                            >
-                              {m.label}
-                            </NavLink>
-                          </Navbar.Text>
+                    {menu.map((menuItem, menuIndex) => (
+                      <Nav key={menuIndex}>
+                        {auth.level >= menuItem.req ? (
+                          <NavDropdown title={menuItem.label} id="navSubMenu">
+                            {menuItem.items.map((subMenuItem, subMenuIndex) => {
+                              return auth.level >= subMenuItem.req ? (
+                                <NavDropdown.Item
+                                  as={Link}
+                                  key={subMenuIndex}
+                                  to={subMenuItem.link}
+                                  id="navItems"
+                                  style={{ backgroundColor: "#212529" }}
+                                >
+                                  {subMenuItem.label}
+                                </NavDropdown.Item>
+                              ) : null;
+                            })}
+                          </NavDropdown>
                         ) : null}
                       </Nav>
                     ))}
@@ -297,16 +349,15 @@ export default function NavMenu() {
                 )}
                 <Nav>
                   <hr />
-                  <Form className="d-flex">
-                    <Navbar.Text>{`${auth.name} | ${auth.origin}`}</Navbar.Text>
-                    <Button
-                      variant="outline-danger"
-                      title="Log Out"
-                      onClick={handleLogout}
-                    >
-                      <LuLogOut />
-                    </Button>
-                  </Form>
+                  <Navbar.Text>{auth.name}</Navbar.Text>
+                  <Navbar.Text>{auth.origin}</Navbar.Text>
+                  <Button
+                    variant="outline-danger"
+                    title="Log Out"
+                    onClick={handleLogout}
+                  >
+                    <LuLogOut /> {` Logout`}
+                  </Button>
                 </Nav>
               </Offcanvas.Body>
             </Navbar.Offcanvas>

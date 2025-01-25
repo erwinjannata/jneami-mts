@@ -4,20 +4,20 @@ import { useRef } from "react";
 import { Button, Modal } from "react-bootstrap";
 import SignatureCanvas from "react-signature-canvas";
 
-export default function SignatureModal(props) {
+export default function SignatureModal({ show, onChange, onHide, onSubmit }) {
   const SignatureCanvasRef = useRef(null);
 
   // Handler untuk Signature Canvas
   const clearSignature = () => {
     SignatureCanvasRef.current.clear();
-    props.onChange("");
+    onChange("");
   };
 
   const saveSignature = () => {
     const signatureImage = SignatureCanvasRef.current
       .getTrimmedCanvas()
       .toDataURL("image/png");
-    props.onChange(signatureImage);
+    onChange(signatureImage);
   };
 
   return (
@@ -26,8 +26,8 @@ export default function SignatureModal(props) {
       centered
       scrollable
       backdrop="static"
-      show={props.show}
-      onHide={props.onHide}
+      show={show}
+      onHide={onHide}
     >
       <Modal.Header closeButton>
         <Modal.Title className="contained-modal-title-vcenter">
@@ -61,7 +61,7 @@ export default function SignatureModal(props) {
         </Button>
         <Button
           onClick={() => {
-            props.onSubmit(), props.onHide();
+            onSubmit(), onHide();
           }}
         >
           Approve
