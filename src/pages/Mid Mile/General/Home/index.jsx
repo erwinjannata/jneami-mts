@@ -2,7 +2,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import { Col, Container, FloatingLabel, Form, Row } from "react-bootstrap";
-import { fetchData, handleFilter } from "./partials/functions";
+import { fetchData, handleFilter, handleFind } from "./partials/functions";
 import firebase from "../../../../config/firebase";
 import DocumentTable from "./partials/documentTable";
 import NavMenu from "../../../../components/partials/navbarMenu";
@@ -63,6 +63,24 @@ const AirportHomePage = () => {
           setState={setState}
           setShowData={setShowData}
         />
+        <hr />
+        <FloatingLabel
+          controlId="floatingInput"
+          label="Document Number"
+          className="mb-3"
+        >
+          <Form.Control
+            type="text"
+            placeholder="Document Number"
+            onChange={() =>
+              handleFind({
+                e: event,
+                documentList: data,
+                setShowData: setShowData,
+              })
+            }
+          />
+        </FloatingLabel>
         <hr />
         <DocumentTable documents={showData} />
         <hr />

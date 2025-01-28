@@ -47,3 +47,21 @@ export const handleFilter = ({
     setShowList(data.filter((datalist) => datalist.status.includes(status)));
   }
 };
+
+// Handle change in search input field
+export const handleFind = ({ e, documentList, setShowData }) => {
+  e.preventDefault();
+  const value = e.target.value;
+  let searchResult = [];
+
+  if (e.target.value === "") {
+    setShowData(documentList);
+  } else {
+    documentList.forEach((doc) => {
+      if (doc.documentNumber.includes(value)) {
+        searchResult.push(doc);
+      }
+    });
+    setShowData(searchResult);
+  }
+};
