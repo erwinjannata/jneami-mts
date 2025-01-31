@@ -14,7 +14,7 @@ import { HiDocumentPlus } from "react-icons/hi2";
 import { HiDocumentArrowDown } from "react-icons/hi2";
 import { BiSearchAlt, BiError } from "react-icons/bi";
 import { RiAdminFill, RiUserAddFill } from "react-icons/ri";
-import { FaPlane } from "react-icons/fa6";
+import { FaBookOpen, FaPlane } from "react-icons/fa6";
 import { LuLogOut } from "react-icons/lu";
 import { MenuItem, Sidebar, Menu, SubMenu } from "react-pro-sidebar";
 import { useEffect, useState } from "react";
@@ -87,6 +87,19 @@ export default function NavMenu() {
       ],
     },
     {
+      label: "Manual Book",
+      req: 1,
+      icon: <FaBookOpen size={navMenuIconSize} />,
+      items: [
+        {
+          label: "Mid Mile",
+          link: "https://e-mts-manualbook.tiiny.site/",
+          req: 1,
+          icon: <FaPlaneArrival size={navSubMenuIconSize} />,
+        },
+      ],
+    },
+    {
       label: "Admin",
       req: 5,
       icon: <RiAdminFill size={navMenuIconSize} />,
@@ -116,7 +129,7 @@ export default function NavMenu() {
   let vendorMenu = [
     {
       label: "Dashboard",
-      link: "/vendor",
+      link: "/v",
       req: 1,
       icon: <MdHomeFilled size={navMenuIconSize} />,
     },
@@ -204,6 +217,7 @@ export default function NavMenu() {
                   {vendorMenu.map((m, index) =>
                     auth.level >= m.req ? (
                       <MenuItem
+                        id="navSubmenu"
                         key={index}
                         component={<Link to={m.link} />}
                         icon={m.icon}

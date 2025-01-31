@@ -12,7 +12,6 @@ import UnreceivedPage from "./pages/Last Mile/General/unreceived";
 import Penarikan from "./pages/Last Mile/General/Penarikan";
 import FindManifestNumber from "./pages/Last Mile/General/findManifest";
 import AirportHomePage from "./pages/Mid Mile/General/Home";
-import Create from "./pages/Mid Mile/Airport/Create Doc/create";
 import MidMileDoc from "./pages/Mid Mile/Airport/Detail Doc/doc";
 import MidMileFindBag from "./pages/Mid Mile/General/Find Bag/find";
 import Vendor from "./pages/Last Mile/Vendor";
