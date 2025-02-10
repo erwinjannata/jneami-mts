@@ -1,24 +1,18 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
-import { Button, Spinner, Table } from "react-bootstrap";
-import {
-  handleCancel,
-  handleReceived,
-  handleRemark,
-  handleMissing,
-} from "./functions";
+import { Spinner, Table } from "react-bootstrap";
+import TableButtons from "./tableButtons";
 
 const AirPortBagTable = ({
   data,
   bagList,
   setBagList,
   oldBagList,
+  setOldBagList,
   loading,
   setShow,
   setRemark,
   setCurrentFocus,
-  changedItem,
-  setChangedItem,
 }) => {
   const tableHeader = [
     { label: "No.", className: "w-auto" },
@@ -30,6 +24,18 @@ const AirPortBagTable = ({
     { label: "SM#", className: "w-auto" },
     { label: "", className: "w-25" },
   ];
+
+  const textStyle = ({ status }) => {
+    if (status === "Received") {
+      return "text-success bg-success";
+    } else if (status === "Dalam Perjalanan") {
+      return "text-primary bg-primary";
+    } else if (status === "Standby") {
+      return "text-dark bg-dark";
+    } else if (status === "Missing") {
+      return "text-danger bg-danger";
+    }
+  };
 
   return loading ? (
     <Spinner animation="grow" size="sm" />
@@ -51,56 +57,32 @@ const AirPortBagTable = ({
             <td>{bag.bagNumber}</td>
             <td>{bag.koli}</td>
             <td>{bag.weight}</td>
-            <td>{bag.statusBag}</td>
+            <td className="d-flex">
+              <p
+                style={{ fontWeight: "bold" }}
+                className={`bg-opacity-10 rounded text-center py-1 px-2 ${textStyle(
+                  {
+                    status: bag.statusBag,
+                  }
+                )}`}
+              >
+                {bag.statusBag}
+              </p>
+            </td>
             <td>{bag.remark}</td>
             <td>{bag.sm}</td>
-            {data.status === "Received" ? (
-              <td></td>
-            ) : (
-              <td>
-                {bag.statusBag === "Submitted" ||
-                bag.statusBag === "Dalam Perjalanan" ? (
-                  <>
-                    <Button
-                      variant="outline-dark"
-                      className="mx-2"
-                      onClick={() =>
-                        handleMissing({
-                          index: index,
-                          bagList: bagList,
-                          setBagList: setBagList,
-                          changedItem: changedItem,
-                          setChangedItem: setChangedItem,
-                        })
-                      }
-                    >
-                      Missing
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    {oldBagList[index].statusBag == "Submitted" ? (
-                      <Button
-                        variant="danger"
-                        className="mx-2"
-                        onClick={() =>
-                          handleCancel({
-                            index: index,
-                            bagList: bagList,
-                            setBagList: setBagList,
-                            oldBagList: oldBagList,
-                            changedItem: changedItem,
-                            setChangedItem: setChangedItem,
-                          })
-                        }
-                      >
-                        Batal
-                      </Button>
-                    ) : null}
-                  </>
-                )}
-              </td>
-            )}
+            <TableButtons
+              bag={bag}
+              index={index}
+              data={data}
+              bagList={bagList}
+              setBagList={setBagList}
+              oldBagList={oldBagList}
+              setOldBagList={setOldBagList}
+              setShow={setShow}
+              setRemark={setRemark}
+              setCurrentFocus={setCurrentFocus}
+            />
           </tr>
         ))}
       </tbody>

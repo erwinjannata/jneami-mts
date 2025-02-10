@@ -33,6 +33,8 @@ import BagInfo from "./partials/bagInfo";
 import MidMileDocSignatures from "./partials/signatures";
 import { useReactToPrint } from "react-to-print";
 import MidMilePrintContent from "../../General/Print Component/print";
+import AddBagModal from "./partials/addModal";
+import SignatureGudangModal from "./partials/signatureGudangModal";
 
 const MidMileAirportDoc = () => {
   const { key } = useParams();
@@ -46,13 +48,18 @@ const MidMileAirportDoc = () => {
   const [oldBagList, setOldBagList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [show, setShow] = useState(false);
-  const [showSignature, setShowSignature] = useState(false);
-  const [showSignatureB, setShowSignatureB] = useState(false);
+  const [showAddBag, setShowAddBag] = useState(false);
+  const [showSignatureAirport, setShowSignatureAirport] = useState(false);
+  const [showSignatureGudang, setShowSignatureGudang] = useState(false);
+  const [showSignatureDriver, setShowSignatureDriver] = useState(false);
   const [currentFocus, setCurrentFocus] = useState();
   const [remark, setRemark] = useState("");
   const [zerofilled, setZeroFilled] = useState("");
   const [signatureImage, setSignatureImage] = useState("");
-  const [changedItem, setChangedItem] = useState(0);
+  const [gudangBandaraState, setGudangBandaraState] = useState({
+    namaPetugas: "",
+    signatureImage: "",
+  });
   const inputRef = useRef(null);
 
   const [state, setState] = useState({
@@ -124,11 +131,9 @@ const MidMileAirportDoc = () => {
                     handleRcc({
                       state: state,
                       bagList: bagList,
-                      changedItem: changedItem,
                       inputRef: inputRef,
                       setState: setState,
                       setBagList: setBagList,
-                      setChangedItem: setChangedItem,
                     })
                   }
                 >
@@ -158,15 +163,19 @@ const MidMileAirportDoc = () => {
             bagList={bagList}
             setBagList={setBagList}
             oldBagList={oldBagList}
+            setOldBagList={setOldBagList}
             loading={loading}
             setShow={setShow}
             setRemark={setRemark}
             setCurrentFocus={setCurrentFocus}
-            changedItem={changedItem}
-            setChangedItem={setChangedItem}
           />
         </div>
-        <BagInfo data={data} />
+        <div className="d-grid gap-2">
+          <Button variant="outline-primary" onClick={() => setShowAddBag(true)}>
+            Add Bag
+          </Button>
+        </div>
+        <BagInfo bagList={bagList} />
         <hr />
         {data.status === "Received" ? null : (
           <>
@@ -177,7 +186,7 @@ const MidMileAirportDoc = () => {
                 handleApprove({
                   user: auth.name,
                   bagList: bagList,
-                  setShow: setShowSignature,
+                  setShow: setShowSignatureGudang,
                 });
               }}
             >
@@ -203,7 +212,7 @@ const MidMileAirportDoc = () => {
                 } else if (isAllNotStandby) {
                   alert("Bag belum dikonfirmasi oleh tim Admin Airport");
                 } else {
-                  setShowSignatureB(true);
+                  setShowSignatureDriver(true);
                 }
               }}
             >
@@ -237,8 +246,8 @@ const MidMileAirportDoc = () => {
           setvalue={handleSubmitRemark}
         />
         <SignatureModal
-          show={showSignature}
-          onHide={() => setShowSignature(false)}
+          show={showSignatureAirport}
+          onHide={() => setShowSignatureAirport(false)}
           onChange={setSignatureImage}
           onSubmit={() => {
             updateData({
@@ -249,25 +258,40 @@ const MidMileAirportDoc = () => {
               dbRef: dbRef,
               documentNumber: zerofilled,
               signatureImage: signatureImage,
-              setChangedItem: setChangedItem,
               setLoading: setLoading,
+              stateGudang: gudangBandaraState,
             });
           }}
         />
         <SignatureModal
-          show={showSignatureB}
-          onHide={() => setShowSignatureB(false)}
+          show={showSignatureDriver}
+          onHide={() => setShowSignatureDriver(false)}
           onChange={setSignatureImage}
           onSubmit={() => {
             handleTransport({
               bagList: bagList,
               documentKey: key,
               documentNumber: zerofilled,
-              setChangedItem: setChangedItem,
               setLoading: setLoading,
               signatureImage: signatureImage,
             });
           }}
+        />
+        <SignatureGudangModal
+          show={showSignatureGudang}
+          setShow={setShowSignatureGudang}
+          gudangBandaraState={gudangBandaraState}
+          setGudangBandaraState={setGudangBandaraState}
+          setShowSignatureAirport={setShowSignatureAirport}
+        />
+        <AddBagModal
+          bagList={bagList}
+          setBagList={setBagList}
+          oldBagList={oldBagList}
+          setOldBagList={setOldBagList}
+          show={showAddBag}
+          setShow={setShowAddBag}
+          documentId={key}
         />
       </Container>
     </div>

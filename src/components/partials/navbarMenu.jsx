@@ -14,7 +14,7 @@ import { HiDocumentPlus } from "react-icons/hi2";
 import { HiDocumentArrowDown } from "react-icons/hi2";
 import { BiSearchAlt, BiError } from "react-icons/bi";
 import { RiAdminFill, RiUserAddFill } from "react-icons/ri";
-import { FaBookOpen, FaPlane } from "react-icons/fa6";
+import { FaBookOpen, FaFileInvoiceDollar, FaPlane } from "react-icons/fa6";
 import { LuLogOut } from "react-icons/lu";
 import { MenuItem, Sidebar, Menu, SubMenu } from "react-pro-sidebar";
 import { useEffect, useState } from "react";
@@ -83,6 +83,12 @@ export default function NavMenu() {
           link: "/mm/find",
           req: 1,
           icon: <BiSearchAlt size={navSubMenuIconSize} />,
+        },
+        {
+          label: "Personal",
+          link: "/mm/personal",
+          req: 1,
+          icon: <FaFileInvoiceDollar size={navSubMenuIconSize} />,
         },
       ],
     },

@@ -46,17 +46,10 @@ export const fetchData = ({
 };
 
 // Handle Received button click
-export const handleReceived = ({
-  index,
-  bagList,
-  setBagList,
-  changedItem,
-  setChangedItem,
-}) => {
+export const handleReceived = ({ index, bagList, setBagList }) => {
   setBagList(
     bagList.map((lists, idx) => {
       if (idx === index && lists.statusBag === "Submitted") {
-        setChangedItem(changedItem + 1);
         return {
           ...lists,
           statusBag: "Standby",
@@ -69,17 +62,10 @@ export const handleReceived = ({
 };
 
 // Handle Overload button click
-export const handleMissing = ({
-  index,
-  bagList,
-  setBagList,
-  changedItem,
-  setChangedItem,
-}) => {
+export const handleMissing = ({ index, bagList, setBagList }) => {
   setBagList(
     bagList.map((lists, idx) => {
       if (idx === index) {
-        setChangedItem(changedItem + 1);
         return {
           ...lists,
           statusBag: "Missing",
@@ -104,18 +90,10 @@ export const handleRemark = ({
 };
 
 // Handle Cancel button click
-export const handleCancel = ({
-  index,
-  bagList,
-  setBagList,
-  oldBagList,
-  changedItem,
-  setChangedItem,
-}) => {
+export const handleCancel = ({ index, bagList, setBagList, oldBagList }) => {
   setBagList(
     bagList.map((lists, idx) => {
       if (idx === index) {
-        setChangedItem(changedItem - 1);
         return {
           ...lists,
           statusBag: `${oldBagList[index].statusBag}`,
@@ -148,10 +126,14 @@ export const updateData = async ({
   bagList,
   signatureImage,
   setLoading,
-  setChangedItem,
+  stateGudang,
 }) => {
   if (signatureImage === "") {
     alert("Tanda tangan invalid");
+  } else if (stateGudang.namaPetugas === "") {
+    alert("Nama petugas gudang kosong!");
+  } else if (stateGudang.signatureImage === "") {
+    alert("Tanda tangan petugas gudang kosong!");
   } else {
     if (confirm("Konfirmasi approve?") === true) {
       // Get current DateTime
@@ -167,9 +149,17 @@ export const updateData = async ({
       const metadata = {
         contentType: "image/png",
       };
-      const storageRef = ref(
+
+      // For Petugas Airport
+      const storageRefAirport = ref(
         storage,
-        `midMile/signatures/${year}-${documentNumber}/adminAirport.png`
+        `midMile/signatures/${year}-${documentNumber}/airport.png`
+      );
+
+      // For Petugas Gudang
+      const storageRefGudang = ref(
+        storage,
+        `midMile/signatures/${year}-${documentNumber}/petugasGudang.png`
       );
 
       // Set Document Status
@@ -187,43 +177,75 @@ export const updateData = async ({
       try {
         setLoading(true);
         await uploadString(
-          storageRef,
+          storageRefAirport,
           signatureImage,
           "data_url",
           metadata
         ).then((snapshot) => {
-          getDownloadURL(snapshot.ref).then(async (url) => {
-            // Setup updates
-            let updates = {};
-            if (data.approvedDate === undefined) {
-              updates = {
-                status: finalStatus,
-                approvedDate: `${date} ${time}`,
-                latestUpdateDate: `${date} ${time}`,
-                airportUser: user,
-                airportSign: url,
-              };
-            } else {
-              updates = {
-                status: finalStatus,
-                latestUpdateDate: `${date} ${time}`,
-                airportUser: user,
-                airportSign: url,
-              };
-            }
+          getDownloadURL(snapshot.ref).then(async (urlAirport) => {
+            await uploadString(
+              storageRefGudang,
+              stateGudang.signatureImage,
+              "data_url",
+              metadata
+            ).then((snapshot2) => {
+              getDownloadURL(snapshot2.ref).then(async (urlGudang) => {
+                // Setup updates
+                let updates = {};
+                if (data.approvedDate === undefined) {
+                  updates = {
+                    status: finalStatus,
+                    approvedDate: `${date} ${time}`,
+                    latestUpdateDate: `${date} ${time}`,
+                    airportUser: user,
+                    airportSign: urlAirport,
+                    gudangUser: stateGudang.namaPetugas,
+                    gudangSign: urlGudang,
+                    totalPcs: bagList.length,
+                    totalWeight: bagList.reduce((prev, next) => {
+                      return prev + parseInt(next.weight);
+                    }, 0),
+                    totalKoli: bagList.reduce((prev, next) => {
+                      return prev + parseInt(next.koli);
+                    }, 0),
+                  };
+                } else {
+                  updates = {
+                    status: finalStatus,
+                    latestUpdateDate: `${date} ${time}`,
+                    airportUser: user,
+                    airportSign: urlAirport,
+                    gudangUser: stateGudang.namaPetugas,
+                    gudangSign: urlGudang,
+                    totalPcs: bagList.length,
+                    totalWeight: bagList.reduce((prev, next) => {
+                      return prev + parseInt(next.weight);
+                    }, 0),
+                    totalKoli: bagList.reduce((prev, next) => {
+                      return prev + parseInt(next.koli);
+                    }, 0),
+                  };
+                }
 
-            await dbDocRef
-              .child(documentKey)
-              .update(updates)
-              .then(async () => {
-                await bagList.forEach((bag) => {
-                  const { key, ...rest } = bag;
-                  dbBagRef.child(bag.key).update({
-                    ...rest,
+                await dbDocRef
+                  .child(documentKey)
+                  .update(updates)
+                  .then(async () => {
+                    await bagList.forEach((bag) => {
+                      if (bag.key === undefined) {
+                        dbBagRef.push({
+                          ...bag,
+                        });
+                      } else {
+                        const { key, ...rest } = bag;
+                        dbBagRef.child(bag.key).update({
+                          ...rest,
+                        });
+                      }
+                    });
                   });
-                });
-                setChangedItem(0);
               });
+            });
           });
         });
       } catch (error) {
@@ -241,7 +263,6 @@ export const handleTransport = async ({
   bagList,
   signatureImage,
   setLoading,
-  setChangedItem,
 }) => {
   if (signatureImage === "") {
     alert("Tanda tangan invalid");
@@ -294,7 +315,6 @@ export const handleTransport = async ({
                     });
                   }
                 });
-                setChangedItem(0);
               });
           });
         });
@@ -309,9 +329,7 @@ export const handleTransport = async ({
 export const handleRcc = ({
   state,
   bagList,
-  changedItem,
   setBagList,
-  setChangedItem,
   setState,
   inputRef,
 }) => {
@@ -324,9 +342,7 @@ export const handleRcc = ({
       handleReceived({
         index: findIndex,
         bagList: bagList,
-        changedItem: changedItem,
         setBagList: setBagList,
-        setChangedItem: setChangedItem,
       });
       setState({
         ...state,
@@ -363,5 +379,72 @@ export const handleRmrk = ({
     } else {
       alert("Bag tidak ditemukan!");
     }
+  }
+};
+
+export const handleAddBag = ({
+  bagList,
+  setBagList,
+  oldBagList,
+  setOldBagList,
+  bagNo,
+  koli,
+  weight,
+  remark,
+  sm,
+  statusBag,
+  documentId,
+  setState,
+  setShow,
+}) => {
+  if (bagNo === "") {
+    alert("Bag Number tidak boleh kosong!");
+  } else if (koli === 0) {
+    alert("Jumlah koli invalid!");
+  } else if (weight === 0) {
+    alert("Berat bag invalid!");
+  } else {
+    setBagList([
+      ...bagList,
+      {
+        bagNumber: bagNo,
+        koli: parseInt(koli),
+        weight: parseInt(weight),
+        remark: remark,
+        sm: sm,
+        statusBag: statusBag,
+        documentId: documentId,
+      },
+    ]);
+    setOldBagList([
+      ...oldBagList,
+      {
+        bagNumber: bagNo,
+        koli: parseInt(koli),
+        weight: parseInt(weight),
+        remark: remark,
+        sm: sm,
+        statusBag: statusBag,
+        documentId: documentId,
+      },
+    ]);
+    setState({
+      bagNo: "",
+      koli: 0,
+      weight: 0,
+      remark: "",
+      sm: "",
+    });
+    setShow(false);
+  }
+};
+
+export const handleRemoveNewBag = ({ bagNo, setBagList }) => {
+  if (confirm("Hapus bag?") === true) {
+    setBagList((current) =>
+      current.filter((number) => {
+        return number.bagNumber !== bagNo;
+      })
+    );
   }
 };

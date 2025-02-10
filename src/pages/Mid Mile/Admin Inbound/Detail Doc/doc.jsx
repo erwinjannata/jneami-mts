@@ -87,7 +87,7 @@ const MidMileInboundDoc = () => {
           />
         </div>
         <hr />
-        <BagInfo data={data} />
+        <BagInfo bagList={bagList} />
         <hr />
         <Row>
           <Col>

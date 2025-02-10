@@ -20,7 +20,7 @@ const MidMilePrintContent = ({ data }) => {
               .format("lll"),
     },
     {
-      label: "Admin Airport",
+      label: "Petugas Airport",
       value: data.airportUser === undefined ? "-" : data.airportUser,
     },
   ];

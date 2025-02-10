@@ -14,7 +14,7 @@ const MidMileDocInfo = ({ docData, loading }) => {
       },
     ],
     [
-      { label: `Admin Airport: `, value: docData.inboundUser },
+      { label: `Airport: `, value: docData.inboundUser },
       {
         label: `Approve Date: `,
         value:

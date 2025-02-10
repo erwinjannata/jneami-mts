@@ -26,6 +26,18 @@ const InboundBagTable = ({
     { label: "", className: "w-auto" },
   ];
 
+  const textStyle = ({ status }) => {
+    if (status === "Received") {
+      return "text-success bg-success";
+    } else if (status === "Dalam Perjalanan") {
+      return "text-primary bg-primary";
+    } else if (status === "Standby") {
+      return "text-dark bg-dark";
+    } else if (status === "Missing") {
+      return "text-danger bg-danger";
+    }
+  };
+
   return loading ? (
     <LoadingAnimation />
   ) : (
@@ -46,7 +58,18 @@ const InboundBagTable = ({
             <td>{bag.bagNumber}</td>
             <td>{bag.koli}</td>
             <td>{bag.weight}</td>
-            <td>{bag.statusBag}</td>
+            <td className="d-flex">
+              <p
+                style={{ fontWeight: "bold" }}
+                className={`bg-opacity-10 rounded text-center py-1 px-2 ${textStyle(
+                  {
+                    status: bag.statusBag,
+                  }
+                )}`}
+              >
+                {bag.statusBag}
+              </p>
+            </td>
             <td>{bag.remark}</td>
             <td>{bag.sm}</td>
             <td>
