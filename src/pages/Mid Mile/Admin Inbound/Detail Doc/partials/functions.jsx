@@ -17,6 +17,21 @@ export const handleReceive = ({ index, bagList, setBagList }) => {
   );
 };
 
+export const handleUnreceive = ({ index, bagList, setBagList }) => {
+  setBagList(
+    bagList.map((bag, idx) => {
+      if (idx === index && bag.statusBag === "Dalam Perjalanan") {
+        return {
+          ...bag,
+          statusBag: "Unreceived",
+        };
+      } else {
+        return bag;
+      }
+    })
+  );
+};
+
 export const handleCancel = ({ index, bagList, oldBagList, setBagList }) => {
   setBagList(
     bagList.map((bag, idx) => {
@@ -75,7 +90,10 @@ export const handleApprove = async ({ docKey, bagList, setLoading }) => {
           // Update Bag Details
           await bagList.forEach((bag) => {
             const { key, ...rest } = bag;
-            if (bag.statusBag === "Received") {
+            if (
+              bag.statusBag === "Received" ||
+              bag.statusBag === "Unreceived"
+            ) {
               dbBagRef.child(bag.key).update({
                 ...rest,
               });

@@ -5,12 +5,13 @@ import { Button, FloatingLabel, Form, Modal, Row } from "react-bootstrap";
 import ReactSignatureCanvas from "react-signature-canvas";
 import { handleChange } from "../../../../../components/functions/functions";
 
-const SignatureGudangModal = ({
+const SignatureModalWithName = ({
+  userText,
   show,
   setShow,
-  gudangBandaraState,
-  setGudangBandaraState,
-  setShowSignatureAirport,
+  state,
+  setState,
+  nextStep,
 }) => {
   const signatureCanvasRef = useRef(null);
 
@@ -22,8 +23,8 @@ const SignatureGudangModal = ({
     const signatureImage = signatureCanvasRef.current
       .getTrimmedCanvas()
       .toDataURL("image/png");
-    setGudangBandaraState({
-      ...gudangBandaraState,
+    setState({
+      ...state,
       signatureImage: signatureImage,
     });
   };
@@ -42,24 +43,20 @@ const SignatureGudangModal = ({
     >
       <Modal.Header closeButton>
         <Modal.Title className="contained-modal-title-vcenter">
-          Tanda Tangan Petugas Gudang Bandara
+          {`Tanda Tangan ${userText}`}
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <FloatingLabel
-          controlId="floatingInput"
-          label="Nama petugas gudang"
-          className="mb-3"
-        >
+        <FloatingLabel controlId="floatingInput" label="Nama" className="mb-3">
           <Form.Control
             type="text"
-            placeholder="Nama petugas gudang"
+            placeholder="Nama"
             name="namaPetugas"
             onChange={() => {
               handleChange({
                 e: event,
-                state: gudangBandaraState,
-                stateSetter: setGudangBandaraState,
+                state: state,
+                stateSetter: setState,
               });
             }}
           />
@@ -87,7 +84,7 @@ const SignatureGudangModal = ({
           onClick={() => {
             handleSubmit();
             setShow(false);
-            setShowSignatureAirport(true);
+            nextStep();
           }}
         >
           Approve
@@ -97,4 +94,4 @@ const SignatureGudangModal = ({
   );
 };
 
-export default SignatureGudangModal;
+export default SignatureModalWithName;

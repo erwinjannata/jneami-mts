@@ -29,7 +29,7 @@ const TableButtons = ({
         <td></td>
       ) : (
         <td>
-          {bag.statusBag === "Submitted" ? (
+          {bag.statusBag === "Submitted" || bag.statusBag === "Unreceived" ? (
             <>
               <Button
                 variant="outline-primary"
@@ -74,7 +74,8 @@ const TableButtons = ({
             </>
           ) : (
             <>
-              {oldBagList[index].statusBag === "Submitted" ? (
+              {oldBagList[index].statusBag === "Submitted" ||
+              oldBagList[index].statusBag === "Unreceived" ? (
                 <Button
                   variant="danger"
                   className="mx-2"

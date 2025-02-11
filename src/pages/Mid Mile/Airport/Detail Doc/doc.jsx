@@ -27,14 +27,14 @@ import firebase from "../../../../config/firebase";
 import NavMenu from "../../../../components/partials/navbarMenu";
 import MidMileDocInfo from "./partials/docInfo";
 import AirPortBagTable from "./partials/bagTable";
-import RemarkModal from "../../../../components/partials/remarkModal";
 import SignatureModal from "../../../../components/partials/signatureModal";
 import BagInfo from "./partials/bagInfo";
 import MidMileDocSignatures from "./partials/signatures";
 import { useReactToPrint } from "react-to-print";
 import MidMilePrintContent from "../../General/Print Component/print";
 import AddBagModal from "./partials/addModal";
-import SignatureGudangModal from "./partials/signatureGudangModal";
+import SignatureModalWithName from "./partials/signatureGudangModal";
+import EditMasterBagModal from "./partials/editModal";
 
 const MidMileAirportDoc = () => {
   const { key } = useParams();
@@ -57,6 +57,10 @@ const MidMileAirportDoc = () => {
   const [zerofilled, setZeroFilled] = useState("");
   const [signatureImage, setSignatureImage] = useState("");
   const [gudangBandaraState, setGudangBandaraState] = useState({
+    namaPetugas: "",
+    signatureImage: "",
+  });
+  const [driverState, setDrvierState] = useState({
     namaPetugas: "",
     signatureImage: "",
   });
@@ -112,7 +116,7 @@ const MidMileAirportDoc = () => {
         <div className="mt-4">
           <MidMileDocInfo docData={data} loading={loading} />
           <hr />
-          {data.status === "Received" ? null : (
+          {data.status === "Received" || data.status === "Received*" ? null : (
             <>
               <InputGroup className="mb-3">
                 <FloatingLabel controlId="floatingInput" label="Bag No.">
@@ -171,13 +175,18 @@ const MidMileAirportDoc = () => {
           />
         </div>
         <div className="d-grid gap-2">
-          <Button variant="outline-primary" onClick={() => setShowAddBag(true)}>
-            Add Bag
-          </Button>
+          {data.status === "Received" || data.status === "Received*" ? null : (
+            <Button
+              variant="outline-primary"
+              onClick={() => setShowAddBag(true)}
+            >
+              Add Bag
+            </Button>
+          )}
         </div>
         <BagInfo bagList={bagList} />
         <hr />
-        {data.status === "Received" ? null : (
+        {data.status === "Received" || data.status === "Received*" ? null : (
           <>
             <Button
               variant="primary"
@@ -236,16 +245,15 @@ const MidMileAirportDoc = () => {
             <MidMilePrintContent data={data} />
           </div>
         </div>
-        <RemarkModal
+        <EditMasterBagModal
+          index={currentFocus}
+          bagList={currentFocus !== undefined ? bagList : []}
+          setBagList={setBagList}
           show={show}
-          onHide={() => {
-            setShow(false), setCurrentFocus();
-          }}
-          getvalue={setRemark}
-          getfocus={setCurrentFocus}
-          setvalue={handleSubmitRemark}
+          setShow={setShow}
         />
         <SignatureModal
+          userText="Petugas Bandara"
           show={showSignatureAirport}
           onHide={() => setShowSignatureAirport(false)}
           onChange={setSignatureImage}
@@ -263,26 +271,29 @@ const MidMileAirportDoc = () => {
             });
           }}
         />
-        <SignatureModal
+        <SignatureModalWithName
+          userText="Driver"
           show={showSignatureDriver}
-          onHide={() => setShowSignatureDriver(false)}
-          onChange={setSignatureImage}
-          onSubmit={() => {
+          setShow={setShowSignatureDriver}
+          state={driverState}
+          setState={setDrvierState}
+          nextStep={() => {
             handleTransport({
               bagList: bagList,
               documentKey: key,
               documentNumber: zerofilled,
               setLoading: setLoading,
-              signatureImage: signatureImage,
+              driverState: driverState,
             });
           }}
         />
-        <SignatureGudangModal
+        <SignatureModalWithName
+          userText="Gudang Bandara"
           show={showSignatureGudang}
           setShow={setShowSignatureGudang}
-          gudangBandaraState={gudangBandaraState}
-          setGudangBandaraState={setGudangBandaraState}
-          setShowSignatureAirport={setShowSignatureAirport}
+          state={gudangBandaraState}
+          setState={setGudangBandaraState}
+          nextStep={() => setShowSignatureAirport(true)}
         />
         <AddBagModal
           bagList={bagList}

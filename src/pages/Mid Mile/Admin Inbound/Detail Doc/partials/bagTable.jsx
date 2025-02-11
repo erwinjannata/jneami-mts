@@ -2,7 +2,7 @@
 /* eslint-disable react/prop-types */
 import { Button, Table } from "react-bootstrap";
 import LoadingAnimation from "../../../../../components/partials/loading";
-import { handleCancel, handleReceive } from "./functions";
+import { handleCancel, handleReceive, handleUnreceive } from "./functions";
 import { handleRemark } from "../../../Airport/Detail Doc/partials/functions";
 
 const InboundBagTable = ({
@@ -33,7 +33,7 @@ const InboundBagTable = ({
       return "text-primary bg-primary";
     } else if (status === "Standby") {
       return "text-dark bg-dark";
-    } else if (status === "Missing") {
+    } else if (status === "Missing" || status === "Unreceived") {
       return "text-danger bg-danger";
     }
   };
@@ -109,6 +109,19 @@ const InboundBagTable = ({
                             }
                           >
                             Receive
+                          </Button>
+                          <Button
+                            variant="secondary"
+                            className="me-2"
+                            onClick={() =>
+                              handleUnreceive({
+                                index: index,
+                                bagList: bagList,
+                                setBagList: setBagList,
+                              })
+                            }
+                          >
+                            Unreceive
                           </Button>
                           <Button
                             variant="warning"

@@ -14,7 +14,7 @@ const MidMileDocSignatures = ({ data }) => {
       label: "Driver",
       source: data.driverSign || "",
       alts: "Driver",
-      name: "Driver",
+      name: data.driverName,
     },
     {
       label: "Petugas Bandara",
@@ -33,7 +33,7 @@ const MidMileDocSignatures = ({ data }) => {
   return (
     <Row className="mt-5">
       {signatures.map((item, index) => (
-        <Col className="signatures" key={index}>
+        <Col className="signatures" key={index} xs={6} md={3}>
           <p style={{ fontWeight: "bolder" }}>{item.label}</p>
           {item.source == "" ? null : (
             <>

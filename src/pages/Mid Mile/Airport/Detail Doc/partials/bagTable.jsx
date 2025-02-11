@@ -32,7 +32,7 @@ const AirPortBagTable = ({
       return "text-primary bg-primary";
     } else if (status === "Standby") {
       return "text-dark bg-dark";
-    } else if (status === "Missing") {
+    } else if (status === "Missing" || status === "Unreceived") {
       return "text-danger bg-danger";
     }
   };

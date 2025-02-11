@@ -14,7 +14,7 @@ const AirportHomePage = () => {
   const [data, setData] = useState([]);
   const [showData, setShowData] = useState([]);
   const [state, setState] = useState({
-    limit: 10,
+    limit: 50,
     filtered: false,
     currentFilter: "",
   });

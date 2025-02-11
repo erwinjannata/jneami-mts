@@ -4,7 +4,13 @@ import { useRef } from "react";
 import { Button, Modal } from "react-bootstrap";
 import SignatureCanvas from "react-signature-canvas";
 
-export default function SignatureModal({ show, onChange, onHide, onSubmit }) {
+export default function SignatureModal({
+  show,
+  onChange,
+  onHide,
+  onSubmit,
+  userText,
+}) {
   const SignatureCanvasRef = useRef(null);
 
   // Handler untuk Signature Canvas
@@ -31,7 +37,7 @@ export default function SignatureModal({ show, onChange, onHide, onSubmit }) {
     >
       <Modal.Header closeButton>
         <Modal.Title className="contained-modal-title-vcenter">
-          Tanda Tangan
+          {`Tanda Tangan ${userText}`}
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>

@@ -49,7 +49,10 @@ export const fetchData = ({
 export const handleReceived = ({ index, bagList, setBagList }) => {
   setBagList(
     bagList.map((lists, idx) => {
-      if (idx === index && lists.statusBag === "Submitted") {
+      if (
+        (idx === index && lists.statusBag === "Submitted") ||
+        lists.statusBag === "Unreceived"
+      ) {
         return {
           ...lists,
           statusBag: "Standby",
@@ -169,7 +172,12 @@ export const updateData = async ({
       } else if (data.status === "Dalam Perjalanan") {
         finalStatus = "Dalam Perjalanan";
       } else if (data.status === "Ongoing") {
-        finalStatus = "Standby";
+        const isStandby = bagList.some((bag) => "Standby" === bag.statusBag);
+        if (isStandby) {
+          finalStatus = "Standby";
+        } else {
+          finalStatus = "Received*";
+        }
       } else if (data.status === "Standby") {
         finalStatus = "Standby";
       }
@@ -261,10 +269,10 @@ export const handleTransport = async ({
   documentKey,
   documentNumber,
   bagList,
-  signatureImage,
   setLoading,
+  driverState,
 }) => {
-  if (signatureImage === "") {
+  if (driverState.signatureImage === "") {
     alert("Tanda tangan invalid");
   } else {
     if (confirm("Konfirmasi proses?") === true) {
@@ -288,7 +296,7 @@ export const handleTransport = async ({
         setLoading(true);
         await uploadString(
           storageRef,
-          signatureImage,
+          driverState.signatureImage,
           "data_url",
           metadata
         ).then((snapshot) => {
@@ -300,6 +308,7 @@ export const handleTransport = async ({
                 transportedDate: `${date} ${time}`,
                 latestUpdateDate: `${date} ${time}`,
                 driverSign: url,
+                driverName: driverState.namaPetugas,
               })
               .then(async () => {
                 await bagList.forEach((bag) => {

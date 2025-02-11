@@ -4,14 +4,14 @@ import { Col, Row } from "react-bootstrap";
 const BagInfo = ({ bagList }) => {
   return (
     <Row className="mt-4">
-      <Col>
+      <Col xs={4} md={4}>
         <p>
           <strong>Pcs</strong>
           <br />
           {bagList.length}
         </p>
       </Col>
-      <Col>
+      <Col xs={4} md={4}>
         <p>
           <strong>Total Koli</strong>
           <br />
@@ -20,7 +20,7 @@ const BagInfo = ({ bagList }) => {
           }, 0)} koli`}
         </p>
       </Col>
-      <Col>
+      <Col xs={4} md={4}>
         <p>
           <strong>Total Weight</strong>
           <br />

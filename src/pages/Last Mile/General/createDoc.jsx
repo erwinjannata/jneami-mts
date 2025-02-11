@@ -509,6 +509,7 @@ export default function CreateDoc() {
         </Row>
         <SignatureModal
           show={show}
+          userText="Petugas Inbound Origin"
           onHide={() => setShow(false)}
           onChange={setImg64}
           onSubmit={approve}

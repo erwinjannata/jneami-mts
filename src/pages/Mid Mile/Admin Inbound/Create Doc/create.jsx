@@ -93,6 +93,7 @@ const MidMileCreateDoc = () => {
           </Button>
         </div>
         <SignatureModal
+          userText="Inbound Station"
           show={show}
           onHide={() => setShow(false)}
           onChange={setSignatureImage}
