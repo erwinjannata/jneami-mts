@@ -85,8 +85,8 @@ export default function NavMenu() {
           icon: <BiSearchAlt size={navSubMenuIconSize} />,
         },
         {
-          label: "Personal",
-          link: "/mm/personal",
+          label: "EMPU",
+          link: "/mm/empu",
           req: 1,
           icon: <FaFileInvoiceDollar size={navSubMenuIconSize} />,
         },

@@ -21,7 +21,8 @@ import MidMileInboundDoc from "./pages/Mid Mile/Admin Inbound/Detail Doc/doc";
 import MidMileCreateDoc from "./pages/Mid Mile/Admin Inbound/Create Doc/create";
 import ErrorListPage from "./pages/Admin/errorList";
 import MidMilePrintContent from "./pages/Mid Mile/General/Print Component/print";
-import PersonalPage from "./pages/Mid Mile/Airport/Personal/personal";
+import EMPUIndex from "./pages/Mid Mile/Airport/EMPU/empuIndex";
+import EMPUAddData from "./pages/Mid Mile/Airport/EMPU/empuAddData";
 
 function App() {
   const protectedRoute = [
@@ -94,9 +95,19 @@ function App() {
       element: <MidMileFindBag />,
     },
     {
-      name: "Personal",
-      path: "/mm/personal",
-      element: <PersonalPage />,
+      name: "EMPU Index",
+      path: "/mm/empu",
+      element: <EMPUIndex />,
+    },
+    {
+      name: "EMPU Add Data",
+      path: "/mm/empu/add",
+      element: <EMPUAddData />,
+    },
+    {
+      name: "EMPU New Customer",
+      path: "/mm/empu/new",
+      element: <EMPUAddData />,
     },
     {
       name: "Print Content",
