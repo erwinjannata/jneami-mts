@@ -2,11 +2,10 @@
 /* eslint-disable no-unused-vars */
 import { useEffect, useState } from "react";
 import NavMenu from "../../../../components/partials/navbarMenu";
-import { Button, Container } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
-import CustomerListModal from "./partials/customerListModal";
-import EMPUAddCustomerModal from "./partials/empuAddCustomerModal";
+import { Col, Container, FloatingLabel, Form, Row } from "react-bootstrap";
 import { fetchCustomerData, fetchTransactionData } from "./partials/functions";
+import DataTransactionTable from "./partials/dataTable";
+import { handleChange } from "../../../../components/functions/functions";
 
 const EMPUIndex = () => {
   const [state, setState] = useState({
@@ -15,25 +14,17 @@ const EMPUIndex = () => {
     limit: 50,
   });
   const [data, setData] = useState([]);
-  const [customerList, setCustomerList] = useState([]);
   const [showData, setShowData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [showCustomerModal, setShowCustomerModal] = useState(false);
-  const [showNewCustomerModal, setShowNewCustomerModal] = useState(false);
-  const navigate = useNavigate();
 
   useEffect(() => {
-    fetchCustomerData({
-      setLoading: setLoading,
-      setCustomerList: setCustomerList,
-    });
     fetchTransactionData({
       state: state,
       setData: setData,
       setShowData: setShowData,
       setLoading: setLoading,
     });
-  }, []);
+  }, [state]);
 
   return (
     <div className="screen">
@@ -41,38 +32,33 @@ const EMPUIndex = () => {
       <Container>
         <h2>EMPU</h2>
         <hr />
-        <Button
-          variant="outline-primary"
-          className="me-2"
-          onClick={() => navigate("add")}
-        >
-          Transaksi Baru
-        </Button>
-        <Button
-          variant="outline-dark"
-          className="me-2"
-          onClick={() => setShowCustomerModal(true)}
-        >
-          Customer
-        </Button>
-        <Button
-          variant="outline-secondary"
-          className="me-0"
-          onClick={() => setShowNewCustomerModal(true)}
-        >
-          Tambah Customer
-        </Button>
+        <DataTransactionTable awbList={data} />
         <hr />
-        <EMPUAddCustomerModal
-          show={showNewCustomerModal}
-          setShow={setShowNewCustomerModal}
-        />
-        <CustomerListModal
-          show={showCustomerModal}
-          setShow={setShowCustomerModal}
-          customerList={customerList}
-          setShowNewCustomer={setShowCustomerModal}
-        />
+        <Row>
+          <Col xl={2} xs={4}>
+            <FloatingLabel controlId="floatingSelectShow" label="Show">
+              <Form.Select
+                aria-label="Show"
+                name="limit"
+                onChange={() =>
+                  handleChange({
+                    e: event,
+                    state: state,
+                    stateSetter: setState,
+                  })
+                }
+                value={state.limit}
+                disabled={loading}
+              >
+                <option value="50">50</option>
+                <option value="100">100</option>
+                <option value="250">250</option>
+                <option value="500">500</option>
+                <option value="1000">1000</option>
+              </Form.Select>
+            </FloatingLabel>
+          </Col>
+        </Row>
       </Container>
     </div>
   );

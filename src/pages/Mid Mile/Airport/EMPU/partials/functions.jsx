@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 import * as XLSX from "xlsx";
 import firebase from "./../../../../../config/firebase";
+import moment from "moment";
 
 export const readFile = ({ file, setAwbList }) => {
   if (file === undefined) {
@@ -31,12 +32,14 @@ export const readFile = ({ file, setAwbList }) => {
       const rowToExlclude = [0, 1, 2, 3];
       rawData = rawData.filter((_, index) => !rowToExlclude.includes(index));
       const headers = rawData.shift();
-      console.log(headers);
       rawData = rawData.map((row) => {
         let obj = {};
-        headers.forEach((header, i) => {
-          obj[header] = row[i];
-        });
+        obj["awb"] = row[0];
+        obj["status"] = row[1];
+        obj["pcs"] = row[2];
+        obj["weight"] = row[3];
+        obj["customer"] = "";
+        obj["amount"] = 0;
         return obj;
       });
       rawData.pop();
@@ -74,7 +77,7 @@ export const fetchTransactionData = ({
 
   dbRef
     .orderByChild("dateAdded")
-    .limitToLast(state.limit)
+    .limitToLast(parseInt(state.limit))
     .on("value", (snapshot) => {
       let data = [];
       snapshot.forEach((childSnapshot) => {
@@ -87,4 +90,44 @@ export const fetchTransactionData = ({
       setShowData(data);
       setLoading(false);
     });
+};
+
+export const submitTransactionData = ({ awbList, setLoading, doAfter }) => {
+  if (awbList.length === 0) {
+    alert("Tidak ada data AWB");
+  } else {
+    try {
+      setLoading(true);
+      const isNotDone = awbList.some((awb) => awb.customer === "");
+      const d = new Date();
+      const time = moment(d).locale("en-sg").format("LT");
+      const date = moment(d).locale("en-ca").format("L");
+
+      if (isNotDone) {
+        alert("Data AWB belum lengkap");
+      } else {
+        const dbRef = firebase.database().ref("empu/transactions");
+
+        let counter = 0;
+        awbList.forEach((awb) => {
+          dbRef
+            .orderByChild("awb")
+            .equalTo(awb.awb)
+            .get()
+            .then((snapshot) => {
+              if (!snapshot.exists()) {
+                dbRef.push({
+                  ...awb,
+                  dateAdded: `${date} ${time}`,
+                });
+              }
+            });
+        });
+        alert(`AWB berhasil di approve`);
+        doAfter("/empu");
+      }
+    } catch (error) {
+      alert(error);
+    }
+  }
 };

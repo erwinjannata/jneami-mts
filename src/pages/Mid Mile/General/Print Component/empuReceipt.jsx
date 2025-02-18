@@ -1,25 +1,19 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
 import moment from "moment";
-import { Col, Row } from "react-bootstrap";
+import { Col, Row, Table } from "react-bootstrap";
+import { UseAuth } from "../../../../config/authContext";
 
 const EMPUReceipt = ({ data }) => {
   const d = new Date();
+  const auth = UseAuth();
   const date = moment(d).locale("en-sg").format("LLL");
 
-  const tableContent = [
-    { label: "AWB", value: data["No AWB"] },
-    { label: "Status", value: data["Status"] },
-    { label: "Qty", value: data["Pieces"] },
-    { label: "Weight", value: data["Chw"] },
-  ];
-
-  return data.map((d, index) => (
+  return (
     <div
       className="my-4 p-4"
       id="printContent"
       style={{ maxWidth: "300px", breakAfter: "page" }}
-      key={index}
     >
       <br />
       <Row className="mt-4">
@@ -47,39 +41,54 @@ const EMPUReceipt = ({ data }) => {
           paddingTop: "10px",
         }}
       >
-        <Row style={{ fontSize: "13px" }}>
-          <Col>AWB</Col>
-          <Col>
-            <p>
-              <strong>{`: ${d["No AWB"]}`}</strong>
-            </p>
-          </Col>
-        </Row>
-        <Row style={{ fontSize: "13px" }}>
-          <Col>Status</Col>
-          <Col>
-            <p>{`: ${d["Status"].toUpperCase()}`}</p>
-          </Col>
-        </Row>
-        <Row style={{ fontSize: "13px" }}>
-          <Col>Qty</Col>
-          <Col>
-            <p>{`: ${d["Pieces"]} of ${d["Pieces"]}`}</p>
-          </Col>
-        </Row>
-        <Row style={{ fontSize: "13px" }}>
-          <Col>Weight</Col>
-          <Col>
-            <p>{`: ${d["Chw"]} Kg`}</p>
-          </Col>
-        </Row>
+        <Table borderless>
+          <thead>
+            <tr>
+              <th className="w-auto"></th>
+              <th className="w-75"></th>
+            </tr>
+          </thead>
+          <tbody style={{ fontSize: "12px" }}>
+            <tr>
+              <td>AWB</td>
+              <td>
+                <strong>{`: ${data.awb}`}</strong>
+              </td>
+            </tr>
+            <tr>
+              <td>Customer</td>
+              <td>{`: ${data.customer}`}</td>
+            </tr>
+            <tr>
+              <td>Status</td>
+              <td>{`: ${data.status.toUpperCase()}`}</td>
+            </tr>
+            <tr>
+              <td>Pieces</td>
+              <td>{`: ${data.pcs}`}</td>
+            </tr>
+            <tr>
+              <td>Weight</td>
+              <td>{`: ${data.weight} Kg`}</td>
+            </tr>
+            <tr>
+              <td>Amount</td>
+              <td>{`: Rp. ${Intl.NumberFormat().format(data.amount)}`}</td>
+            </tr>
+          </tbody>
+        </Table>
       </div>
-      <p style={{ fontSize: "11px", marginTop: "5px", textAlign: "right" }}>
-        {date}
-      </p>
+      <Table borderless size="sm" style={{ fontSize: "10px" }}>
+        <tbody>
+          <tr>
+            <td>{auth.name}</td>
+            <td className="text-end">{date}</td>
+          </tr>
+        </tbody>
+      </Table>
       <hr style={{ color: "white" }} />
     </div>
-  ));
+  );
 };
 
 export default EMPUReceipt;

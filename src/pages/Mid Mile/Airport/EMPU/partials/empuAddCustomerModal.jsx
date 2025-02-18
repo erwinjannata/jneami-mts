@@ -33,6 +33,10 @@ const EMPUAddCustomerModal = ({ show, setShow }) => {
         .then(() => {
           alert("Data customer disimpan");
           setLoading(false);
+          setState({
+            name: "",
+            type: "",
+          });
           setShow(false);
         })
         .catch((error) => {
@@ -50,7 +54,8 @@ const EMPUAddCustomerModal = ({ show, setShow }) => {
       show={show}
       onHide={() => {
         setState({
-          searched: "",
+          name: "",
+          type: "",
         });
         setShow(false);
       }}

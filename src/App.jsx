@@ -23,6 +23,8 @@ import ErrorListPage from "./pages/Admin/errorList";
 import MidMilePrintContent from "./pages/Mid Mile/General/Print Component/print";
 import EMPUIndex from "./pages/Mid Mile/Airport/EMPU/empuIndex";
 import EMPUAddData from "./pages/Mid Mile/Airport/EMPU/empuAddData";
+import EMPUCustomersList from "./pages/Mid Mile/Airport/EMPU/empuCustomers";
+import EMPUFindData from "./pages/Mid Mile/Airport/EMPU/empuFindData";
 
 function App() {
   const protectedRoute = [
@@ -94,25 +96,27 @@ function App() {
       path: "/mm/find",
       element: <MidMileFindBag />,
     },
+
+    // EMPU
     {
       name: "EMPU Index",
-      path: "/mm/empu",
+      path: "/empu",
       element: <EMPUIndex />,
     },
     {
       name: "EMPU Add Data",
-      path: "/mm/empu/add",
+      path: "/empu/add",
       element: <EMPUAddData />,
     },
     {
-      name: "EMPU New Customer",
-      path: "/mm/empu/new",
-      element: <EMPUAddData />,
+      name: "EMPU Customers List",
+      path: "/empu/customers",
+      element: <EMPUCustomersList />,
     },
     {
-      name: "Print Content",
-      path: "/mm/print",
-      element: <MidMilePrintContent />,
+      name: "EMPU Find Transaction",
+      path: "/empu/find",
+      element: <EMPUFindData />,
     },
 
     // Vendor

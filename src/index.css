@@ -86,6 +86,13 @@ td {
   overflow-y: auto;
 }
 
+#tableData2 {
+  max-height: 300px;
+  display: block;
+  overflow-x: auto;
+  overflow-y: auto;
+}
+
 #stickyHead {
   top: 0 !important;
   position: sticky !important;

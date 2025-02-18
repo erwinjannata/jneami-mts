@@ -1,20 +1,25 @@
 /* eslint-disable no-unused-vars */
 import { Button, Container, Form, Row } from "react-bootstrap";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { fileChange } from "../../Admin Inbound/Create Doc/partials/functions";
-import { fetchCustomerData, readFile } from "./partials/functions";
-import { useReactToPrint } from "react-to-print";
+import {
+  fetchCustomerData,
+  readFile,
+  submitTransactionData,
+} from "./partials/functions";
 import NavMenu from "../../../../components/partials/navbarMenu";
 import AWBTable from "./partials/awbTable";
-import EMPUReceipt from "../../General/Print Component/empuReceipt";
+import EMPUSelectCustomerModal from "./partials/empuSelectCustomerModal";
+import { useNavigate } from "react-router-dom";
 
 const EMPUAddData = () => {
+  const navigate = useNavigate();
   const [file, setFile] = useState();
   const [awbList, setAwbList] = useState([]);
   const [customerList, setCustomerList] = useState([]);
   const [loading, setLoading] = useState(false);
-  const contentRef = useRef(null);
-  const reactToPrintFn = useReactToPrint({ contentRef });
+  const [showSelectModal, setShowSelectModal] = useState(false);
+  const [currentFocus, setCurrentFocus] = useState();
 
   useEffect(() => {
     fetchCustomerData({
@@ -52,22 +57,35 @@ const EMPUAddData = () => {
         >
           Upload
         </Button>
-        <Button
-          variant="success"
-          className="mx-2"
-          onClick={() => reactToPrintFn()}
-          disabled={loading}
-        >
-          Print
-        </Button>
         <hr />
-        <AWBTable awbList={awbList} />
-        <div className="d-none">
-          <div ref={contentRef}>
-            <EMPUReceipt data={awbList} />
-          </div>
-        </div>
+        <AWBTable
+          awbList={awbList}
+          setAwbList={setAwbList}
+          setShowSelectModal={setShowSelectModal}
+          setCurrentFocus={setCurrentFocus}
+        />
+        <hr />
+        <Button
+          variant="outline-primary"
+          onClick={() =>
+            submitTransactionData({
+              awbList: awbList,
+              setLoading: setLoading,
+              doAfter: navigate,
+            })
+          }
+        >
+          Approve
+        </Button>
       </Container>
+      <EMPUSelectCustomerModal
+        index={currentFocus}
+        show={showSelectModal}
+        setShow={setShowSelectModal}
+        customerList={customerList}
+        awbList={awbList}
+        setAwbList={setAwbList}
+      />
     </div>
   );
 };
