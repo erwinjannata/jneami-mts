@@ -66,14 +66,14 @@ export const fetchCustomerData = ({ setLoading, setCustomerList }) => {
   });
 };
 
-export const fetchTransactionData = ({
+export const fetchInboundData = ({
   state,
   setLoading,
   setData,
   setShowData,
 }) => {
   setLoading(true);
-  const dbRef = firebase.database().ref("empu/transactions");
+  const dbRef = firebase.database().ref("empu/inbound");
 
   dbRef
     .orderByChild("dateAdded")
@@ -92,7 +92,7 @@ export const fetchTransactionData = ({
     });
 };
 
-export const submitTransactionData = ({ awbList, setLoading, doAfter }) => {
+export const submitInboundData = ({ awbList, setLoading, doAfter }) => {
   if (awbList.length === 0) {
     alert("Tidak ada data AWB");
   } else {
@@ -106,9 +106,7 @@ export const submitTransactionData = ({ awbList, setLoading, doAfter }) => {
       if (isNotDone) {
         alert("Data AWB belum lengkap");
       } else {
-        const dbRef = firebase.database().ref("empu/transactions");
-
-        let counter = 0;
+        const dbRef = firebase.database().ref("empu/inbound");
         awbList.forEach((awb) => {
           dbRef
             .orderByChild("awb")
@@ -130,4 +128,38 @@ export const submitTransactionData = ({ awbList, setLoading, doAfter }) => {
       alert(error);
     }
   }
+};
+
+// Handle processing data into XLSX file
+export const handleExcel = ({ dataList }) => {
+  const processedData = dataList.map((row) => ({
+    awb: row.awb,
+    customer: row.customer,
+    customerType: row.customerType,
+    pcs: row.pcs,
+    weight: row.weight,
+    amount: row.amount,
+    status: row.status,
+    dateAdded: new Date(row.dateAdded),
+  }));
+  const worksheet = XLSX.utils.json_to_sheet(processedData);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+  XLSX.utils.sheet_add_aoa(
+    worksheet,
+    [
+      [
+        "AWB",
+        "Customer",
+        "Customer Type",
+        "Pieces",
+        "Weight",
+        "Amount",
+        "Status",
+        "Date Added",
+      ],
+    ],
+    { origin: "A1" }
+  );
+  XLSX.writeFile(workbook, `empu.xlsx`);
 };

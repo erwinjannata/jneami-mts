@@ -78,7 +78,7 @@ export const AuthProvider = ({ children }) => {
           alert(error.message);
         });
     } catch (error) {
-      console.log(error);
+      alert(error);
     }
   };
 

@@ -12,6 +12,7 @@ import { MdHomeFilled, MdNearbyError } from "react-icons/md";
 import { RiAdminFill, RiUserAddFill } from "react-icons/ri";
 import { cabangList } from "./branchList";
 import { IoPerson } from "react-icons/io5";
+import { HiDownload } from "react-icons/hi";
 
 const navMenuIconSize = 20;
 const navSubMenuIconSize = 18;
@@ -94,7 +95,7 @@ export const navbarMenus = [
         icon: <MdHomeFilled size={navSubMenuIconSize} />,
       },
       {
-        label: "New Transactions",
+        label: "Inbound",
         link: "/empu/add",
         req: 1,
         icon: <FaFileInvoiceDollar size={navSubMenuIconSize} />,
@@ -110,6 +111,12 @@ export const navbarMenus = [
         link: "/empu/find",
         req: 1,
         icon: <BiSearchAlt size={navSubMenuIconSize} />,
+      },
+      {
+        label: "Download Data",
+        link: "/empu/get",
+        req: 1,
+        icon: <HiDownload size={navSubMenuIconSize} />,
       },
     ],
   },

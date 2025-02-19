@@ -19,16 +19,16 @@ const DataTransactionTable = ({ awbList }) => {
     <NotFound />
   ) : (
     <div>
-      <Table responsive striped id="tableData">
+      <Table responsive hover id="tableData">
         <thead id="stickyHead">
           <tr>
             <th className="w-25">AWB</th>
-            <th className="w-25">Date Added</th>
             <th className="w-auto">Pcs</th>
             <th className="w-auto">Weight</th>
             <th className="w-auto">Status</th>
             <th className="w-auto">Customer</th>
-            <th className="w-100">Amount</th>
+            <th className="w-auto">Amount</th>
+            <th className="w-50">Date Added</th>
             <th className="w-auto"></th>
           </tr>
         </thead>
@@ -36,12 +36,12 @@ const DataTransactionTable = ({ awbList }) => {
           {awbList.map((awb, index) => (
             <tr key={index}>
               <td>{awb.awb}</td>
-              <td>{moment(awb.dateAdded).locale("en-sg").format("LLL")}</td>
               <td>{awb.pcs}</td>
               <td>{`${awb.weight} Kg`}</td>
               <td>{awb.status.toUpperCase()}</td>
               <td>{awb.customer}</td>
               <td>{`Rp. ${Intl.NumberFormat().format(awb.amount)}`}</td>
+              <td>{moment(awb.dateAdded).locale("en-sg").format("LLL")}</td>
               <td>
                 <OverlayTrigger
                   placement="top"

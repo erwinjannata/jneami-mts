@@ -78,8 +78,10 @@ export default function Home() {
 
   useEffect(() => {
     setLoading(true);
-    if (auth.origin == "VENDOR") {
+    if (auth.origin === "VENDOR") {
       navigate("/v");
+    } else if (auth.origin === "BANDARA") {
+      navigate("/mm");
     }
     let filters =
       state.showed == "all"

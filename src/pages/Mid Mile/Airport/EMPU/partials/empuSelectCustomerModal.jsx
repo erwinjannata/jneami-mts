@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
-import { Button, FloatingLabel, Form, Modal, Table } from "react-bootstrap";
+import { FloatingLabel, Form, Modal, Table } from "react-bootstrap";
 import { useState } from "react";
 
 const EMPUSelectCustomerModal = ({

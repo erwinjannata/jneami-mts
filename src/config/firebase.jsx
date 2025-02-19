@@ -15,8 +15,8 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_APP_ID,
 };
 
-firebase.initializeApp(firebaseConfig);
 self.FIREBASE_APPCHECK_DEBUG_TOKEN = import.meta.env.VITE_APP_DEBUG_TOKEN;
+firebase.initializeApp(firebaseConfig);
 firebase.appCheck().activate(import.meta.env.VITE_SITE_KEY, true);
 
 export default firebase;

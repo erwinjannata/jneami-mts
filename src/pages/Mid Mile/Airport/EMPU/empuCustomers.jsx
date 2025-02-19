@@ -13,9 +13,6 @@ import NavMenu from "../../../../components/partials/navbarMenu";
 import EMPUAddCustomerModal from "./partials/empuAddCustomerModal";
 
 const EMPUCustomersList = () => {
-  const [state, setState] = useState({
-    searched: "",
-  });
   const [customerList, setCustomerList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showNewCustomerModal, setShowNewCustomerModal] = useState(false);
@@ -40,6 +37,7 @@ const EMPUCustomersList = () => {
           <Button
             variant="outline-secondary"
             className="me-0"
+            disabled={loading}
             onClick={() => setShowNewCustomerModal(true)}
           >
             <IoPersonAdd />

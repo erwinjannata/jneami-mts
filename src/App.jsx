@@ -20,11 +20,11 @@ import AddUser from "./pages/Admin/addUser";
 import MidMileInboundDoc from "./pages/Mid Mile/Admin Inbound/Detail Doc/doc";
 import MidMileCreateDoc from "./pages/Mid Mile/Admin Inbound/Create Doc/create";
 import ErrorListPage from "./pages/Admin/errorList";
-import MidMilePrintContent from "./pages/Mid Mile/General/Print Component/print";
 import EMPUIndex from "./pages/Mid Mile/Airport/EMPU/empuIndex";
 import EMPUAddData from "./pages/Mid Mile/Airport/EMPU/empuAddData";
 import EMPUCustomersList from "./pages/Mid Mile/Airport/EMPU/empuCustomers";
 import EMPUFindData from "./pages/Mid Mile/Airport/EMPU/empuFindData";
+import EMPUDownloadData from "./pages/Mid Mile/Airport/EMPU/empuDownloadData";
 
 function App() {
   const protectedRoute = [
@@ -117,6 +117,11 @@ function App() {
       name: "EMPU Find Transaction",
       path: "/empu/find",
       element: <EMPUFindData />,
+    },
+    {
+      name: "EMPU Download Data",
+      path: "/empu/get",
+      element: <EMPUDownloadData />,
     },
 
     // Vendor

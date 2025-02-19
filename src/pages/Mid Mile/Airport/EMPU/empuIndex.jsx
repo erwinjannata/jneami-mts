@@ -1,11 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 import { useEffect, useState } from "react";
-import NavMenu from "../../../../components/partials/navbarMenu";
 import { Col, Container, FloatingLabel, Form, Row } from "react-bootstrap";
-import { fetchCustomerData, fetchTransactionData } from "./partials/functions";
-import DataTransactionTable from "./partials/dataTable";
+import { fetchInboundData } from "./partials/functions";
 import { handleChange } from "../../../../components/functions/functions";
+import NavMenu from "../../../../components/partials/navbarMenu";
+import DataTransactionTable from "./partials/dataTable";
 
 const EMPUIndex = () => {
   const [state, setState] = useState({
@@ -18,7 +18,7 @@ const EMPUIndex = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetchTransactionData({
+    fetchInboundData({
       state: state,
       setData: setData,
       setShowData: setShowData,

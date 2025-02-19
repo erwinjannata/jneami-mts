@@ -30,8 +30,6 @@ const ErrorListPage = () => {
       });
   }, []);
 
-  console.log(data);
-
   return (
     <div className="screen">
       <NavMenu />

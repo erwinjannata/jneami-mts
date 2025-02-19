@@ -5,12 +5,12 @@ import { fileChange } from "../../Admin Inbound/Create Doc/partials/functions";
 import {
   fetchCustomerData,
   readFile,
-  submitTransactionData,
+  submitInboundData,
 } from "./partials/functions";
+import { useNavigate } from "react-router-dom";
 import NavMenu from "../../../../components/partials/navbarMenu";
 import AWBTable from "./partials/awbTable";
 import EMPUSelectCustomerModal from "./partials/empuSelectCustomerModal";
-import { useNavigate } from "react-router-dom";
 
 const EMPUAddData = () => {
   const navigate = useNavigate();
@@ -68,7 +68,7 @@ const EMPUAddData = () => {
         <Button
           variant="outline-primary"
           onClick={() =>
-            submitTransactionData({
+            submitInboundData({
               awbList: awbList,
               setLoading: setLoading,
               doAfter: navigate,
