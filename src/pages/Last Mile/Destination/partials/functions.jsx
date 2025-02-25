@@ -276,9 +276,8 @@ export const handleApproval = async ({
                 setterChangedItem(0);
                 alert("Received");
               })
-              .catch((error) => {
+              .catch(() => {
                 setterLoading(false);
-                console.log(error);
                 alert("Program mengalami kendala, silahkan hubungi tim IT");
               });
           });

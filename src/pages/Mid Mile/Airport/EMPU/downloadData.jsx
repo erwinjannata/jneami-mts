@@ -13,7 +13,7 @@ import { handleChange } from "../../../../components/functions/functions";
 import NavMenu from "../../../../components/partials/navbarMenu";
 import DatePicker from "react-datepicker";
 import moment from "moment";
-import firebase from "./../../../../config/firebase";
+import firebase from "../../../../config/firebase";
 import DataTransactionTable from "./partials/dataTable";
 
 const EMPUDownloadData = () => {

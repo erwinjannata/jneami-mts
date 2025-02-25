@@ -5,10 +5,12 @@ import { Button, FloatingLabel, Form, Modal } from "react-bootstrap";
 import { handleChange } from "../../../../../components/functions/functions";
 import firebase from "./../../../../../config/firebase";
 import moment from "moment";
+import CustomInput from "../../../../../components/partials/customInput";
 
 const EMPUAddCustomerModal = ({ show, setShow }) => {
   const [state, setState] = useState({
     name: "",
+    number: "",
     type: "",
   });
   const [loading, setLoading] = useState(false);
@@ -28,6 +30,7 @@ const EMPUAddCustomerModal = ({ show, setShow }) => {
         .push({
           customerName: state.name,
           customerType: state.type,
+          customerNumber: state.number,
           dateAdded: `${date} ${time}`,
         })
         .then(() => {
@@ -66,22 +69,26 @@ const EMPUAddCustomerModal = ({ show, setShow }) => {
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <FloatingLabel
-          controlId="floatingInput"
+        <CustomInput
+          name="name"
+          type="text"
           label="Nama Customer"
-          className="mb-3"
-        >
-          <Form.Control
-            name="name"
-            placeholder="Nama Customer"
-            type="text"
-            disabled={loading}
-            value={state.name}
-            onChange={() =>
-              handleChange({ e: event, state: state, stateSetter: setState })
-            }
-          />
-        </FloatingLabel>
+          value={state.name}
+          onChange={() =>
+            handleChange({ e: event, state: state, stateSetter: setState })
+          }
+          disabled={loading}
+        />
+        <CustomInput
+          name="number"
+          type="text"
+          label="No. HP"
+          value={state.number}
+          onChange={() =>
+            handleChange({ e: event, state: state, stateSetter: setState })
+          }
+          disabled={loading}
+        />
         <FloatingLabel
           controlId="floatingSelect"
           label="Type Customer"

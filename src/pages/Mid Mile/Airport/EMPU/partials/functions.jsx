@@ -49,7 +49,11 @@ export const readFile = ({ file, setAwbList }) => {
   }
 };
 
-export const fetchCustomerData = ({ setLoading, setCustomerList }) => {
+export const fetchCustomerData = ({
+  setLoading,
+  setCustomerList,
+  setShowCustomerList,
+}) => {
   setLoading(true);
   const dbRef = firebase.database().ref("empu/customers");
 
@@ -62,6 +66,9 @@ export const fetchCustomerData = ({ setLoading, setCustomerList }) => {
       });
     });
     setCustomerList(data);
+    if (setShowCustomerList !== undefined) {
+      setShowCustomerList(data);
+    }
     setLoading(false);
   });
 };
@@ -92,38 +99,37 @@ export const fetchInboundData = ({
     });
 };
 
-export const submitInboundData = ({ awbList, setLoading, doAfter }) => {
-  if (awbList.length === 0) {
-    alert("Tidak ada data AWB");
+export const submitInboundData = ({ state, setLoading, doAfter }) => {
+  if (state.awb === "") {
+    alert("AWB kosong");
+  } else if (state.pcs === 0) {
+    alert("Pcs invalid");
+  } else if (state.weight === 0) {
+    alert("Berat invalid");
+  } else if (state.customerId === "") {
+    alert("Customer kosong");
   } else {
     try {
       setLoading(true);
-      const isNotDone = awbList.some((awb) => awb.customer === "");
       const d = new Date();
       const time = moment(d).locale("en-sg").format("LT");
       const date = moment(d).locale("en-ca").format("L");
 
-      if (isNotDone) {
-        alert("Data AWB belum lengkap");
-      } else {
-        const dbRef = firebase.database().ref("empu/inbound");
-        awbList.forEach((awb) => {
-          dbRef
-            .orderByChild("awb")
-            .equalTo(awb.awb)
-            .get()
-            .then((snapshot) => {
-              if (!snapshot.exists()) {
-                dbRef.push({
-                  ...awb,
-                  dateAdded: `${date} ${time}`,
-                });
-              }
+      const dbRef = firebase.database().ref("empu/inbound");
+      dbRef
+        .orderByChild("awb")
+        .equalTo(state.awb)
+        .get()
+        .then((snapshot) => {
+          if (!snapshot.exists()) {
+            dbRef.push({
+              ...state,
+              dateAdded: `${date} ${time}`,
             });
+          }
         });
-        alert(`AWB berhasil di approve`);
-        doAfter("/empu");
-      }
+      alert(`AWB berhasil di approve`);
+      doAfter("/empu");
     } catch (error) {
       alert(error);
     }

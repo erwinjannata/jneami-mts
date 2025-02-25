@@ -4,14 +4,13 @@ import { FloatingLabel, Form, Modal, Table } from "react-bootstrap";
 import { useState } from "react";
 
 const EMPUSelectCustomerModal = ({
-  index,
+  state,
+  setState,
   show,
   setShow,
   customerList,
-  awbList,
-  setAwbList,
 }) => {
-  const [state, setState] = useState({
+  const [suggestion, setSuggestion] = useState({
     searched: "",
     suggestions: [],
   });
@@ -19,8 +18,8 @@ const EMPUSelectCustomerModal = ({
   const handleSearch = (e) => {
     e.preventDefault();
     const value = e.target.value;
-    setState({
-      ...state,
+    setSuggestion({
+      ...suggestion,
       searched: value,
     });
     let searchResult = [];
@@ -31,13 +30,13 @@ const EMPUSelectCustomerModal = ({
           searchResult.push(customer);
         }
       });
-      setState({
-        ...state,
+      setSuggestion({
+        ...suggestion,
         suggestions: searchResult,
       });
     } else {
-      setState({
-        ...state,
+      setSuggestion({
+        ...suggestion,
         suggestions: [],
       });
     }
@@ -46,29 +45,19 @@ const EMPUSelectCustomerModal = ({
   const handleSelection = ({ selected }) => {
     let amt = 0;
 
-    setAwbList(
-      awbList.map((awb, idx) => {
-        if (idx === index) {
-          if (selected.customerType === "Agen") {
-            amt = awb.weight * 1600 + 4000;
-            amt = amt + amt * 0.11;
-          } else {
-            amt = awb.weight * 2000 + 6000;
-          }
-
-          return {
-            ...awb,
-            customerId: selected.key,
-            customer: selected.customerName,
-            customerType: selected.customerType,
-            amount: amt,
-          };
-        } else {
-          return awb;
-        }
-      })
-    );
+    if (selected.customerType === "Agen") {
+      amt = state.weight * 1600 + 4000;
+      amt = amt + amt * 0.11;
+    } else {
+      amt = state.weight * 2000 + 6000;
+    }
     setState({
+      ...state,
+      amount: amt,
+      customerId: selected.key,
+      customerType: selected.customerType,
+    });
+    setSuggestion({
       searched: "",
       suggestions: [],
     });
@@ -82,8 +71,8 @@ const EMPUSelectCustomerModal = ({
       backdrop="static"
       show={show}
       onHide={() => {
-        setState({
-          ...state,
+        setSuggestion({
+          ...suggestion,
           searched: "",
           suggestions: [],
         });
@@ -112,7 +101,7 @@ const EMPUSelectCustomerModal = ({
         <hr />
         <Table responsive hover>
           <tbody>
-            {state.suggestions.map((selection, index) => (
+            {suggestion.suggestions.map((selection, index) => (
               <tr
                 key={index}
                 onClick={() => {

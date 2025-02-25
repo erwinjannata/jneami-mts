@@ -2,7 +2,7 @@
 /* eslint-disable no-unused-vars */
 import { useEffect, useState } from "react";
 import { Col, Container, FloatingLabel, Form, Row } from "react-bootstrap";
-import { fetchInboundData } from "./partials/functions";
+import { fetchCustomerData, fetchInboundData } from "./partials/functions";
 import { handleChange } from "../../../../components/functions/functions";
 import NavMenu from "../../../../components/partials/navbarMenu";
 import DataTransactionTable from "./partials/dataTable";
@@ -14,10 +14,15 @@ const EMPUIndex = () => {
     limit: 50,
   });
   const [data, setData] = useState([]);
+  const [customerList, setCustomerList] = useState([]);
   const [showData, setShowData] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    fetchCustomerData({
+      setCustomerList: setCustomerList,
+      setLoading: setLoading,
+    });
     fetchInboundData({
       state: state,
       setData: setData,
@@ -32,7 +37,11 @@ const EMPUIndex = () => {
       <Container>
         <h2>EMPU</h2>
         <hr />
-        <DataTransactionTable awbList={data} />
+        <DataTransactionTable
+          awbList={data}
+          customerList={customerList}
+          loading={loading}
+        />
         <hr />
         <Row>
           <Col xl={2} xs={4}>

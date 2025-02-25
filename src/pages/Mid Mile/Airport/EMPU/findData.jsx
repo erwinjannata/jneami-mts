@@ -9,7 +9,7 @@ import { useState } from "react";
 import { handleChange } from "../../../../components/functions/functions";
 import NavMenu from "../../../../components/partials/navbarMenu";
 import DataTransactionTable from "./partials/dataTable";
-import firebase from "./../../../../config/firebase";
+import firebase from "../../../../config/firebase";
 
 const EMPUFindData = () => {
   const [state, setState] = useState({
