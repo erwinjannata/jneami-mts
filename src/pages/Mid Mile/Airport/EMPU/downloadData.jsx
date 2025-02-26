@@ -163,13 +163,21 @@ const EMPUDownloadData = () => {
           <Button
             className="me-2"
             variant="success"
-            onClick={() => handleExcel({ dataList: dataList })}
+            onClick={() =>
+              handleExcel({ dataList: dataList, customerList: customerList })
+            }
           >
             Download
           </Button>
         )}
         <hr />
-        {show ? <DataTransactionTable awbList={dataList} /> : null}
+        {show ? (
+          <DataTransactionTable
+            awbList={dataList}
+            loading={loading}
+            customerList={customerList}
+          />
+        ) : null}
       </Container>
     </div>
   );

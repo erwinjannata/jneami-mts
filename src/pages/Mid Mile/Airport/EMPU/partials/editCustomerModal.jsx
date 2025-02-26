@@ -15,7 +15,11 @@ const EMPUEditCustomerModal = ({
   setLoading,
   setCurrentFocus,
 }) => {
-  const [state, setState] = useState({});
+  const [state, setState] = useState({
+    customerName: "",
+    customerType: "",
+    customerNumber: "",
+  });
 
   const handleSubmit = () => {
     if (state.customerName !== "") {
@@ -44,7 +48,11 @@ const EMPUEditCustomerModal = ({
   };
 
   useEffect(() => {
-    setState(customer);
+    setState({
+      customerName: customer.customerName,
+      customerType: customer.customerType,
+      customerNumber: customer.customerNumber,
+    });
   }, [customer]);
 
   return (

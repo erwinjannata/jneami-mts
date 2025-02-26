@@ -13,7 +13,6 @@ import NavMenu from "../../../../components/partials/navbarMenu";
 import EMPUAddCustomerModal from "./partials/addCustomerModal";
 import CustomInput from "../../../../components/partials/customInput";
 import LoadingAnimation from "../../../../components/partials/loading";
-import { FaPen } from "react-icons/fa6";
 import EMPUEditCustomerModal from "./partials/editCustomerModal";
 
 const EMPUCustomersList = () => {
@@ -28,7 +27,6 @@ const EMPUCustomersList = () => {
   const [showEditCustomerModal, setShowEditCustomerModal] = useState(false);
 
   const handleFind = (e) => {
-    e.preventDefault();
     const value = e.target.value;
     let searchResult = [];
 
@@ -55,7 +53,7 @@ const EMPUCustomersList = () => {
       setCustomerList: setCustomerList,
       setShowCustomerList: setShowCustomerList,
     });
-  }, [currentFocus]);
+  }, []);
 
   return (
     <div className="screen">
@@ -92,22 +90,23 @@ const EMPUCustomersList = () => {
             <thead id="stickyHead">
               <tr>
                 <th>Customer Name</th>
-                <th>Customer Number</th>
                 <th>Customer Type</th>
+                <th>Customer Number</th>
               </tr>
             </thead>
             <tbody>
               {showCustomerList.map((customer, index) => (
                 <tr
                   key={index}
-                  onClick={async () => {
+                  onClick={async (e) => {
+                    e.preventDefault();
                     await setCurrentFocus(index);
                     setShowEditCustomerModal(true);
                   }}
                 >
                   <td className="w-50">{customer.customerName}</td>
+                  <td className="w-50">{customer.customerType}</td>
                   <td className="w-75">{customer.customerNumber || "-"}</td>
-                  <td className="w-100">{customer.customerType}</td>
                 </tr>
               ))}
             </tbody>

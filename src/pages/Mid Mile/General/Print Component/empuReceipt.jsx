@@ -4,10 +4,14 @@ import moment from "moment";
 import { Col, Row, Table } from "react-bootstrap";
 import { UseAuth } from "../../../../config/authContext";
 
-const EMPUReceipt = ({ data }) => {
+const EMPUReceipt = ({ data, customerList }) => {
   const d = new Date();
   const auth = UseAuth();
   const date = moment(d).locale("en-sg").format("LLL");
+
+  let idx = customerList.findIndex(
+    (customer) => customer.key === data.customerId
+  );
 
   return (
     <div
@@ -57,11 +61,7 @@ const EMPUReceipt = ({ data }) => {
             </tr>
             <tr>
               <td>Customer</td>
-              <td>{`: ${data.customer}`}</td>
-            </tr>
-            <tr>
-              <td>Status</td>
-              <td>{`: ${data.status.toUpperCase()}`}</td>
+              <td>{`: ${customerList[idx].customerName}`}</td>
             </tr>
             <tr>
               <td>Pieces</td>
@@ -74,6 +74,14 @@ const EMPUReceipt = ({ data }) => {
             <tr>
               <td>Amount</td>
               <td>{`: Rp. ${Intl.NumberFormat().format(data.amount)}`}</td>
+            </tr>
+            <tr>
+              <td colSpan={2}>
+                <strong>
+                  <p>Keterangan:</p>
+                </strong>
+                <p className="text-wrap">{data.keterangan || "-"}</p>
+              </td>
             </tr>
           </tbody>
         </Table>

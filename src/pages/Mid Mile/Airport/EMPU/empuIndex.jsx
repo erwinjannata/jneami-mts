@@ -11,7 +11,7 @@ const EMPUIndex = () => {
   const [state, setState] = useState({
     searched: "",
     filter: "",
-    limit: 50,
+    limit: 25,
   });
   const [data, setData] = useState([]);
   const [customerList, setCustomerList] = useState([]);
@@ -59,11 +59,10 @@ const EMPUIndex = () => {
                 value={state.limit}
                 disabled={loading}
               >
+                <option value="25">25</option>
                 <option value="50">50</option>
                 <option value="100">100</option>
                 <option value="250">250</option>
-                <option value="500">500</option>
-                <option value="1000">1000</option>
               </Form.Select>
             </FloatingLabel>
           </Col>

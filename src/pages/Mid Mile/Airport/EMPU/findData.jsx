@@ -10,6 +10,7 @@ import { handleChange } from "../../../../components/functions/functions";
 import NavMenu from "../../../../components/partials/navbarMenu";
 import DataTransactionTable from "./partials/dataTable";
 import firebase from "../../../../config/firebase";
+import { fetchCustomerData } from "./partials/functions";
 
 const EMPUFindData = () => {
   const [state, setState] = useState({
@@ -17,10 +18,15 @@ const EMPUFindData = () => {
     data: "empu/inbound",
   });
   const [awbList, setAwbList] = useState([]);
+  const [customerList, setCustomerList] = useState([]);
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const fetchData = () => {
+    fetchCustomerData({
+      setCustomerList: setCustomerList,
+      setLoading: setLoading,
+    });
     if (state.awb === "") {
       alert("AWB kosong");
     } else {
@@ -94,7 +100,13 @@ const EMPUFindData = () => {
           Find
         </Button>
         <hr />
-        {show ? <DataTransactionTable awbList={awbList} /> : null}
+        {show ? (
+          <DataTransactionTable
+            awbList={awbList}
+            loading={loading}
+            customerList={customerList}
+          />
+        ) : null}
       </Container>
     </div>
   );

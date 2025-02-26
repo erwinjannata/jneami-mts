@@ -37,50 +37,52 @@ const DataTransactionTable = ({ awbList, customerList, loading }) => {
               </tr>
             </thead>
             <tbody>
-              {awbList.map((awb, index) => {
-                let idx = customerList.findIndex(
-                  (customer) => customer.key === awb.customerId
-                );
+              {awbList
+                .map((awb, index) => {
+                  let idx = customerList.findIndex(
+                    (customer) => customer.key === awb.customerId
+                  );
 
-                return (
-                  <tr key={index}>
-                    <td>{awb.awb}</td>
-                    <td>{awb.pcs}</td>
-                    <td>{`${awb.weight} Kg`}</td>
-                    <td>{customerList[index].customerName}</td>
-                    <td>{`Rp. ${Intl.NumberFormat().format(awb.amount)}`}</td>
-                    <td>
-                      {moment(awb.dateAdded).locale("en-sg").format("LLL")}
-                    </td>
-                    <td>
-                      <OverlayTrigger
-                        placement="top"
-                        overlay={
-                          <Tooltip id={`tooltip-top`}>
-                            Print AWB : {awb.awb}
-                          </Tooltip>
-                        }
-                      >
-                        <Button
-                          variant="outline-dark"
-                          onClick={async () => {
-                            await setCurrentFocus(index);
-                            reactToPrintFn();
-                          }}
+                  return (
+                    <tr key={index}>
+                      <td>{awb.awb}</td>
+                      <td>{awb.pcs}</td>
+                      <td>{`${awb.weight} Kg`}</td>
+                      <td>{customerList[idx].customerName}</td>
+                      <td>{`Rp. ${Intl.NumberFormat().format(awb.amount)}`}</td>
+                      <td>
+                        {moment(awb.dateAdded).locale("en-sg").format("LLL")}
+                      </td>
+                      <td>
+                        <OverlayTrigger
+                          placement="top"
+                          overlay={
+                            <Tooltip id={`tooltip-top`}>
+                              Print AWB : {awb.awb}
+                            </Tooltip>
+                          }
                         >
-                          <FaPrint />
-                        </Button>
-                      </OverlayTrigger>
-                    </td>
-                  </tr>
-                );
-              })}
+                          <Button
+                            variant="outline-dark"
+                            onClick={async () => {
+                              await setCurrentFocus(index);
+                              reactToPrintFn();
+                            }}
+                          >
+                            <FaPrint />
+                          </Button>
+                        </OverlayTrigger>
+                      </td>
+                    </tr>
+                  );
+                })
+                .reverse()}
             </tbody>
           </Table>
           {currentFocus === null ? null : (
             <div className="d-none">
               <div ref={contentRef}>
-                <EMPUReceipt data={awbs} />
+                <EMPUReceipt data={awbs} customerList={customerList} />
               </div>
             </div>
           )}

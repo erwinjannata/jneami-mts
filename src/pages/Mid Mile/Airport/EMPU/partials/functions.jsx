@@ -109,45 +109,60 @@ export const submitInboundData = ({ state, setLoading, doAfter }) => {
   } else if (state.customerId === "") {
     alert("Customer kosong");
   } else {
-    try {
-      setLoading(true);
-      const d = new Date();
-      const time = moment(d).locale("en-sg").format("LT");
-      const date = moment(d).locale("en-ca").format("L");
+    setLoading(true);
+    const d = new Date();
+    const time = moment(d).locale("en-sg").format("LT");
+    const date = moment(d).locale("en-ca").format("L");
 
-      const dbRef = firebase.database().ref("empu/inbound");
-      dbRef
-        .orderByChild("awb")
-        .equalTo(state.awb)
-        .get()
-        .then((snapshot) => {
-          if (!snapshot.exists()) {
-            dbRef.push({
+    const dbRef = firebase.database().ref("empu/inbound");
+    dbRef
+      .orderByChild("awb")
+      .equalTo(state.awb)
+      .get()
+      .then((snapshot) => {
+        if (!snapshot.exists()) {
+          dbRef
+            .push({
               ...state,
               dateAdded: `${date} ${time}`,
+            })
+            .then(() => {
+              alert(`AWB berhasil di approve`);
+              doAfter("/empu");
+            })
+            .catch((error) => {
+              alert(error);
+              setLoading(false);
             });
-          }
-        });
-      alert(`AWB berhasil di approve`);
-      doAfter("/empu");
-    } catch (error) {
-      alert(error);
-    }
+        } else {
+          alert("AWB sudah terdaftar");
+          setLoading(false);
+        }
+      });
   }
 };
 
 // Handle processing data into XLSX file
-export const handleExcel = ({ dataList }) => {
-  const processedData = dataList.map((row) => ({
-    awb: row.awb,
-    customer: row.customer,
-    customerType: row.customerType,
-    pcs: row.pcs,
-    weight: row.weight,
-    amount: row.amount,
-    status: row.status,
-    dateAdded: new Date(row.dateAdded),
-  }));
+export const handleExcel = ({ dataList, customerList }) => {
+  const processedData = dataList.map((row) => {
+    let idx = customerList.findIndex(
+      (customer) => customer.key === row.customerId
+    );
+
+    return {
+      awb: row.awb,
+      customer: customerList[idx].customerName,
+      customerType: row.customerType,
+      pcs: row.pcs,
+      weight: row.weight,
+      amount: row.amount,
+      surchargeDay: row.surchargeDay,
+      reqTS: row.reqTS,
+      isDG: row.isDG,
+      dateAdded: new Date(row.dateAdded),
+      keterangan: row.keterangan,
+    };
+  });
   const worksheet = XLSX.utils.json_to_sheet(processedData);
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
@@ -161,8 +176,11 @@ export const handleExcel = ({ dataList }) => {
         "Pieces",
         "Weight",
         "Amount",
-        "Status",
+        "Hold Day",
+        "Request TS",
+        "Dangerous Goods",
         "Date Added",
+        "Keterangan",
       ],
     ],
     { origin: "A1" }

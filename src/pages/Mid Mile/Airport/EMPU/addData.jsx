@@ -26,7 +26,7 @@ const EMPUAddData = () => {
     amount: 0,
     isDG: false,
     isSurcharge: false,
-    surchargeDay: 3,
+    surchargeDay: 0,
     reqTS: false,
     customerId: "",
     customerType: "",
@@ -42,24 +42,44 @@ const EMPUAddData = () => {
     { name: "isDG", label: "Dangerous Goods" },
   ];
 
+  const calculations = {
+    Agen: { tarif: 1600, admin: 4000, tax: 0.11 },
+    Personal: { tarif: 2000, admin: 6000, tax: 0.0 },
+  };
+
   const countAmount = () => {
     if (state.customerId !== "") {
-      let amt = 0;
+      let baseAmount =
+        state.weight * calculations[state.customerType].tarif +
+        calculations[state.customerType].admin;
+      let tax = baseAmount * calculations[state.customerType].tax;
+      let tsAmount = 0;
+      let surchargeAmount = 0;
+      let dgAmount = 0;
 
-      if (state.customerType === "Agen") {
-        amt = state.weight * 1600 + 4000;
-        amt = amt + amt * 0.11;
-      } else {
-        amt = state.weight * 2000 + 6000;
-      }
-
+      // Request TS
       if (state.reqTS) {
-        amt = amt + 3000;
+        tsAmount = 5000 * state.pcs;
       }
+
+      // Surcharge
+      if (state.isSurcharge && state.surchargeDay >= 3) {
+        let baseCharge = state.weight * calculations[state.customerType].tarif;
+        let chargeTax = baseCharge * calculations[state.customerType].tax;
+        surchargeAmount = baseCharge + chargeTax;
+      }
+
+      // Dangerous Goods
+      if (state.isDG) {
+        dgAmount = baseAmount;
+      }
+
+      let finalAmount =
+        baseAmount + tax + tsAmount + surchargeAmount + dgAmount;
 
       setState({
         ...state,
-        amount: amt,
+        amount: finalAmount,
         customerId: state.customerId,
         customerType: state.customerType,
       });
@@ -82,7 +102,16 @@ const EMPUAddData = () => {
 
     getCustomerName();
     countAmount();
-  }, [state.customerId, state.weight, state.reqTS]);
+  }, [
+    state.customerId,
+    state.customerType,
+    state.weight,
+    state.pcs,
+    state.reqTS,
+    state.isSurcharge,
+    state.isDG,
+    state.surchargeDay,
+  ]);
 
   return (
     <div className="screen">

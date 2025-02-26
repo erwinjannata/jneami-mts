@@ -43,17 +43,8 @@ const EMPUSelectCustomerModal = ({
   };
 
   const handleSelection = ({ selected }) => {
-    let amt = 0;
-
-    if (selected.customerType === "Agen") {
-      amt = state.weight * 1600 + 4000;
-      amt = amt + amt * 0.11;
-    } else {
-      amt = state.weight * 2000 + 6000;
-    }
     setState({
       ...state,
-      amount: amt,
       customerId: selected.key,
       customerType: selected.customerType,
     });
