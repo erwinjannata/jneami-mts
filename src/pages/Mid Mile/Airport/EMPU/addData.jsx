@@ -65,7 +65,7 @@ const EMPUAddData = () => {
       let specialAmount = 0;
 
       // Penimbunan Amount / Surcharge Amount
-      if (state.isSurcharge) {
+      if (state.isSurcharge && state.surchargeDay > 3) {
         penimbunanAmount = tarifJaster * (state.surchargeDay - 2) + 3000;
         penimbunanAmount += penimbunanAmount * 0.11;
       }
@@ -76,7 +76,7 @@ const EMPUAddData = () => {
         specialAmount += specialAmount * 0.11;
       }
 
-      let additionalCharge = Math.ceil(
+      let additionalCharge = Math.round(
         penimbunanAmount + specialAmount + tsAmount
       );
 

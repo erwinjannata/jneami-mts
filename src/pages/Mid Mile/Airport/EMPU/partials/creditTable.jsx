@@ -21,7 +21,7 @@ const CreditTable = ({ awbList, customerList }) => {
 
   const handleConfirm = ({ customerId }) => {
     setLoading(true);
-    const dbRef = firebase.database().ref("test/empu/inbound");
+    const dbRef = firebase.database().ref("empu/inbound");
     const d = new Date();
     const time = moment(d).locale("en-sg").format("LT");
     const date = moment(d).locale("en-ca").format("L");

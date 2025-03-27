@@ -8,8 +8,11 @@ import EMPUReceipt from "../../../General/Print Component/empuReceipt";
 import NotFound from "./../../../../../components/partials/notFound";
 import moment from "moment";
 import LoadingAnimation from "../../../../../components/partials/loading";
+import { UseAuth } from "../../../../../config/authContext";
+import { MdOutlineNumbers } from "react-icons/md";
 
 const DataTransactionTable = ({ awbList, customerList, loading }) => {
+  const auth = UseAuth();
   const contentRef = useRef(null);
   const reactToPrintFn = useReactToPrint({ contentRef });
   const [currentFocus, setCurrentFocus] = useState(null);
@@ -35,6 +38,7 @@ const DataTransactionTable = ({ awbList, customerList, loading }) => {
                 <th className="w-auto">Payment Method</th>
                 <th className="w-auto">Payment Date</th>
                 <th className="w-50">Date Added</th>
+                {auth.level === 5 ? <th className="w-auto"></th> : null}
                 <th className="w-auto"></th>
               </tr>
             </thead>
@@ -45,6 +49,8 @@ const DataTransactionTable = ({ awbList, customerList, loading }) => {
                     (customer) => customer.key === awb.customerId
                   );
 
+                  let totalCharge = awb.totalAmount || awb.amount;
+
                   return (
                     <tr key={index}>
                       <td>{awb.awb}</td>
@@ -52,11 +58,11 @@ const DataTransactionTable = ({ awbList, customerList, loading }) => {
                       <td>{`${awb.weight} Kg`}</td>
                       <td>{customerList[idx].customerName}</td>
                       <td>{`Rp. ${Intl.NumberFormat().format(
-                        awb.totalAmount
+                        totalCharge
                       )}`}</td>
                       <td>{awb.paymentMethod}</td>
                       <td>
-                        {awb.paymentDate === ""
+                        {awb.paymentDate === undefined || awb.paymentDate === ""
                           ? "-"
                           : moment(awb.paymentDate)
                               .locale("en-sg")
@@ -65,6 +71,25 @@ const DataTransactionTable = ({ awbList, customerList, loading }) => {
                       <td>
                         {moment(awb.dateAdded).locale("en-sg").format("LLL")}
                       </td>
+                      {auth.level === 5 ? (
+                        <td>
+                          <OverlayTrigger
+                            placement="top"
+                            overlay={
+                              <Tooltip id={`tooltip-top`}>{awb.key}</Tooltip>
+                            }
+                          >
+                            <Button
+                              variant="outline-dark"
+                              onClick={() =>
+                                navigator.clipboard.writeText(awb.key)
+                              }
+                            >
+                              <MdOutlineNumbers />
+                            </Button>
+                          </OverlayTrigger>
+                        </td>
+                      ) : null}
                       <td>
                         <OverlayTrigger
                           placement="top"

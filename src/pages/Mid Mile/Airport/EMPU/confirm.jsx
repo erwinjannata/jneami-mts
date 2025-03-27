@@ -17,7 +17,7 @@ const EMPUConfirm = () => {
 
   const handleSubmit = () => {
     setLoading(true);
-    const dbRef = firebase.database().ref("test/empu/inbound");
+    const dbRef = firebase.database().ref("empu/inbound");
 
     dbRef
       .orderByChild("dateAdded")

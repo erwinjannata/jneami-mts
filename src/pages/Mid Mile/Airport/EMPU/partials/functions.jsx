@@ -82,10 +82,10 @@ export const fetchInboundData = ({
   setLoading(true);
 
   // Test Env
-  const dbRef = firebase.database().ref("test/empu/inbound");
+  // const dbRef = firebase.database().ref("test/empu/inbound");
 
   // Production Env
-  // const dbRef = firebase.database().ref("empu/inbound");
+  const dbRef = firebase.database().ref("empu/inbound");
 
   dbRef
     .orderByChild("dateAdded")
@@ -122,10 +122,10 @@ export const submitInboundData = ({ state, setLoading, doAfter }) => {
     const date = moment(d).locale("en-ca").format("L");
 
     // Test Env
-    const dbRef = firebase.database().ref("test/empu/inbound");
+    // const dbRef = firebase.database().ref("test/empu/inbound");
 
     // Production Env
-    // const dbRef = firebase.database().ref("empu/inbound");
+    const dbRef = firebase.database().ref("empu/inbound");
 
     dbRef
       .orderByChild("awb")
@@ -182,7 +182,10 @@ export const handleExcel = ({ dataList, customerList }) => {
       totalAmount: row.totalAmount || row.amount,
       paymentMethod: row.paymentMethod,
       paymentStatus: row.paymentStatus,
-      paymentDate: row.paymentDate === "" ? "" : new Date(row.paymentDate),
+      paymentDate:
+        row.paymentDate === "" || row.paymentDate === undefined
+          ? ""
+          : new Date(row.paymentDate),
     };
   });
   const worksheet = XLSX.utils.json_to_sheet(processedData);
