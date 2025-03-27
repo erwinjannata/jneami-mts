@@ -8,7 +8,7 @@ import {
   FaWarehouse,
 } from "react-icons/fa6";
 import { HiDocumentArrowDown, HiDocumentPlus } from "react-icons/hi2";
-import { MdHomeFilled, MdNearbyError } from "react-icons/md";
+import { MdHomeFilled, MdNearbyError, MdPayments } from "react-icons/md";
 import { RiAdminFill, RiUserAddFill } from "react-icons/ri";
 import { cabangList } from "./branchList";
 import { IoPerson } from "react-icons/io5";
@@ -111,6 +111,12 @@ export const navbarMenus = [
         link: "/empu/find",
         req: 1,
         icon: <BiSearchAlt size={navSubMenuIconSize} />,
+      },
+      {
+        label: "Confirm Payment",
+        link: "/empu/confirm",
+        req: 2,
+        icon: <MdPayments size={navSubMenuIconSize} />,
       },
       {
         label: "Download Data",

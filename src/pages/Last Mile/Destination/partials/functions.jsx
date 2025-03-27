@@ -170,48 +170,43 @@ export const handleArrive = async ({
 }) => {
   if (data.status === "Dalam Perjalanan") {
     if (confirm("Konfirmasi kedatangan armada") == true) {
-      try {
-        setterLoading(true);
-        const d = new Date();
-        const date = moment(d).locale("en-ca").format("L");
-        const time = moment(d).locale("en-sg").format("LT");
+      setterLoading(true);
+      const d = new Date();
+      const date = moment(d).locale("en-ca").format("L");
+      const time = moment(d).locale("en-sg").format("LT");
 
-        let berangkat = `${moment(data.departureDate)
-          .locale("id")
-          .format("L")} ${data.departureTime}:00`;
-        let tiba = `${moment(date).locale("id").format("L")} ${time}:00`;
-        let dura = moment(tiba, "DD/MM/YYYY HH:mm:ss").diff(
-          moment(berangkat, "DD/MM/YYYY HH:mm:ss")
-        );
-        let durasi = moment.duration(dura);
-        let finalDurasi = [
-          Math.floor(durasi.asHours()) <= 0
-            ? ""
-            : `${Math.floor(durasi.asHours())} jam`,
-          Math.floor(durasi.minutes() <= 0) ? "" : `${durasi.minutes()} menit`,
-        ].join(Math.floor(durasi.asHours()) <= 0 ? "" : " ");
+      let berangkat = `${moment(data.departureDate).locale("id").format("L")} ${
+        data.departureTime
+      }:00`;
+      let tiba = `${moment(date).locale("id").format("L")} ${time}:00`;
+      let dura = moment(tiba, "DD/MM/YYYY HH:mm:ss").diff(
+        moment(berangkat, "DD/MM/YYYY HH:mm:ss")
+      );
+      let durasi = moment.duration(dura);
+      let finalDurasi = [
+        Math.floor(durasi.asHours()) <= 0
+          ? ""
+          : `${Math.floor(durasi.asHours())} jam`,
+        Math.floor(durasi.minutes() <= 0) ? "" : `${durasi.minutes()} menit`,
+      ].join(Math.floor(durasi.asHours()) <= 0 ? "" : " ");
 
-        await dbRef
-          .child(data.key)
-          .update({
-            status: "Sampai Tujuan",
-            isArrived: true,
-            arrivalDate: date,
-            arrivalTime: time,
-            durasi: finalDurasi,
-          })
-          .then(() => {
-            setterLoading(false);
-            alert("Bag diterima, silahkan konfirmasi kelengkapan bag");
-            setterChangedItem(0);
-          })
-          .catch((error) => {
-            console.log(error);
-            alert("Program mengalami kendala, silahkan hubungi tim IT");
-          });
-      } catch (error) {
-        console.log(error);
-      }
+      await dbRef
+        .child(data.key)
+        .update({
+          status: "Sampai Tujuan",
+          isArrived: true,
+          arrivalDate: date,
+          arrivalTime: time,
+          durasi: finalDurasi,
+        })
+        .then(() => {
+          setterLoading(false);
+          alert("Bag diterima, silahkan konfirmasi kelengkapan bag");
+          setterChangedItem(0);
+        })
+        .catch(() => {
+          alert("Program mengalami kendala, silahkan hubungi tim IT");
+        });
     }
   } else {
     alert("Bag belum berangkat dari Origin");
@@ -284,7 +279,7 @@ export const handleApproval = async ({
         });
       } catch (error) {
         setterLoading(false);
-        console.log(error);
+        alert("Program mengalami kendala, silahkan hubungi tim IT");
       }
     }
   }

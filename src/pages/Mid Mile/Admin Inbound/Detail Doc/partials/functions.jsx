@@ -102,8 +102,8 @@ export const handleApprove = async ({ docKey, bagList, setLoading }) => {
           alert("Berhasil approve");
         });
     } catch (error) {
-      console.log(error);
       setLoading(false);
+      alert("Gagal approve");
     }
   }
 };

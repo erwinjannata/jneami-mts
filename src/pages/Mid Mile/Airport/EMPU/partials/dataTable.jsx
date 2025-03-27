@@ -28,10 +28,12 @@ const DataTransactionTable = ({ awbList, customerList, loading }) => {
             <thead id="stickyHead">
               <tr>
                 <th className="w-25">AWB</th>
-                <th className="w-auto">Pcs</th>
+                <th className="w-auto">Koli</th>
                 <th className="w-auto">Weight</th>
                 <th className="w-auto">Customer</th>
                 <th className="w-auto">Amount</th>
+                <th className="w-auto">Payment Method</th>
+                <th className="w-auto">Payment Date</th>
                 <th className="w-50">Date Added</th>
                 <th className="w-auto"></th>
               </tr>
@@ -49,7 +51,17 @@ const DataTransactionTable = ({ awbList, customerList, loading }) => {
                       <td>{awb.pcs}</td>
                       <td>{`${awb.weight} Kg`}</td>
                       <td>{customerList[idx].customerName}</td>
-                      <td>{`Rp. ${Intl.NumberFormat().format(awb.amount)}`}</td>
+                      <td>{`Rp. ${Intl.NumberFormat().format(
+                        awb.totalAmount
+                      )}`}</td>
+                      <td>{awb.paymentMethod}</td>
+                      <td>
+                        {awb.paymentDate === ""
+                          ? "-"
+                          : moment(awb.paymentDate)
+                              .locale("en-sg")
+                              .format("LLL")}
+                      </td>
                       <td>
                         {moment(awb.dateAdded).locale("en-sg").format("LLL")}
                       </td>

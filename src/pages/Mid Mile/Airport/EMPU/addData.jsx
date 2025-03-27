@@ -6,7 +6,6 @@ import {
   FloatingLabel,
   Form,
   InputGroup,
-  Row,
 } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import { fetchCustomerData, submitInboundData } from "./partials/functions";
@@ -23,13 +22,15 @@ const EMPUAddData = () => {
     pcs: 0,
     weight: 0,
     keterangan: "",
-    amount: 0,
     isDG: false,
     isSurcharge: false,
     surchargeDay: 0,
     reqTS: false,
     customerId: "",
     customerType: "",
+    paymentMethod: "",
+    amount: 0,
+    additionalCharge: 0,
   });
   const [customerName, setCustomerName] = useState("");
   const [customerList, setCustomerList] = useState([]);
@@ -37,9 +38,9 @@ const EMPUAddData = () => {
   const [showSelectModal, setShowSelectModal] = useState(false);
 
   const checkLabels = [
-    { name: "isSurcharge", label: "Penumpukan" },
-    { name: "reqTS", label: "Ambil di Mataram" },
-    { name: "isDG", label: "Dangerous Goods" },
+    { name: "isSurcharge", label: "Penimbunan" },
+    { name: "reqTS", label: "Antar ke alamat" },
+    { name: "isDG", label: "Special Handling" },
   ];
 
   const calculations = {
@@ -49,37 +50,41 @@ const EMPUAddData = () => {
 
   const countAmount = () => {
     if (state.customerId !== "") {
+      // Weight
+      let chargedWeight = state.weight <= 10 ? 10 : state.weight;
+
+      // Base Amount
       let baseAmount =
-        state.weight * calculations[state.customerType].tarif +
+        chargedWeight * calculations[state.customerType].tarif +
         calculations[state.customerType].admin;
-      let tax = baseAmount * calculations[state.customerType].tax;
-      let tsAmount = 0;
-      let surchargeAmount = 0;
-      let dgAmount = 0;
+      baseAmount += baseAmount * calculations[state.customerType].tax;
 
-      // Request TS
-      if (state.reqTS) {
-        tsAmount = 5000 * state.pcs;
+      let tarifJaster = chargedWeight * 640;
+      let tsAmount = state.reqTS ? 5000 : 0;
+      let penimbunanAmount = 0;
+      let specialAmount = 0;
+
+      // Penimbunan Amount / Surcharge Amount
+      if (state.isSurcharge) {
+        penimbunanAmount = tarifJaster * (state.surchargeDay - 2) + 3000;
+        penimbunanAmount += penimbunanAmount * 0.11;
       }
 
-      // Surcharge
-      if (state.isSurcharge && state.surchargeDay >= 3) {
-        let baseCharge = state.weight * calculations[state.customerType].tarif;
-        let chargeTax = baseCharge * calculations[state.customerType].tax;
-        surchargeAmount = baseCharge + chargeTax;
-      }
-
-      // Dangerous Goods
+      // Dangerous Goods / Special Handling
       if (state.isDG) {
-        dgAmount = baseAmount;
+        specialAmount = tarifJaster + 3000;
+        specialAmount += specialAmount * 0.11;
       }
 
-      let finalAmount =
-        baseAmount + tax + tsAmount + surchargeAmount + dgAmount;
+      let additionalCharge = Math.ceil(
+        penimbunanAmount + specialAmount + tsAmount
+      );
 
       setState({
         ...state,
-        amount: finalAmount,
+        amount: baseAmount,
+        additionalCharge: additionalCharge,
+        totalAmount: baseAmount + additionalCharge,
         customerId: state.customerId,
         customerType: state.customerType,
       });
@@ -134,7 +139,7 @@ const EMPUAddData = () => {
             name="pcs"
             type="number"
             value={state.pcs}
-            label="Pieces"
+            label="Koli"
             onChange={() =>
               handleChange({ e: event, state: state, stateSetter: setState })
             }
@@ -171,29 +176,49 @@ const EMPUAddData = () => {
           onClick={() => setShowSelectModal(true)}
           readOnly
         />
+        <CustomInput
+          name="surchargeDay"
+          type="number"
+          label="Penimbunan (Hari)"
+          value={state.surchargeDay}
+          onChange={() =>
+            handleChange({
+              e: event,
+              state: state,
+              stateSetter: setState,
+            })
+          }
+          disabled={!state.isSurcharge || loading}
+        />
         <InputGroup>
           <CustomInput
-            name="surchargeDay"
-            type="number"
-            label="Penumpukan (Hari)"
-            value={state.surchargeDay}
-            onChange={() =>
-              handleChange({
-                e: event,
-                state: state,
-                stateSetter: setState,
-              })
-            }
-            disabled={!state.isSurcharge || loading}
+            name="amount"
+            type="text"
+            label="Amount"
+            value={`Rp. ${Intl.NumberFormat().format(
+              state.amount + state.additionalCharge
+            )}`}
+            readOnly
           />
+          <FloatingLabel label="Payment Method">
+            <Form.Select
+              name="paymentMethod"
+              onChange={() =>
+                handleChange({
+                  e: event,
+                  state: state,
+                  stateSetter: setState,
+                })
+              }
+              value={state.paymentMethod}
+              disabled={loading}
+            >
+              <option value="">- Pilih -</option>
+              <option value="CASH">CASH</option>
+              <option value="CREDIT">CREDIT</option>
+            </Form.Select>
+          </FloatingLabel>
         </InputGroup>
-        <CustomInput
-          name="amount"
-          type="text"
-          label="Amount"
-          value={`Rp. ${Intl.NumberFormat().format(state.amount)}`}
-          readOnly
-        />
 
         {checkLabels.map((check, index) => (
           <Form.Check

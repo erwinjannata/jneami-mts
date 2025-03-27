@@ -55,8 +55,6 @@ export default function AddUser() {
           });
         })
         .catch((error) => {
-          console.log(error.code);
-          console.log(error.message);
           alert(error.message);
         });
     } else {

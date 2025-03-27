@@ -257,8 +257,8 @@ export const updateData = async ({
           });
         });
       } catch (error) {
-        console.log(error);
         setLoading(false);
+        alert("Gagal update data");
       }
     }
   }
@@ -328,7 +328,6 @@ export const handleTransport = async ({
           });
         });
       } catch (error) {
-        console.log(error);
         setLoading(false);
       }
     }

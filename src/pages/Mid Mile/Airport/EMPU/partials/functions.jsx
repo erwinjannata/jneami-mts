@@ -80,7 +80,12 @@ export const fetchInboundData = ({
   setShowData,
 }) => {
   setLoading(true);
-  const dbRef = firebase.database().ref("empu/inbound");
+
+  // Test Env
+  const dbRef = firebase.database().ref("test/empu/inbound");
+
+  // Production Env
+  // const dbRef = firebase.database().ref("empu/inbound");
 
   dbRef
     .orderByChild("dateAdded")
@@ -107,14 +112,21 @@ export const submitInboundData = ({ state, setLoading, doAfter }) => {
   } else if (state.weight === 0) {
     alert("Berat invalid");
   } else if (state.customerId === "") {
-    alert("Customer kosong");
+    alert("Customer invalid");
+  } else if (state.paymentMethod === "") {
+    alert("Metode pembayaran belum dipilih");
   } else {
     setLoading(true);
     const d = new Date();
     const time = moment(d).locale("en-sg").format("LT");
     const date = moment(d).locale("en-ca").format("L");
 
-    const dbRef = firebase.database().ref("empu/inbound");
+    // Test Env
+    const dbRef = firebase.database().ref("test/empu/inbound");
+
+    // Production Env
+    // const dbRef = firebase.database().ref("empu/inbound");
+
     dbRef
       .orderByChild("awb")
       .equalTo(state.awb)
@@ -125,6 +137,10 @@ export const submitInboundData = ({ state, setLoading, doAfter }) => {
             .push({
               ...state,
               dateAdded: `${date} ${time}`,
+              paymentStatus:
+                state.paymentMethod === "CREDIT" ? "UNPAID" : "PAID",
+              paymentDate:
+                state.paymentMethod === "CASH" ? `${date} ${time}` : "",
             })
             .then(() => {
               alert(`AWB berhasil di approve`);
@@ -155,12 +171,18 @@ export const handleExcel = ({ dataList, customerList }) => {
       customerType: row.customerType,
       pcs: row.pcs,
       weight: row.weight,
-      amount: row.amount,
+      reqTS: row.reqTS === true ? "Y" : "N",
+      isDG: row.isDG === true ? "Y" : "N",
+      isSurcharged: row.isSurcharge === true ? "Y" : "N",
       surchargeDay: row.surchargeDay,
-      reqTS: row.reqTS,
-      isDG: row.isDG,
-      dateAdded: new Date(row.dateAdded),
       keterangan: row.keterangan,
+      dateAdded: new Date(row.dateAdded),
+      amount: row.amount,
+      additionalCharge: row.additionalCharge || 0,
+      totalAmount: row.totalAmount || row.amount,
+      paymentMethod: row.paymentMethod,
+      paymentStatus: row.paymentStatus,
+      paymentDate: row.paymentDate === "" ? "" : new Date(row.paymentDate),
     };
   });
   const worksheet = XLSX.utils.json_to_sheet(processedData);
@@ -173,14 +195,20 @@ export const handleExcel = ({ dataList, customerList }) => {
         "AWB",
         "Customer",
         "Customer Type",
-        "Pieces",
+        "Koli",
         "Weight",
-        "Amount",
-        "Hold Day",
         "Request TS",
-        "Dangerous Goods",
-        "Date Added",
+        "Special Handling",
+        "Penimbunan",
+        "Penimbunan (Hari)",
         "Keterangan",
+        "Date Added",
+        "Amount",
+        "Additional Charge",
+        "Total Amount",
+        "Payment Method",
+        "Payment Status",
+        "Payment Date",
       ],
     ],
     { origin: "A1" }

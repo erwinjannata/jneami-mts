@@ -33,7 +33,10 @@ const EMPUDownloadData = () => {
     setLoading(true);
     const dbRef = firebase
       .database()
-      .ref(`empu/${state.data}`)
+      // Test Env
+      .ref(`test/empu/${state.data}`)
+      // Production Env
+      // .ref(`empu/${state.data}`)
       .orderByChild("dateAdded")
       .startAt(`${state.dateFrom} 00:00`)
       .endAt(`${state.dateThru} 23:59`);

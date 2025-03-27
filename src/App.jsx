@@ -25,6 +25,7 @@ import EMPUAddData from "./pages/Mid Mile/Airport/EMPU/addData";
 import EMPUCustomersList from "./pages/Mid Mile/Airport/EMPU/customersList";
 import EMPUFindData from "./pages/Mid Mile/Airport/EMPU/findData";
 import EMPUDownloadData from "./pages/Mid Mile/Airport/EMPU/downloadData";
+import EMPUConfirm from "./pages/Mid Mile/Airport/EMPU/confirm";
 
 function App() {
   const protectedRoute = [
@@ -117,6 +118,11 @@ function App() {
       name: "EMPU Find Transaction",
       path: "/empu/find",
       element: <EMPUFindData />,
+    },
+    {
+      name: "EMPU Konfirmasi Credit",
+      path: "/empu/confirm",
+      element: <EMPUConfirm />,
     },
     {
       name: "EMPU Download Data",

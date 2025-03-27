@@ -13,6 +13,8 @@ const EMPUReceipt = ({ data, customerList }) => {
     (customer) => customer.key === data.customerId
   );
 
+  let totalCharge = data.amount + data.additionalCharge || data.amount;
+
   return (
     <div
       className="my-4 p-4"
@@ -64,7 +66,7 @@ const EMPUReceipt = ({ data, customerList }) => {
               <td>{`: ${customerList[idx].customerName}`}</td>
             </tr>
             <tr>
-              <td>Pieces</td>
+              <td>Koli</td>
               <td>{`: ${data.pcs}`}</td>
             </tr>
             <tr>
@@ -72,8 +74,12 @@ const EMPUReceipt = ({ data, customerList }) => {
               <td>{`: ${data.weight} Kg`}</td>
             </tr>
             <tr>
+              <td>Payment Method</td>
+              <td>{`: ${data.paymentMethod || "-"}`}</td>
+            </tr>
+            <tr>
               <td>Amount</td>
-              <td>{`: Rp. ${Intl.NumberFormat().format(data.amount)}`}</td>
+              <td>{`: Rp. ${Intl.NumberFormat().format(totalCharge)}`}</td>
             </tr>
             <tr>
               <td colSpan={2}>

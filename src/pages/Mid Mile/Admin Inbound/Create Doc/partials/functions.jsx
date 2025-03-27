@@ -159,9 +159,8 @@ export const approveDoc = async ({
                 setLoading(false);
                 alert("Data berhasil disimpan");
               })
-              .catch((error) => {
+              .catch(() => {
                 setLoading(false);
-                console.log(error);
                 alert("Data gagal disimpan");
               });
           });
