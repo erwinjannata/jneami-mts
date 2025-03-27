@@ -39,8 +39,8 @@ const EMPUAddData = () => {
 
   const checkLabels = [
     { name: "isSurcharge", label: "Penimbunan" },
-    { name: "reqTS", label: "Antar ke alamat" },
     { name: "isDG", label: "Special Handling" },
+    { name: "reqTS", label: "Antar ke Mataram / Alamat" },
   ];
 
   const calculations = {
@@ -60,13 +60,13 @@ const EMPUAddData = () => {
       baseAmount += baseAmount * calculations[state.customerType].tax;
 
       let tarifJaster = chargedWeight * 640;
-      let tsAmount = state.reqTS ? 5000 : 0;
+      let tsAmount = 0;
       let penimbunanAmount = 0;
       let specialAmount = 0;
 
       // Penimbunan Amount / Surcharge Amount
       if (state.isSurcharge && state.surchargeDay > 3) {
-        penimbunanAmount = tarifJaster * (state.surchargeDay - 2) + 3000;
+        penimbunanAmount = tarifJaster * (state.surchargeDay - 3) + 3000;
         penimbunanAmount += penimbunanAmount * 0.11;
       }
 
@@ -74,6 +74,15 @@ const EMPUAddData = () => {
       if (state.isDG) {
         specialAmount = tarifJaster + 3000;
         specialAmount += specialAmount * 0.11;
+      }
+
+      // Req TS
+      if (state.reqTS) {
+        if (state.customerType === "Agen") {
+          tsAmount = 5000;
+        } else {
+          baseAmount = state.weight * 5000;
+        }
       }
 
       let additionalCharge = Math.round(
