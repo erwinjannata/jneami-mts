@@ -11,15 +11,15 @@ const EMPUConfirm = () => {
   const [state, setState] = useState({
     periode: "",
   });
-  const [customerList, setCustomerList] = useState([]);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [customerList, setCustomerList] = useState([]);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setLoading(true);
     const dbRef = firebase.database().ref("empu/inbound");
 
-    dbRef
+    await dbRef
       .orderByChild("dateAdded")
       .startAt(`2025-${state.periode}-01 00:00`)
       .endAt(`2025-${state.periode}-31 23:59`)
@@ -44,22 +44,22 @@ const EMPUConfirm = () => {
   };
 
   useEffect(() => {
-    const dbRef = firebase.database().ref("empu/customers");
-
-    dbRef
-      .orderByChild("customerType")
-      .equalTo("Agen")
-      .on("value", (snapshot) => {
-        let data = [];
-        snapshot.forEach((childSnapshot) => {
-          data.push({
-            key: childSnapshot.key,
-            ...childSnapshot.val(),
+    const dbRefCustomers = firebase.database().ref("empu/customers");
+    
+        dbRefCustomers
+          .orderByChild("customerType")
+          .equalTo("Agen")
+          .on("value", (snapshot) => {
+            let data = [];
+            snapshot.forEach((childSnapshot) => {
+              data.push({
+                key: childSnapshot.key,
+                ...childSnapshot.val(),
+              });
+            });
+            setCustomerList(data);
           });
-        });
-        setCustomerList(data);
-      });
-  }, []);
+  }, [])
 
   return (
     <div className="screen">
@@ -93,8 +93,8 @@ const EMPUConfirm = () => {
         <hr />
         <CreditTable
           awbList={data}
-          customerList={customerList}
           loading={loading}
+          customerList={customerList}
         />
       </Container>
     </div>

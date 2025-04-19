@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { IoMdDoneAll } from "react-icons/io";
 import { Button, OverlayTrigger, Table, Tooltip } from "react-bootstrap";
 import LoadingAnimation from "../../../../../components/partials/loading";
@@ -63,7 +63,7 @@ const CreditTable = ({ awbList, customerList }) => {
 
                 return (
                   <tr key={index}>
-                    <td>{customerList[idx].customerName}</td>
+                    <td>{customerList[idx]?.customerName}</td>
                     <td>{`Rp. ${Intl.NumberFormat().format(
                       awb.totalAmount
                     )}`}</td>
