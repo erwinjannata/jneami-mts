@@ -75,7 +75,8 @@ const InboundBagTable = ({
             <td>
               {data.status === "Dalam Perjalanan" ? (
                 <>
-                  {bag.statusBag === "Received" ? (
+                  {bag.statusBag === "Received" ||
+                  bag.statusBag === "Unreceived" ? (
                     <>
                       {oldBagList[index].statusBag === "Received" ? null : (
                         <Button

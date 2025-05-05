@@ -16,7 +16,6 @@ export const fetchData = ({
   setData,
   setBagList,
   setOldBagList,
-  setZeroFilled,
 }) => {
   setLoading(true);
   dbRef.child(`documents/${key}`).on("value", (snapshot) => {
@@ -40,7 +39,6 @@ export const fetchData = ({
           }
         });
     }
-    setZeroFilled(snapshot.val().documentNumber.split("/")[2]);
     setLoading(false);
   });
 };
@@ -50,8 +48,8 @@ export const handleReceived = ({ index, bagList, setBagList }) => {
   setBagList(
     bagList.map((lists, idx) => {
       if (
-        (idx === index && lists.statusBag === "Submitted") ||
-        lists.statusBag === "Unreceived"
+        idx === index &&
+        (lists.statusBag === "Submitted" || lists.statusBag === "Unreceived")
       ) {
         return {
           ...lists,
@@ -124,7 +122,6 @@ export const handleApprove = ({ user, bagList, setShow }) => {
 export const updateData = async ({
   user,
   documentKey,
-  documentNumber,
   data,
   bagList,
   signatureImage,
@@ -143,7 +140,6 @@ export const updateData = async ({
       const d = new Date();
       const time = moment(d).locale("en-sg").format("LT");
       const date = moment(d).locale("en-ca").format("L");
-      const year = d.getFullYear().toString().substring(2, 4);
 
       // Initiate Firebase Storage
       const dbDocRef = firebase.database().ref("midMile/documents");
@@ -156,17 +152,18 @@ export const updateData = async ({
       // For Petugas Airport
       const storageRefAirport = ref(
         storage,
-        `midMile/signatures/${year}-${documentNumber}/airport.png`
+        `midMile/signatures/${documentKey}/petugasEMPU.png`
       );
 
       // For Petugas Gudang
       const storageRefGudang = ref(
         storage,
-        `midMile/signatures/${year}-${documentNumber}/petugasGudang.png`
+        `midMile/signatures/${documentKey}/gudangBandara.png`
       );
 
       // Set Document Status
       let finalStatus = "";
+
       if (data.status === "Submitted") {
         finalStatus = "Standby";
       } else if (data.status === "Dalam Perjalanan") {
@@ -267,7 +264,6 @@ export const updateData = async ({
 // Update data in database = Start "Dalam Perjalanan" state
 export const handleTransport = async ({
   documentKey,
-  documentNumber,
   bagList,
   setLoading,
   driverState,
@@ -279,7 +275,6 @@ export const handleTransport = async ({
       const d = new Date();
       const time = moment(d).locale("en-sg").format("LT");
       const date = moment(d).locale("en-ca").format("L");
-      const year = d.getFullYear().toString().substring(2, 4);
 
       const dbDocRef = firebase.database().ref("midMile/documents");
       const dbBagRef = firebase.database().ref("midMile/bags");
@@ -289,7 +284,7 @@ export const handleTransport = async ({
       };
       const storageRef = ref(
         storage,
-        `midMile/signatures/${year}-${documentNumber}/driver.png`
+        `midMile/signatures/${documentKey}/driver.png`
       );
 
       try {

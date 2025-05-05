@@ -53,18 +53,19 @@ export const readFile = ({ file, setBagList }) => {
       const processed_data = [];
 
       raw_data.forEach((row) => {
-        const bags = row["REMARKS"].replace(/\r?\n|\r|\s/g, "").split("+");
+        const bags = row["BAG"].replace(/\r?\n|\r|\s/g, "").split("+");
         bags.forEach((bag) => {
           const bag_split = bag.split("/");
           processed_data.push({
             bagNumber: bag_split[0],
             weight: parseInt(bag_split[1]),
-            sm: row["S M #"],
+            sm: row["AWB/SMU"],
             koli: 1,
           });
         });
       });
 
+      // Clean the data from duplicated bagNumbers and sum the weight and koli
       const clean_data = processed_data.reduce((a, c) => {
         const obj = a.find((obj) => obj.bagNumber === c.bagNumber);
         if (!obj) {
@@ -96,22 +97,46 @@ export const approveDoc = async ({
   } else {
     if (confirm("Konfirmasi approve?") === true) {
       setLoading(true);
+
+      // Database References
+      const dbDocRef = firebase.database().ref("midMile/documents");
+      const keyReference = dbDocRef.push().key;
+
+      const dbBagRef = firebase.database().ref("midMile/bags");
+      const collectionLengthRef = firebase
+        .database()
+        .ref("status/midMileCollectionLength");
+
       const storage = getStorage();
       const metadata = {
         contentType: "image/png",
       };
       const storageRef = ref(
         storage,
-        `midMile/signatures/${storageNumber}/adminInbound.png`
+        `midMile/signatures/${keyReference}/submittedSignature.png`
       );
 
-      const dbDocRef = firebase.database().ref("midMile/documents");
-      const dbBagRef = firebase.database().ref("midMile/bags");
-      const collectionLengthRef = firebase
-        .database()
-        .ref("status/midMileCollectionLength");
-
       try {
+        // Check if every bag is already submitted
+        const bagChecks = await Promise.all(
+          bagList.map(async (bag) => {
+            const snapshot = await dbBagRef
+              .orderByChild("bagNumber")
+              .equalTo(bag.bagNumber)
+              .get();
+            return snapshot.exists();
+          })
+        );
+
+        const allBagsExist = bagChecks.every((exists) => exists);
+
+        if (allBagsExist) {
+          alert("Seluruh bag sudah terdaftar di sistem");
+          setLoading(false);
+          return;
+        }
+
+        // Upload signature image
         await uploadString(
           storageRef,
           signatureImage,
@@ -119,18 +144,42 @@ export const approveDoc = async ({
           metadata
         ).then((snapshot) => {
           getDownloadURL(snapshot.ref).then(async (url) => {
-            const keyReference = dbDocRef.push().key;
             const d = new Date();
             const time = moment(d).locale("en-sg").format("LT");
             const date = moment(d).locale("en-ca").format("L");
 
+            // Upload bag data
+            await bagList.map((bag) => {
+              dbBagRef
+                .orderByChild("bagNumber")
+                .equalTo(bag.bagNumber)
+                .get()
+                .then(async (snapshot) => {
+                  if (!snapshot.exists()) {
+                    await dbBagRef
+                      .push({
+                        documentId: keyReference,
+                        statusBag: "Submitted",
+                        bagNumber: bag.bagNumber,
+                        weight: bag.weight,
+                        sm: bag.sm,
+                        koli: bag.koli,
+                      })
+                      .catch((error) => {
+                        console.log(error);
+                      });
+                  }
+                });
+            });
+
+            // Upload document data
             await dbDocRef
               .child(keyReference)
               .set({
                 documentNumber: docNumber,
                 status: "Submitted",
-                inboundUser: userInfo,
-                inboundSign: url,
+                submittedBy: userInfo,
+                submittedSignature: url,
                 submittedDate: `${date} ${time}`,
                 totalPcs: bagList.length,
                 totalWeight: bagList.reduce((prev, next) => {
@@ -141,20 +190,6 @@ export const approveDoc = async ({
                 }, 0),
               })
               .then(() => {
-                bagList.map(async (bag) => {
-                  await dbBagRef
-                    .push({
-                      documentId: keyReference,
-                      statusBag: "Submitted",
-                      bagNumber: bag.bagNumber,
-                      weight: bag.weight,
-                      sm: bag.sm,
-                      koli: bag.koli,
-                    })
-                    .catch((error) => {
-                      console.log(error);
-                    });
-                });
                 collectionLengthRef.set(collectionLength);
                 setLoading(false);
                 alert("Data berhasil disimpan");
@@ -169,5 +204,13 @@ export const approveDoc = async ({
         alert("Error: ", error);
       }
     }
+  }
+};
+
+export const removeBag = ({ bagNumber, setBagList }) => {
+  if (confirm("Hapus bag?") === true) {
+    setBagList((current) =>
+      current.filter((bag) => bag.bagNumber !== bagNumber)
+    );
   }
 };

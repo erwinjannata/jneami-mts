@@ -35,6 +35,8 @@ import MidMilePrintContent from "../../General/Print Component/print";
 import AddBagModal from "./partials/addModal";
 import SignatureModalWithName from "./partials/signatureGudangModal";
 import EditMasterBagModal from "./partials/editModal";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import MidMileDocument from "../../General/Print Component/midMileDocument";
 
 const MidMileAirportDoc = () => {
   const { key } = useParams();
@@ -213,7 +215,7 @@ const MidMileAirportDoc = () => {
                 );
 
                 if (data.status === "Submitted") {
-                  alert("Bag belum dikonfirmasi oleh tim Admin Airport");
+                  alert("Bag belum dikonfirmasi oleh tim Airport");
                 } else if (isAllOnTransport) {
                   alert(
                     "Semua bag sedang dalam proses transport menuju Inbound Station"
@@ -236,8 +238,17 @@ const MidMileAirportDoc = () => {
           id="bg-nested-dropdown"
         >
           <Dropdown.Item eventKey="1" onClick={() => reactToPrintFn()}>
-            Print
+            Print Ticket
           </Dropdown.Item>
+          <Dropdown.Divider />
+          <PDFDownloadLink
+            className="mx-3"
+            document={<MidMileDocument data={data} bagList={bagList} />}
+            fileName={`${data.documentNumber}.pdf`}
+            style={{ color: "black" }}
+          >
+            {({ loading }) => (loading ? "Loading..." : "Print Document")}
+          </PDFDownloadLink>
         </DropdownButton>
         <MidMileDocSignatures data={data} />
         <div className="d-none">
@@ -253,7 +264,7 @@ const MidMileAirportDoc = () => {
           setShow={setShow}
         />
         <SignatureModal
-          userText="Petugas Bandara"
+          userText="Petugas EMPU"
           show={showSignatureAirport}
           onHide={() => setShowSignatureAirport(false)}
           onChange={setSignatureImage}
@@ -264,7 +275,6 @@ const MidMileAirportDoc = () => {
               data: data,
               bagList: bagList,
               dbRef: dbRef,
-              documentNumber: zerofilled,
               signatureImage: signatureImage,
               setLoading: setLoading,
               stateGudang: gudangBandaraState,
@@ -279,16 +289,15 @@ const MidMileAirportDoc = () => {
           setState={setDrvierState}
           nextStep={() => {
             handleTransport({
-              bagList: bagList,
               documentKey: key,
-              documentNumber: zerofilled,
+              bagList: bagList,
               setLoading: setLoading,
               driverState: driverState,
             });
           }}
         />
         <SignatureModalWithName
-          userText="Gudang Bandara"
+          userText="Petugas Bandara"
           show={showSignatureGudang}
           setShow={setShowSignatureGudang}
           state={gudangBandaraState}

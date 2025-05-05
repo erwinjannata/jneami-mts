@@ -1,8 +1,10 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
-import { Table } from "react-bootstrap";
+import { Button, Table } from "react-bootstrap";
+import { ImCross } from "react-icons/im";
+import { removeBag } from "./functions";
 
-const BagTable = ({ bagList, loading }) => {
+const BagTable = ({ bagList, setBagList, loading }) => {
   const header = [
     { name: "No.", className: "w-auto" },
     { name: "Bag No.", className: "w-auto" },
@@ -21,6 +23,7 @@ const BagTable = ({ bagList, loading }) => {
                 {item.name}
               </th>
             ))}
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -33,6 +36,7 @@ const BagTable = ({ bagList, loading }) => {
                   <td>{item.koli}</td>
                   <td>{item.weight}</td>
                   <td>{item.sm}</td>
+                  <td><Button variant='outline-danger' onClick={() => removeBag({bagNumber: item.bagNumber, setBagList: setBagList})}><ImCross /></Button></td>
                 </tr>
               ))}
         </tbody>

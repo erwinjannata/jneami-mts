@@ -5,7 +5,7 @@ import { Col, Row, Spinner } from "react-bootstrap";
 const MidMileDocInfo = ({ docData, loading }) => {
   const infos = [
     [
-      { label: `Inbound Station: `, value: docData.inboundUser },
+      { label: `Submit By: `, value: docData.submittedBy },
       {
         label: `Submit Date: `,
         value: moment(Date.parse(docData.submittedDate))
@@ -14,7 +14,7 @@ const MidMileDocInfo = ({ docData, loading }) => {
       },
     ],
     [
-      { label: `Airport: `, value: docData.inboundUser },
+      { label: `Approved By: `, value: docData.airportUser },
       {
         label: `Approve Date: `,
         value:
@@ -26,7 +26,7 @@ const MidMileDocInfo = ({ docData, loading }) => {
       },
     ],
     [
-      { label: `Status: `, value: docData.status },
+      { label: `Current Status: `, value: docData.status },
       {
         label:
           docData.status === "Received"

@@ -5,10 +5,16 @@ import { Col, Row } from "react-bootstrap";
 const MidMileDocSignatures = ({ data }) => {
   const signatures = [
     {
-      label: "Inbound Station",
-      source: data.inboundSign,
-      alts: "Inbound Station",
-      name: data.inboundUser,
+      label: "Petugas EMPU",
+      source: data.airportSign || "",
+      alts: "Petugas EMPU",
+      name: data.airportUser,
+    },
+    {
+      label: "Petugas Bandara",
+      source: data.gudangSign || "",
+      alts: "Petugas Bandara",
+      name: data.gudangUser,
     },
     {
       label: "Driver",
@@ -17,16 +23,10 @@ const MidMileDocSignatures = ({ data }) => {
       name: data.driverName,
     },
     {
-      label: "Petugas Bandara",
-      source: data.airportSign || "",
-      alts: "Petugas Bandara",
-      name: data.airportUser,
-    },
-    {
-      label: "Gudang Bandara",
-      source: data.gudangSign || "",
-      alts: "Gudang Bandaras",
-      name: data.gudangUser,
+      label: "Inbound Station",
+      source: data.inboundSign || "",
+      alts: "Inbound Station",
+      name: data.inboundUser,
     },
   ];
 

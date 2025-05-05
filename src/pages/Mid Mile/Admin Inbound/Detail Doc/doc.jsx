@@ -1,5 +1,4 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable no-unused-vars */
 import {
   Button,
   ButtonGroup,
@@ -24,6 +23,9 @@ import MidMileDocSignatures from "../../Airport/Detail Doc/partials/signatures";
 import { handleApprove } from "./partials/functions";
 import { useReactToPrint } from "react-to-print";
 import MidMilePrintContent from "../../General/Print Component/print";
+import SignatureModal from "../../../../components/partials/signatureModal";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import MidMileDocument from "../../General/Print Component/midMileDocument";
 
 const MidMileInboundDoc = () => {
   const { key } = useParams();
@@ -38,9 +40,10 @@ const MidMileInboundDoc = () => {
   const [oldBagList, setOldBagList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [show, setShow] = useState(false);
+  const [showSignatureModal, setShowSignatureModal] = useState(false);
   const [currentFocus, setCurrentFocus] = useState();
   const [remark, setRemark] = useState("");
-  const [zerofilled, setZeroFilled] = useState("");
+  const [signatureImage, setSignatureImage] = useState("");
 
   const handleSubmitRemark = () => {
     setBagList(
@@ -61,7 +64,6 @@ const MidMileInboundDoc = () => {
       setData: setData,
       setBagList: setBagList,
       setOldBagList: setOldBagList,
-      setZeroFilled: setZeroFilled,
       setLoading: setLoading,
     });
   }, [auth.origin]);
@@ -95,13 +97,7 @@ const MidMileInboundDoc = () => {
               <Button
                 variant="primary"
                 className="me-2"
-                onClick={() =>
-                  handleApprove({
-                    docKey: key,
-                    bagList: bagList,
-                    setLoading: setLoading,
-                  })
-                }
+                onClick={() => setShowSignatureModal(true)}
               >
                 Approve
               </Button>
@@ -112,11 +108,18 @@ const MidMileInboundDoc = () => {
               title="Export"
               id="bg-nested-dropdown"
             >
-              <Dropdown.Item eventKey="2">XLSX</Dropdown.Item>
-              <Dropdown.Divider />
-              <Dropdown.Item eventKey="3" onClick={() => reactToPrintFn()}>
-                Print
+              <Dropdown.Item eventKey="1" onClick={() => reactToPrintFn()}>
+                Print Ticket
               </Dropdown.Item>
+              <Dropdown.Divider />
+              <PDFDownloadLink
+                className="mx-3"
+                document={<MidMileDocument data={data} bagList={bagList} />}
+                fileName={`${data.documentNumber}.pdf`}
+                style={{ color: "black" }}
+              >
+                {({ loading }) => (loading ? "Loading..." : "Print Document")}
+              </PDFDownloadLink>
             </DropdownButton>
           </Col>
         </Row>
@@ -126,6 +129,22 @@ const MidMileInboundDoc = () => {
             <MidMilePrintContent data={data} />
           </div>
         </div>
+        <SignatureModal
+          show={showSignatureModal}
+          userText="Inbound Station"
+          onHide={() => setShowSignatureModal(false)}
+          onChange={setSignatureImage}
+          onSubmit={async () => {
+            await handleApprove({
+              docKey: key,
+              bagList: bagList,
+              setLoading: setLoading,
+              inboundUser: auth.name,
+              signatureImage: signatureImage,
+            });
+            navigate("/mm");
+          }}
+        />
         <RemarkModal
           show={show}
           onHide={() => {

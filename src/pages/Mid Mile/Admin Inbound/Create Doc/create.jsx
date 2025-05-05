@@ -84,7 +84,11 @@ const MidMileCreateDoc = () => {
             Submit
           </Button>
           <hr />
-          <BagTable bagList={bagList} loading={loading} />
+          <BagTable
+            bagList={bagList}
+            setBagList={setBagList}
+            loading={loading}
+          />
           <hr />
           <DocInfo bagList={bagList} />
           <hr />
@@ -93,7 +97,7 @@ const MidMileCreateDoc = () => {
           </Button>
         </div>
         <SignatureModal
-          userText="Inbound Station"
+          userText="Petugas EMPU"
           show={show}
           onHide={() => setShow(false)}
           onChange={setSignatureImage}

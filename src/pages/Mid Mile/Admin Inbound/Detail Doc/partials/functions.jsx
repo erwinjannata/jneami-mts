@@ -1,6 +1,12 @@
 /* eslint-disable no-unused-vars */
 import moment from "moment";
 import firebase from "./../../../../../config/firebase";
+import {
+  ref,
+  getStorage,
+  uploadString,
+  getDownloadURL,
+} from "firebase/storage";
 
 export const handleReceive = ({ index, bagList, setBagList }) => {
   setBagList(
@@ -47,7 +53,13 @@ export const handleCancel = ({ index, bagList, oldBagList, setBagList }) => {
   );
 };
 
-export const handleApprove = async ({ docKey, bagList, setLoading }) => {
+export const handleApprove = async ({
+  docKey,
+  bagList,
+  setLoading,
+  inboundUser,
+  signatureImage,
+}) => {
   if (confirm("Konfirmasi approve?") === true) {
     // Get current DateTime
     const d = new Date();
@@ -76,31 +88,53 @@ export const handleApprove = async ({ docKey, bagList, setLoading }) => {
     }
 
     try {
+      // Database Reference
       const dbDocRef = firebase.database().ref(`midMile/documents/${docKey}`);
       const dbBagRef = firebase.database().ref("midMile/bags");
 
-      // Update Document Details
-      await dbDocRef
-        .update({
-          status: finalStatus,
-          receivedDate: `${date} ${time}`,
-          latestUpdateDate: `${date} ${time}`,
-        })
-        .then(async () => {
-          // Update Bag Details
-          await bagList.forEach((bag) => {
-            const { key, ...rest } = bag;
-            if (
-              bag.statusBag === "Received" ||
-              bag.statusBag === "Unreceived"
-            ) {
-              dbBagRef.child(bag.key).update({
-                ...rest,
+      // Initiate Firebase Storage
+      const storage = getStorage();
+      const metadata = {
+        contentType: "image/png",
+      };
+
+      // For Petugas Airport
+      const storageRef = ref(
+        storage,
+        `midMile/signatures/${docKey}/inboundStation.png`
+      );
+
+      // Upload Signature to Storage
+      await uploadString(storageRef, signatureImage, "data_url", metadata).then(
+        (snapshot) => {
+          getDownloadURL(snapshot.ref).then(async (url) => {
+            // Update Document Details
+            await dbDocRef
+              .update({
+                status: finalStatus,
+                receivedDate: `${date} ${time}`,
+                latestUpdateDate: `${date} ${time}`,
+                inboundUser: inboundUser,
+                inboundSign: url,
+              })
+              .then(async () => {
+                // Update Bag Details
+                await bagList.forEach((bag) => {
+                  const { key, ...rest } = bag;
+                  if (
+                    bag.statusBag === "Received" ||
+                    bag.statusBag === "Unreceived"
+                  ) {
+                    dbBagRef.child(bag.key).update({
+                      ...rest,
+                    });
+                  }
+                });
+                alert("Berhasil approve");
               });
-            }
           });
-          alert("Berhasil approve");
-        });
+        }
+      );
     } catch (error) {
       setLoading(false);
       alert("Gagal approve");

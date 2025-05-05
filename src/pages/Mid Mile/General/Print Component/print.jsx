@@ -3,8 +3,13 @@
 import "./../../../../index.css";
 import { Col, Container, Row, Table } from "react-bootstrap";
 import moment from "moment";
+import { UseAuth } from "../../../../config/authContext";
 
 const MidMilePrintContent = ({ data }) => {
+  const auth = UseAuth();
+  const d = new Date();
+  const date = moment(d).locale("en-sg").format("LLL");
+
   const tableContent = [
     { label: "Document No.", value: data.documentNumber },
     { label: "QTY", value: `${data.totalPcs} Pcs` },
@@ -20,7 +25,7 @@ const MidMilePrintContent = ({ data }) => {
               .format("lll"),
     },
     {
-      label: "Petugas Airport",
+      label: "Petugas EMPU",
       value: data.airportUser === undefined ? "-" : data.airportUser,
     },
   ];
@@ -46,7 +51,13 @@ const MidMilePrintContent = ({ data }) => {
           </p>
         </Col>
       </Row>
-      <div style={{ borderBottom: "1px solid black" }}>
+      <div
+        style={{
+          borderBottom: "2px solid black",
+          borderTop: "2px solid black",
+          paddingTop: "10px",
+        }}
+      >
         {tableContent.map((content, index) => (
           <Row key={index} style={{ fontSize: "11px" }}>
             <Col>
@@ -65,6 +76,15 @@ const MidMilePrintContent = ({ data }) => {
           </Row>
         ))}
       </div>
+      <Table borderless size="sm" style={{ fontSize: "10px" }}>
+        <tbody>
+          <tr>
+            <td>{auth.name}</td>
+            <td className="text-end">{date}</td>
+          </tr>
+        </tbody>
+      </Table>
+      <hr style={{ color: "white" }} />
       <hr style={{ color: "white" }} />
     </div>
   );
