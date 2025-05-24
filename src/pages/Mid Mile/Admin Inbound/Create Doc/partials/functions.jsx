@@ -59,7 +59,7 @@ export const readFile = ({ file, setBagList }) => {
           processed_data.push({
             bagNumber: bag_split[0],
             weight: parseInt(bag_split[1]),
-            sm: row["AWB/SMU"],
+            sm: row["SMU"],
             koli: 1,
           });
         });

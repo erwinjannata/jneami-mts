@@ -1,7 +1,11 @@
 /* eslint-disable react/prop-types */
 import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
+import moment from "moment";
 
 const MidMileDocument = ({ data, bagList }) => {
+  const d = new Date();
+  const today = moment(d).locale("id-ID").format("llll");
+
   const itemsPerPage = 5;
   const groupedBags = bagList.reduce((acc, bag) => {
     if (!acc[bag.sm]) {
@@ -10,7 +14,10 @@ const MidMileDocument = ({ data, bagList }) => {
         totalKoli: 0,
       };
     }
-    acc[bag.sm].bagNumbers.push(`${bag.bagNumber} / ${bag.weight}`);
+
+    for (let index = 0; index < bag.koli; index++) {
+      acc[bag.sm].bagNumbers.push(`${bag.bagNumber}/${bag.weight}`);
+    }
     acc[bag.sm].totalKoli += parseInt(bag.koli);
     return acc;
   }, {});
@@ -33,7 +40,7 @@ const MidMileDocument = ({ data, bagList }) => {
                 <Text style={styles.dataRowA}>No. Dokumen</Text>
                 <Text style={styles.dataRowB}>: {data.documentNumber}</Text>
                 <Text style={styles.dataRowA}>Hari / Tanggal</Text>
-                <Text style={styles.dataRowB}>:</Text>
+                <Text style={styles.dataRowB}>: {today}</Text>
               </View>
             </View>
             <View style={[styles.row, styles.noBorder]}>
