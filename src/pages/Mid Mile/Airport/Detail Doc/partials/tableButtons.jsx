@@ -1,24 +1,14 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 
 import { Button } from "react-bootstrap";
-import {
-  handleCancel,
-  handleMissing,
-  handleReceived,
-  handleRemark,
-  handleRemoveNewBag,
-} from "./functions";
-import { FaCheck, FaPen, FaTrashAlt } from "react-icons/fa";
+import { handleAction, handleEdit } from "./functions";
+import { FaCheck, FaPen } from "react-icons/fa";
 import { FaXmark } from "react-icons/fa6";
 
 const TableButtons = ({
   data,
   bag,
   index,
-  bagList,
-  setBagList,
-  oldBagList,
   setShow,
   setCurrentFocus,
   setRemark,
@@ -35,10 +25,10 @@ const TableButtons = ({
                 variant="outline-primary"
                 className="mx-2"
                 onClick={() =>
-                  handleReceived({
-                    index: index,
-                    bagList: bagList,
-                    setBagList: setBagList,
+                  handleAction({
+                    bag: bag,
+                    doc: data,
+                    statusBag: "Standby",
                   })
                 }
               >
@@ -48,7 +38,7 @@ const TableButtons = ({
                 variant="warning"
                 className="mx-2"
                 onClick={() =>
-                  handleRemark({
+                  handleEdit({
                     index: index,
                     setShow: setShow,
                     setRemark: setRemark,
@@ -62,51 +52,17 @@ const TableButtons = ({
                 variant="outline-dark"
                 className="mx-2"
                 onClick={() =>
-                  handleMissing({
-                    index: index,
-                    bagList: bagList,
-                    setBagList: setBagList,
+                  handleAction({
+                    bag: bag,
+                    doc: data,
+                    statusBag: "Missing",
                   })
                 }
               >
                 <FaXmark />
               </Button>
             </>
-          ) : (
-            <>
-              {oldBagList[index].statusBag === "Submitted" ||
-              oldBagList[index].statusBag === "Unreceived" ? (
-                <Button
-                  variant="danger"
-                  className="mx-2"
-                  onClick={() =>
-                    handleCancel({
-                      index: index,
-                      bagList: bagList,
-                      setBagList: setBagList,
-                      oldBagList: oldBagList,
-                    })
-                  }
-                >
-                  Batal
-                </Button>
-              ) : null}
-              {bag.key === undefined ? (
-                <Button
-                  variant="danger"
-                  className="mx-2"
-                  onClick={() =>
-                    handleRemoveNewBag({
-                      bagNo: bag.bagNumber,
-                      setBagList: setBagList,
-                    })
-                  }
-                >
-                  <FaTrashAlt />
-                </Button>
-              ) : null}
-            </>
-          )}
+          ) : null}
         </td>
       )}
     </>

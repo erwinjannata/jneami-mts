@@ -7,20 +7,17 @@ import {
   uploadString,
   getDownloadURL,
 } from "firebase/storage";
+import { Toast } from "react-bootstrap";
 
 // Download the data from database
-export const fetchData = ({
-  dbRef,
-  key,
-  setLoading,
-  setData,
-  setBagList,
-  setOldBagList,
-}) => {
+export const fetchData = ({ dbRef, key, setLoading, setData, setBagList }) => {
   setLoading(true);
   dbRef.child(`documents/${key}`).on("value", (snapshot) => {
     if (snapshot.exists()) {
-      setData(snapshot.val());
+      setData({
+        ...snapshot.val(),
+        key: snapshot.key,
+      });
       dbRef
         .child(`bags`)
         .orderByChild("documentId")
@@ -35,7 +32,6 @@ export const fetchData = ({
               });
             });
             setBagList(bags);
-            setOldBagList(bags);
           }
         });
     }
@@ -44,66 +40,64 @@ export const fetchData = ({
 };
 
 // Handle Received button click
-export const handleReceived = ({ index, bagList, setBagList }) => {
-  setBagList(
-    bagList.map((lists, idx) => {
-      if (
-        idx === index &&
-        (lists.statusBag === "Submitted" || lists.statusBag === "Unreceived")
-      ) {
-        return {
-          ...lists,
-          statusBag: "Standby",
-        };
-      } else {
-        return lists;
-      }
-    })
-  );
-};
+export const handleAction = ({ bag, doc, statusBag }) => {
+  // Initialize Database Reference
+  // const dbBagRef = firebase.database().ref("midMile/bags");
+  // const dbDocRef = firebase.database().ref("midMile/documents");
+  const dbBagRef = firebase.database().ref("test/midMile/bags");
+  const dbDocRef = firebase.database().ref("test/midMile/documents");
 
-// Handle Overload button click
-export const handleMissing = ({ index, bagList, setBagList }) => {
-  setBagList(
-    bagList.map((lists, idx) => {
-      if (idx === index) {
-        return {
-          ...lists,
-          statusBag: "Missing",
-        };
-      } else {
-        return lists;
-      }
-    })
-  );
+  let docUpdate = {
+    latestUpdate: moment().locale("fr-ca").format("L LT"),
+  };
+
+  if (doc.status === "Submitted" && statusBag !== "Missing") {
+    docUpdate = {
+      ...docUpdate,
+      status: "Standby",
+    };
+  }
+
+  // Update bag status to "Standby"
+  if (bag.statusBag === "Submitted") {
+    dbBagRef
+      .child(bag.key)
+      .update({
+        statusBag: statusBag,
+        receivedDate: moment().locale("fr-ca").format("L LT"),
+      })
+      .then(() => {
+        dbDocRef
+          .child(bag.documentId)
+          .update(docUpdate)
+          .then(() => {
+            alert("Bag telah dikonfirmasi");
+          });
+      });
+  } else {
+    return (
+      <Toast>
+        <Toast.Header>
+          <img src="holder.js/20x20?text=%20" className="rounded me-2" alt="" />
+          <strong className="me-auto">Bootstrap</strong>
+          <small>11 mins ago</small>
+        </Toast.Header>
+        <Toast.Body>Hello, world! This is a toast message.</Toast.Body>
+      </Toast>
+    );
+  }
 };
 
 // Handles Remark button click
-export const handleRemark = ({
+export const handleEdit = async ({
   index,
   setShow,
   setCurrentFocus,
   setRemark,
 }) => {
+  await setCurrentFocus(index);
+  await setRemark("");
   setShow(true);
-  setCurrentFocus(index);
-  setRemark("");
-};
-
-// Handle Cancel button click
-export const handleCancel = ({ index, bagList, setBagList, oldBagList }) => {
-  setBagList(
-    bagList.map((lists, idx) => {
-      if (idx === index) {
-        return {
-          ...lists,
-          statusBag: `${oldBagList[index].statusBag}`,
-        };
-      } else {
-        return lists;
-      }
-    })
-  );
 };
 
 // Handle Approve button click
@@ -123,10 +117,9 @@ export const updateData = async ({
   user,
   documentKey,
   data,
-  bagList,
   signatureImage,
-  setLoading,
   stateGudang,
+  setLoading,
 }) => {
   if (signatureImage === "") {
     alert("Tanda tangan invalid");
@@ -136,14 +129,9 @@ export const updateData = async ({
     alert("Tanda tangan petugas gudang kosong!");
   } else {
     if (confirm("Konfirmasi approve?") === true) {
-      // Get current DateTime
-      const d = new Date();
-      const time = moment(d).locale("en-sg").format("LT");
-      const date = moment(d).locale("en-ca").format("L");
-
       // Initiate Firebase Storage
-      const dbDocRef = firebase.database().ref("midMile/documents");
-      const dbBagRef = firebase.database().ref("midMile/bags");
+      // const dbDocRef = firebase.database().ref("midMile/documents");
+      const dbDocRef = firebase.database().ref("test/midMile/documents");
       const storage = getStorage();
       const metadata = {
         contentType: "image/png",
@@ -152,32 +140,16 @@ export const updateData = async ({
       // For Petugas Airport
       const storageRefAirport = ref(
         storage,
-        `midMile/signatures/${documentKey}/petugasEMPU.png`
+        // `midMile/signatures/${documentKey}/petugasEMPU.png`
+        `test/midMile/signatures/${documentKey}/petugasEMPU.png`
       );
 
       // For Petugas Gudang
       const storageRefGudang = ref(
         storage,
-        `midMile/signatures/${documentKey}/gudangBandara.png`
+        // `midMile/signatures/${documentKey}/gudangBandara.png`
+        `test/midMile/signatures/${documentKey}/gudangBandara.png`
       );
-
-      // Set Document Status
-      let finalStatus = "";
-
-      if (data.status === "Submitted") {
-        finalStatus = "Standby";
-      } else if (data.status === "Dalam Perjalanan") {
-        finalStatus = "Dalam Perjalanan";
-      } else if (data.status === "Ongoing") {
-        const isStandby = bagList.some((bag) => "Standby" === bag.statusBag);
-        if (isStandby) {
-          finalStatus = "Standby";
-        } else {
-          finalStatus = "Received*";
-        }
-      } else if (data.status === "Standby") {
-        finalStatus = "Standby";
-      }
 
       try {
         setLoading(true);
@@ -196,58 +168,27 @@ export const updateData = async ({
             ).then((snapshot2) => {
               getDownloadURL(snapshot2.ref).then(async (urlGudang) => {
                 // Setup updates
-                let updates = {};
+                let updates = {
+                  latestUpdate: moment().locale("fr-ca").format("L LT"),
+                  airportUser: user,
+                  airportSign: urlAirport,
+                  gudangUser: stateGudang.namaPetugas,
+                  gudangSign: urlGudang,
+                };
+
                 if (data.approvedDate === undefined) {
                   updates = {
-                    status: finalStatus,
-                    approvedDate: `${date} ${time}`,
-                    latestUpdateDate: `${date} ${time}`,
-                    airportUser: user,
-                    airportSign: urlAirport,
-                    gudangUser: stateGudang.namaPetugas,
-                    gudangSign: urlGudang,
-                    totalPcs: bagList.length,
-                    totalWeight: bagList.reduce((prev, next) => {
-                      return prev + parseInt(next.weight);
-                    }, 0),
-                    totalKoli: bagList.reduce((prev, next) => {
-                      return prev + parseInt(next.koli);
-                    }, 0),
-                  };
-                } else {
-                  updates = {
-                    status: finalStatus,
-                    latestUpdateDate: `${date} ${time}`,
-                    airportUser: user,
-                    airportSign: urlAirport,
-                    gudangUser: stateGudang.namaPetugas,
-                    gudangSign: urlGudang,
-                    totalPcs: bagList.length,
-                    totalWeight: bagList.reduce((prev, next) => {
-                      return prev + parseInt(next.weight);
-                    }, 0),
-                    totalKoli: bagList.reduce((prev, next) => {
-                      return prev + parseInt(next.koli);
-                    }, 0),
+                    ...updates,
+                    approvedDate: moment().locale("fr-ca").format("L LT"),
                   };
                 }
 
                 await dbDocRef
                   .child(documentKey)
                   .update(updates)
-                  .then(async () => {
-                    await bagList.forEach((bag) => {
-                      if (bag.key === undefined) {
-                        dbBagRef.push({
-                          ...bag,
-                        });
-                      } else {
-                        const { key, ...rest } = bag;
-                        dbBagRef.child(bag.key).update({
-                          ...rest,
-                        });
-                      }
-                    });
+                  .then(() => {
+                    alert("Approved");
+                    setLoading(false);
                   });
               });
             });
@@ -272,19 +213,19 @@ export const handleTransport = async ({
     alert("Tanda tangan invalid");
   } else {
     if (confirm("Konfirmasi proses?") === true) {
-      const d = new Date();
-      const time = moment(d).locale("en-sg").format("LT");
-      const date = moment(d).locale("en-ca").format("L");
-
-      const dbDocRef = firebase.database().ref("midMile/documents");
-      const dbBagRef = firebase.database().ref("midMile/bags");
+      // Initialize Database Reference
+      // const dbDocRef = firebase.database().ref("midMile/documents");
+      // const dbBagRef = firebase.database().ref("midMile/bags");
+      const dbDocRef = firebase.database().ref("test/midMile/documents");
+      const dbBagRef = firebase.database().ref("test/midMile/bags");
       const storage = getStorage();
       const metadata = {
         contentType: "image/png",
       };
       const storageRef = ref(
         storage,
-        `midMile/signatures/${documentKey}/driver.png`
+        // `midMile/signatures/${documentKey}/driver.png`
+        `test/midMile/signatures/${documentKey}/driver.png`
       );
 
       try {
@@ -300,8 +241,8 @@ export const handleTransport = async ({
               .child(documentKey)
               .update({
                 status: "Dalam Perjalanan",
-                transportedDate: `${date} ${time}`,
-                latestUpdateDate: `${date} ${time}`,
+                transportedDate: moment().locale("fr-ca").format("L LT"),
+                latestUpdate: moment().locale("fr-ca").format("L LT"),
                 driverSign: url,
                 driverName: driverState.namaPetugas,
               })
@@ -312,10 +253,6 @@ export const handleTransport = async ({
                     dbBagRef.child(bag.key).update({
                       ...rest,
                       statusBag: "Dalam Perjalanan",
-                    });
-                  } else {
-                    dbBagRef.child(bag.key).update({
-                      ...rest,
                     });
                   }
                 });
@@ -331,8 +268,8 @@ export const handleTransport = async ({
 
 export const handleRcc = ({
   state,
+  documentData,
   bagList,
-  setBagList,
   setState,
   inputRef,
 }) => {
@@ -342,10 +279,10 @@ export const handleRcc = ({
     const found = bagList.find((bag) => bag.bagNumber === state.searched);
     if (found) {
       const findIndex = bagList.findIndex((bag) => bag.key === found.key);
-      handleReceived({
-        index: findIndex,
-        bagList: bagList,
-        setBagList: setBagList,
+      handleAction({
+        bag: bagList[findIndex],
+        doc: documentData,
+        statusBag: "Standby",
       });
       setState({
         ...state,
@@ -372,7 +309,7 @@ export const handleRmrk = ({
     const found = bagList.find((bag) => bag.bagNumber === state.searched);
     if (found) {
       const findIndex = bagList.findIndex((bag) => bag.key === found.key);
-      handleRemark({
+      handleEdit({
         index: findIndex,
         setShow: setShow,
         setRemark: setRemark,
@@ -382,63 +319,6 @@ export const handleRmrk = ({
     } else {
       alert("Bag tidak ditemukan!");
     }
-  }
-};
-
-export const handleAddBag = ({
-  bagList,
-  setBagList,
-  oldBagList,
-  setOldBagList,
-  bagNo,
-  koli,
-  weight,
-  remark,
-  sm,
-  statusBag,
-  documentId,
-  setState,
-  setShow,
-}) => {
-  if (bagNo === "") {
-    alert("Bag Number tidak boleh kosong!");
-  } else if (koli === 0) {
-    alert("Jumlah koli invalid!");
-  } else if (weight === 0) {
-    alert("Berat bag invalid!");
-  } else {
-    setBagList([
-      ...bagList,
-      {
-        bagNumber: bagNo,
-        koli: parseInt(koli),
-        weight: parseInt(weight),
-        remark: remark,
-        sm: sm,
-        statusBag: statusBag,
-        documentId: documentId,
-      },
-    ]);
-    setOldBagList([
-      ...oldBagList,
-      {
-        bagNumber: bagNo,
-        koli: parseInt(koli),
-        weight: parseInt(weight),
-        remark: remark,
-        sm: sm,
-        statusBag: statusBag,
-        documentId: documentId,
-      },
-    ]);
-    setState({
-      bagNo: "",
-      koli: 0,
-      weight: 0,
-      remark: "",
-      sm: "",
-    });
-    setShow(false);
   }
 };
 

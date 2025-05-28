@@ -5,7 +5,9 @@ import { Container } from "react-bootstrap";
 import DocListTable from "../../components/partials/documentListTable";
 
 const ErrorListPage = () => {
+  // Initialize Database Reference
   const dbRef = firebase.database().ref("manifestTransit");
+
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
 

@@ -10,7 +10,10 @@ import MidMileCategoryCards from "./partials/categoryCards";
 import { handleChange } from "../../../../components/functions/functions";
 
 const AirportHomePage = () => {
-  const dbRef = firebase.database().ref("midMile/documents");
+  // Initialize Database Reference
+  // const dbRef = firebase.database().ref("midMile/documents");
+  const dbRef = firebase.database().ref("test/midMile/documents");
+
   const [data, setData] = useState([]);
   const [showData, setShowData] = useState([]);
   const [state, setState] = useState({

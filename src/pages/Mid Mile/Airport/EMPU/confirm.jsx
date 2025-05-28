@@ -17,6 +17,8 @@ const EMPUConfirm = () => {
 
   const handleSubmit = async () => {
     setLoading(true);
+
+    // Initialize Database Reference
     const dbRef = firebase.database().ref("empu/inbound");
 
     await dbRef
@@ -44,22 +46,23 @@ const EMPUConfirm = () => {
   };
 
   useEffect(() => {
+    // Initialize Database Reference
     const dbRefCustomers = firebase.database().ref("empu/customers");
-    
-        dbRefCustomers
-          .orderByChild("customerType")
-          .equalTo("Agen")
-          .on("value", (snapshot) => {
-            let data = [];
-            snapshot.forEach((childSnapshot) => {
-              data.push({
-                key: childSnapshot.key,
-                ...childSnapshot.val(),
-              });
-            });
-            setCustomerList(data);
+
+    dbRefCustomers
+      .orderByChild("customerType")
+      .equalTo("Agen")
+      .on("value", (snapshot) => {
+        let data = [];
+        snapshot.forEach((childSnapshot) => {
+          data.push({
+            key: childSnapshot.key,
+            ...childSnapshot.val(),
           });
-  }, [])
+        });
+        setCustomerList(data);
+      });
+  }, []);
 
   return (
     <div className="screen">

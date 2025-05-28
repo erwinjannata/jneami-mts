@@ -20,6 +20,8 @@ const EMPUAddCustomerModal = ({ show, setShow }) => {
     const d = new Date();
     const time = moment(d).locale("en-sg").format("LT");
     const date = moment(d).locale("en-ca").format("L");
+
+    // Initialize Database Reference
     const dbRef = firebase.database().ref("empu/customers");
 
     if ((state.name === "") | (state.type === "")) {

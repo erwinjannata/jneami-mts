@@ -7,7 +7,10 @@ import BagTable from "./partials/bagTable";
 import LoadingAnimation from "../../../../components/partials/loading";
 
 const MidMileFindBag = () => {
-  const dbRef = firebase.database().ref("midMile/bags");
+  // Initialize Database Reference
+  // const dbRef = firebase.database().ref("midMile/bags");
+  const dbRef = firebase.database().ref("test/midMile/bags");
+
   const [state, setState] = useState({
     bagNumber: "",
   });

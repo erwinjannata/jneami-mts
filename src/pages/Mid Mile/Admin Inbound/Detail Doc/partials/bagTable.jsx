@@ -1,20 +1,9 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
-import { Button, Table } from "react-bootstrap";
+import { Table } from "react-bootstrap";
 import LoadingAnimation from "../../../../../components/partials/loading";
-import { handleCancel, handleReceive, handleUnreceive } from "./functions";
-import { handleRemark } from "../../../Airport/Detail Doc/partials/functions";
 
-const InboundBagTable = ({
-  data,
-  bagList,
-  oldBagList,
-  setBagList,
-  setShow,
-  setRemark,
-  setCurrentFocus,
-  loading,
-}) => {
+const InboundBagTable = ({ bagList, loading }) => {
   const tableHeader = [
     { label: "No.", className: "w-auto" },
     { label: "Master Bag No.", className: "w-25" },
@@ -22,8 +11,7 @@ const InboundBagTable = ({
     { label: "Weight", className: "w-auto" },
     { label: "Status Bag", className: "w-auto" },
     { label: "Remark", className: "w-50" },
-    { label: "SM#", className: "w-auto" },
-    { label: "", className: "w-auto" },
+    { label: "SM#", className: "w-50" },
   ];
 
   const textStyle = ({ status }) => {
@@ -72,80 +60,6 @@ const InboundBagTable = ({
             </td>
             <td>{bag.remark}</td>
             <td>{bag.sm}</td>
-            <td>
-              {data.status === "Dalam Perjalanan" ? (
-                <>
-                  {bag.statusBag === "Received" ||
-                  bag.statusBag === "Unreceived" ? (
-                    <>
-                      {oldBagList[index].statusBag === "Received" ? null : (
-                        <Button
-                          variant="danger"
-                          onClick={() =>
-                            handleCancel({
-                              index: index,
-                              bagList: bagList,
-                              oldBagList: oldBagList,
-                              setBagList: setBagList,
-                            })
-                          }
-                        >
-                          Batal
-                        </Button>
-                      )}
-                    </>
-                  ) : (
-                    <>
-                      {bag.statusBag === "Dalam Perjalanan" ? (
-                        <>
-                          <Button
-                            variant="primary"
-                            className="me-2"
-                            onClick={() =>
-                              handleReceive({
-                                index: index,
-                                bagList: bagList,
-                                setBagList: setBagList,
-                              })
-                            }
-                          >
-                            Receive
-                          </Button>
-                          <Button
-                            variant="secondary"
-                            className="me-2"
-                            onClick={() =>
-                              handleUnreceive({
-                                index: index,
-                                bagList: bagList,
-                                setBagList: setBagList,
-                              })
-                            }
-                          >
-                            Unreceive
-                          </Button>
-                          <Button
-                            variant="warning"
-                            onClick={() =>
-                              handleRemark({
-                                index: index,
-                                setShow: setShow,
-                                setRemark: setRemark,
-                                setCurrentFocus: setCurrentFocus,
-                              })
-                            }
-                          >
-                            Remark
-                          </Button>
-                        </>
-                      ) : null}
-                    </>
-                  )}
-                </>
-              ) : (
-                <></>
-              )}
-            </td>
           </tr>
         ))}
       </tbody>

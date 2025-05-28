@@ -1,7 +1,7 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import { Spinner, Table } from "react-bootstrap";
 import TableButtons from "./tableButtons";
+import moment from "moment";
 
 const AirPortBagTable = ({
   data,
@@ -20,9 +20,10 @@ const AirPortBagTable = ({
     { label: "Koli", className: "w-auto" },
     { label: "Weight", className: "w-auto" },
     { label: "Status Bag", className: "w-auto" },
-    { label: "Remark", className: "w-50" },
-    { label: "SM#", className: "w-auto" },
-    { label: "", className: "w-25" },
+    { label: "Remark", className: "w-25" },
+    { label: "SM#", className: "w-25" },
+    { label: "Receiving Date", className: "w-auto" },
+    { label: "", className: "w-auto" },
   ];
 
   const textStyle = ({ status }) => {
@@ -71,6 +72,13 @@ const AirPortBagTable = ({
             </td>
             <td>{bag.remark}</td>
             <td>{bag.sm}</td>
+            <td>
+              {bag.receivedDate
+                ? moment(Date.parse(bag.receivedDate))
+                    .locale("en-sg")
+                    .format("lll")
+                : "-"}
+            </td>
             <TableButtons
               bag={bag}
               index={index}

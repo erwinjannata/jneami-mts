@@ -11,9 +11,9 @@ const MidMileDocSignatures = ({ data }) => {
       name: data.airportUser,
     },
     {
-      label: "Petugas Bandara",
+      label: "Checker Bandara",
       source: data.gudangSign || "",
-      alts: "Petugas Bandara",
+      alts: "Checker Bandara",
       name: data.gudangUser,
     },
     {

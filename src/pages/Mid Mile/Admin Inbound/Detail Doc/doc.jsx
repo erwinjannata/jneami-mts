@@ -17,7 +17,6 @@ import firebase from "./../../../../config/firebase";
 import LoadingAnimation from "../../../../components/partials/loading";
 import MidMileDocInfo from "../../Airport/Detail Doc/partials/docInfo";
 import InboundBagTable from "./partials/bagTable";
-import RemarkModal from "../../../../components/partials/remarkModal";
 import BagInfo from "../../Airport/Detail Doc/partials/bagInfo";
 import MidMileDocSignatures from "../../Airport/Detail Doc/partials/signatures";
 import { handleApprove } from "./partials/functions";
@@ -31,31 +30,19 @@ const MidMileInboundDoc = () => {
   const { key } = useParams();
   const auth = UseAuth();
   const navigate = useNavigate();
-  const dbRef = firebase.database().ref("midMile");
+
+  // Initialize Database Reference
+  // const dbRef = firebase.database().ref("midMile");
+  const dbRef = firebase.database().ref("test/midMile");
+
   const contentRef = useRef(null);
   const reactToPrintFn = useReactToPrint({ contentRef });
 
   const [data, setData] = useState([]);
   const [bagList, setBagList] = useState([]);
-  const [oldBagList, setOldBagList] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [show, setShow] = useState(false);
   const [showSignatureModal, setShowSignatureModal] = useState(false);
-  const [currentFocus, setCurrentFocus] = useState();
-  const [remark, setRemark] = useState("");
   const [signatureImage, setSignatureImage] = useState("");
-
-  const handleSubmitRemark = () => {
-    setBagList(
-      bagList.map((bag, index) => {
-        if (index === currentFocus) {
-          return { ...bag, remark: remark };
-        } else {
-          return bag;
-        }
-      })
-    );
-  };
 
   useEffect(() => {
     fetchData({
@@ -63,7 +50,6 @@ const MidMileInboundDoc = () => {
       dbRef: dbRef,
       setData: setData,
       setBagList: setBagList,
-      setOldBagList: setOldBagList,
       setLoading: setLoading,
     });
   }, [auth.origin]);
@@ -77,16 +63,7 @@ const MidMileInboundDoc = () => {
         <div className="mt-4">
           <MidMileDocInfo docData={data} loading={loading} />
           <hr />
-          <InboundBagTable
-            data={data}
-            bagList={bagList}
-            oldBagList={oldBagList}
-            setBagList={setBagList}
-            setShow={setShow}
-            setRemark={setRemark}
-            setCurrentFocus={setCurrentFocus}
-            loading={loading}
-          />
+          <InboundBagTable bagList={bagList} loading={loading} />
         </div>
         <hr />
         <BagInfo bagList={bagList} />
@@ -144,15 +121,6 @@ const MidMileInboundDoc = () => {
             });
             navigate("/mm");
           }}
-        />
-        <RemarkModal
-          show={show}
-          onHide={() => {
-            setShow(false), setCurrentFocus();
-          }}
-          getvalue={setRemark}
-          getfocus={setCurrentFocus}
-          setvalue={handleSubmitRemark}
         />
       </Container>
     </div>

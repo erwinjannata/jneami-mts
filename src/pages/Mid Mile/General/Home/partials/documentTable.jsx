@@ -16,7 +16,7 @@ const DocumentTable = ({ documents, loading }) => {
     { name: "Status" },
     { name: "Submit Date" },
     { name: "Transport Date" },
-    { name: "Receiving Date" },
+    { name: "Received Date" },
   ];
 
   const routing = (key) => {

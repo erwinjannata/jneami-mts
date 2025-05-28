@@ -18,7 +18,7 @@ import Vendor from "./pages/Last Mile/Vendor";
 import VendorDoc from "./pages/Last Mile/Vendor/doc";
 import AddUser from "./pages/Admin/addUser";
 import MidMileInboundDoc from "./pages/Mid Mile/Admin Inbound/Detail Doc/doc";
-import MidMileCreateDoc from "./pages/Mid Mile/Admin Inbound/Create Doc/create";
+import MidMileCreateDoc from "./pages/Mid Mile/Airport/Create Doc/create";
 import ErrorListPage from "./pages/Admin/errorList";
 import EMPUIndex from "./pages/Mid Mile/Airport/EMPU/empuIndex";
 import EMPUAddData from "./pages/Mid Mile/Airport/EMPU/addData";

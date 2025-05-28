@@ -1,16 +1,12 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
-
-import { useEffect, useState } from "react";
 import { Button, FloatingLabel, Form, Modal } from "react-bootstrap";
 import { handleChange } from "../../../../../components/functions/functions";
+import { useEffect, useState } from "react";
+import firebase from "./../../../../../config/firebase";
+import moment from "moment";
 
-const EditMasterBagModal = ({ show, setShow, index, bagList, setBagList }) => {
-  const [state, setState] = useState({
-    remark: "",
-    sm: "",
-  });
+const EditMasterBagModal = ({ show, setShow, bag, document }) => {
+  const [state, setState] = useState({});
 
   const forms = [
     {
@@ -19,7 +15,31 @@ const EditMasterBagModal = ({ show, setShow, index, bagList, setBagList }) => {
       type: "text",
       as: "input",
       rows: 1,
-      value: state.sm,
+      value: state?.sm || "",
+    },
+    {
+      label: "Master Bag No.",
+      name: "bagNumber",
+      type: "text",
+      as: "input",
+      rows: 1,
+      value: state?.bagNumber || "",
+    },
+    {
+      label: "Koli",
+      name: "koli",
+      type: "number",
+      as: "input",
+      rows: 1,
+      value: state?.koli || "",
+    },
+    {
+      label: "Weight",
+      name: "weight",
+      type: "number",
+      as: "input",
+      rows: 1,
+      value: state?.weight || "",
     },
     {
       label: "Remark",
@@ -27,34 +47,49 @@ const EditMasterBagModal = ({ show, setShow, index, bagList, setBagList }) => {
       type: "text",
       as: "textarea",
       rows: 5,
-      value: state.remark,
+      value: state?.remark || "",
     },
   ];
 
   const handleEdit = () => {
-    setBagList(
-      bagList.map((bag, idx) => {
-        if (idx === index) {
-          return {
-            ...bag,
-            remark: state.remark,
-            sm: state.sm,
-          };
-        } else {
-          return bag;
-        }
+    // Initialize Database Reference
+    // const dbBagRef = firebase.database().ref("midMile/bags");
+    // const dbDocRef = firebase.database().ref("midMile/documents");
+    const dbBagRef = firebase.database().ref("test/midMile/bags");
+    const dbDocRef = firebase.database().ref("test/midMile/documents");
+
+    let docUpdates = {
+      latestUpdate: moment().locale("fr-ca").format("L LT"),
+      totalKoli: document.totalKoli - (bag.koli - state.koli),
+      totalWeight: document.totalWeight - (bag.weight - state.weight),
+    };
+
+    dbBagRef
+      .child(bag.key)
+      .update({
+        bagNumber: state.bagNumber,
+        sm: state.sm,
+        koli: state.koli,
+        weight: state.weight,
+        remark: state.remark,
       })
-    );
-    setShow(false);
+      .then(() => {
+        dbDocRef
+          .child(bag.documentId)
+          .update(docUpdates)
+          .then(() => {
+            alert("Data berhasil diperbarui");
+            setShow(false);
+          });
+      })
+      .catch(() => {
+        alert("Data gagal diperbarui");
+      });
   };
 
   useEffect(() => {
-    setState({
-      ...state,
-      remark: bagList.length > 0 ? bagList[index].remark : "",
-      sm: bagList.length > 0 ? bagList[index].sm : "",
-    });
-  }, [bagList]);
+    setState({ ...bag });
+  }, [bag]);
 
   return (
     <Modal
@@ -63,17 +98,11 @@ const EditMasterBagModal = ({ show, setShow, index, bagList, setBagList }) => {
       backdrop="static"
       show={show}
       onHide={() => {
-        setState({
-          remark: "",
-          sm: "",
-        });
         setShow(false);
       }}
     >
       <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">
-          {bagList.length > 0 ? bagList[index].bagNumber : ""}
-        </Modal.Title>
+        <Modal.Title id="contained-modal-title-vcenter">Edit</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         {forms.map((form, index) => (

@@ -1,5 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -12,7 +12,6 @@ import {
 } from "./partials/functions";
 import { UseAuth } from "../../../../config/authContext";
 import {
-  Alert,
   Button,
   ButtonGroup,
   Container,
@@ -41,7 +40,11 @@ import MidMileDocument from "../../General/Print Component/midMileDocument";
 const MidMileAirportDoc = () => {
   const { key } = useParams();
   const auth = UseAuth();
-  const dbRef = firebase.database().ref("midMile");
+
+  // Initialize Database Reference
+  // const dbRef = firebase.database().ref("midMile");
+  const dbRef = firebase.database().ref("test/midMile");
+
   const contentRef = useRef(null);
   const reactToPrintFn = useReactToPrint({ contentRef });
 
@@ -56,13 +59,12 @@ const MidMileAirportDoc = () => {
   const [showSignatureDriver, setShowSignatureDriver] = useState(false);
   const [currentFocus, setCurrentFocus] = useState();
   const [remark, setRemark] = useState("");
-  const [zerofilled, setZeroFilled] = useState("");
   const [signatureImage, setSignatureImage] = useState("");
   const [gudangBandaraState, setGudangBandaraState] = useState({
     namaPetugas: "",
     signatureImage: "",
   });
-  const [driverState, setDrvierState] = useState({
+  const [driverState, setDriverState] = useState({
     namaPetugas: "",
     signatureImage: "",
   });
@@ -80,27 +82,13 @@ const MidMileAirportDoc = () => {
     });
   };
 
-  const handleSubmitRemark = () => {
-    setBagList(
-      bagList.map((bag, index) => {
-        if (index === currentFocus) {
-          return { ...bag, remark: remark };
-        } else {
-          return bag;
-        }
-      })
-    );
-  };
-
   useEffect(() => {
     fetchData({
       dbRef: dbRef,
       key: key,
       setData: setData,
-      setBagList: setBagList,
-      setOldBagList: setOldBagList,
       setLoading: setLoading,
-      setZeroFilled: setZeroFilled,
+      setBagList: setBagList,
     });
   }, [auth.origin]);
   return (
@@ -137,9 +125,9 @@ const MidMileAirportDoc = () => {
                     handleRcc({
                       state: state,
                       bagList: bagList,
+                      documentData: data,
                       inputRef: inputRef,
                       setState: setState,
-                      setBagList: setBagList,
                     })
                   }
                 >
@@ -201,7 +189,7 @@ const MidMileAirportDoc = () => {
                 });
               }}
             >
-              {data.status === "Submitted" ? "Approve" : "Update"}
+              Approve
             </Button>
             <Button
               variant="outline-success"
@@ -257,11 +245,10 @@ const MidMileAirportDoc = () => {
           </div>
         </div>
         <EditMasterBagModal
-          index={currentFocus}
-          bagList={currentFocus !== undefined ? bagList : []}
-          setBagList={setBagList}
+          bag={bagList[currentFocus]}
           show={show}
           setShow={setShow}
+          document={data}
         />
         <SignatureModal
           userText="Petugas EMPU"
@@ -286,7 +273,7 @@ const MidMileAirportDoc = () => {
           show={showSignatureDriver}
           setShow={setShowSignatureDriver}
           state={driverState}
-          setState={setDrvierState}
+          setState={setDriverState}
           nextStep={() => {
             handleTransport({
               documentKey: key,
@@ -297,7 +284,7 @@ const MidMileAirportDoc = () => {
           }}
         />
         <SignatureModalWithName
-          userText="Petugas Bandara"
+          userText="Checker Bandara"
           show={showSignatureGudang}
           setShow={setShowSignatureGudang}
           state={gudangBandaraState}
@@ -305,13 +292,9 @@ const MidMileAirportDoc = () => {
           nextStep={() => setShowSignatureAirport(true)}
         />
         <AddBagModal
-          bagList={bagList}
-          setBagList={setBagList}
-          oldBagList={oldBagList}
-          setOldBagList={setOldBagList}
           show={showAddBag}
           setShow={setShowAddBag}
-          documentId={key}
+          document={data}
         />
       </Container>
     </div>

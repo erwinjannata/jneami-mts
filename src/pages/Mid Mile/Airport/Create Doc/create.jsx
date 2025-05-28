@@ -12,7 +12,6 @@ import {
 import NavMenu from "../../../../components/partials/navbarMenu";
 import BagTable from "./partials/bagTable";
 import DocInfo from "./partials/docInfo";
-import SignatureModal from "../../../../components/partials/signatureModal";
 
 const MidMileCreateDoc = () => {
   const auth = UseAuth();
@@ -20,10 +19,8 @@ const MidMileCreateDoc = () => {
   const [file, setFile] = useState();
   const [docNumber, setDocNumber] = useState("");
   const [storageNumber, setStorageNumber] = useState("");
-  const [signatureImage, setSignatureImage] = useState("");
   const [collectionLength, setCollectionLength] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [show, setShow] = useState(false);
   const [bagList, setBagList] = useState([]);
 
   useEffect(() => {
@@ -34,7 +31,7 @@ const MidMileCreateDoc = () => {
     });
   }, []);
 
-  const handleApprove = () => {
+  const handleApprove = async () => {
     if (docNumber === "") {
       alert(
         "Nomor dokumen tidak valid, silahkan refresh halaman atau login kembali"
@@ -46,7 +43,14 @@ const MidMileCreateDoc = () => {
     } else if (bagList.length === 0) {
       alert("Tidak ada data bag");
     } else {
-      setShow(true);
+      approveDoc({
+        userInfo: auth.name,
+        docNumber: docNumber,
+        storageNumber: storageNumber,
+        bagList: bagList,
+        setLoading: setLoading,
+        collectionLength: collectionLength,
+      });
     }
   };
 
@@ -96,24 +100,6 @@ const MidMileCreateDoc = () => {
             Approve
           </Button>
         </div>
-        <SignatureModal
-          userText="Petugas EMPU"
-          show={show}
-          onHide={() => setShow(false)}
-          onChange={setSignatureImage}
-          onSubmit={async () => {
-            await approveDoc({
-              signatureImage: signatureImage,
-              userInfo: auth.name,
-              docNumber: docNumber,
-              storageNumber: storageNumber,
-              bagList: bagList,
-              setLoading: setLoading,
-              collectionLength: collectionLength,
-            });
-            navigate("/mm");
-          }}
-        />
       </Container>
     </div>
   );

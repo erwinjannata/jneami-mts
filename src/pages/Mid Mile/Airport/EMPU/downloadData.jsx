@@ -31,6 +31,8 @@ const EMPUDownloadData = () => {
 
   const fetchData = () => {
     setLoading(true);
+
+    // Initialize Database Reference
     const dbRef = firebase
       .database()
       // Test Env

@@ -21,6 +21,8 @@ import "react-datepicker/dist/react-datepicker.css";
 
 function UnreceivedPage() {
   const d = new Date();
+
+  // Initialize Database Reference
   const dbRef = firebase.database().ref("manifestTransit");
 
   const [isLoading, setisLoading] = useState(false);

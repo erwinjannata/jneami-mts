@@ -14,7 +14,10 @@ const MidMileDocInfo = ({ docData, loading }) => {
       },
     ],
     [
-      { label: `Approved By: `, value: docData.airportUser },
+      {
+        label: `Approved By: `,
+        value: docData.airportUser === undefined ? "-" : docData.airportUser,
+      },
       {
         label: `Approve Date: `,
         value:
@@ -29,13 +32,11 @@ const MidMileDocInfo = ({ docData, loading }) => {
       { label: `Current Status: `, value: docData.status },
       {
         label:
-          docData.status === "Received"
-            ? `Received Date: `
-            : `Lastest Update: `,
+          docData.status === "Received" ? `Received Date: ` : `Latest Update: `,
         value:
-          docData.latestUpdateDate === undefined
+          docData.latestUpdate === ""
             ? "-"
-            : moment(Date.parse(docData.latestUpdateDate))
+            : moment(Date.parse(docData.latestUpdate))
                 .locale("en-sg")
                 .format("LLL"),
       },

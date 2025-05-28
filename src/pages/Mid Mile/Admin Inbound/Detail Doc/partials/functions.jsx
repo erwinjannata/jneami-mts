@@ -8,51 +8,6 @@ import {
   getDownloadURL,
 } from "firebase/storage";
 
-export const handleReceive = ({ index, bagList, setBagList }) => {
-  setBagList(
-    bagList.map((bag, idx) => {
-      if (idx === index && bag.statusBag === "Dalam Perjalanan") {
-        return {
-          ...bag,
-          statusBag: "Received",
-        };
-      } else {
-        return bag;
-      }
-    })
-  );
-};
-
-export const handleUnreceive = ({ index, bagList, setBagList }) => {
-  setBagList(
-    bagList.map((bag, idx) => {
-      if (idx === index && bag.statusBag === "Dalam Perjalanan") {
-        return {
-          ...bag,
-          statusBag: "Unreceived",
-        };
-      } else {
-        return bag;
-      }
-    })
-  );
-};
-
-export const handleCancel = ({ index, bagList, oldBagList, setBagList }) => {
-  setBagList(
-    bagList.map((bag, idx) => {
-      if (idx === index) {
-        return {
-          ...bag,
-          statusBag: `${oldBagList[index].statusBag}`,
-        };
-      } else {
-        return bag;
-      }
-    })
-  );
-};
-
 export const handleApprove = async ({
   docKey,
   bagList,
@@ -61,36 +16,40 @@ export const handleApprove = async ({
   signatureImage,
 }) => {
   if (confirm("Konfirmasi approve?") === true) {
-    // Get current DateTime
-    const d = new Date();
-    const time = moment(d).locale("en-sg").format("LT");
-    const date = moment(d).locale("en-ca").format("L");
+    // Filter Bag List from already Received Bags
+    const unreceivedBags = bagList.filter(
+      (bag) => "Received" !== bag.statusBag
+    );
 
     // Check if all bag is already Received
-    const isAllReceived = bagList.every((bag) => bag.statusBag === "Received");
-    // Check if there is a bag has "Dalam Perjalanan" status
-    const isTransporting = bagList.some(
-      (bag) => "Dalam Perjalanan" === bag.statusBag
+    const isAllTransporting = unreceivedBags.every(
+      (bag) => bag.statusBag === "Dalam Perjalanan"
     );
+
     // Check for "Missing" bag
-    const isMissing = bagList.some((bag) => "Missing" === bag.statusBag);
+    const isMissing = unreceivedBags.some((bag) => "Missing" === bag.statusBag);
+
+    // Check for "Standby" bag
+    const isStandby = unreceivedBags.some((bag) => "Standby" === bag.statusBag);
 
     // Set Document Status
     let finalStatus = "";
-    if (isAllReceived) {
+    if (isAllTransporting) {
       finalStatus = "Received";
     } else if (isMissing) {
       finalStatus = "Received*";
-    } else if (isTransporting) {
-      finalStatus = "Dalam Perjalanan";
-    } else {
-      finalStatus = "Ongoing";
+    } else if (isStandby) {
+      finalStatus = "Standby";
     }
 
     try {
       // Database Reference
-      const dbDocRef = firebase.database().ref(`midMile/documents/${docKey}`);
-      const dbBagRef = firebase.database().ref("midMile/bags");
+      // const dbDocRef = firebase.database().ref(`midMile/documents/${docKey}`);
+      // const dbBagRef = firebase.database().ref("midMile/bags");
+      const dbDocRef = firebase
+        .database()
+        .ref(`test/midMile/documents/${docKey}`);
+      const dbBagRef = firebase.database().ref("test/midMile/bags");
 
       // Initiate Firebase Storage
       const storage = getStorage();
@@ -101,7 +60,8 @@ export const handleApprove = async ({
       // For Petugas Airport
       const storageRef = ref(
         storage,
-        `midMile/signatures/${docKey}/inboundStation.png`
+        // `midMile/signatures/${docKey}/inboundStation.png`
+        `test/midMile/signatures/${docKey}/inboundStation.png`
       );
 
       // Upload Signature to Storage
@@ -109,29 +69,31 @@ export const handleApprove = async ({
         (snapshot) => {
           getDownloadURL(snapshot.ref).then(async (url) => {
             // Update Document Details
-            await dbDocRef
-              .update({
+            let docUpdates = {
+              receivedDate: moment().locale("fr-ca").format("L LT"),
+              latestUpdate: moment().locale("fr-ca").format("L LT"),
+              inboundUser: inboundUser,
+              inboundSign: url,
+            };
+
+            if (finalStatus !== "") {
+              docUpdates = {
+                ...docUpdates,
                 status: finalStatus,
-                receivedDate: `${date} ${time}`,
-                latestUpdateDate: `${date} ${time}`,
-                inboundUser: inboundUser,
-                inboundSign: url,
-              })
-              .then(async () => {
-                // Update Bag Details
-                await bagList.forEach((bag) => {
-                  const { key, ...rest } = bag;
-                  if (
-                    bag.statusBag === "Received" ||
-                    bag.statusBag === "Unreceived"
-                  ) {
-                    dbBagRef.child(bag.key).update({
-                      ...rest,
-                    });
-                  }
-                });
-                alert("Berhasil approve");
+              };
+            }
+
+            await dbDocRef.update(docUpdates).then(async () => {
+              // Update Bag Details
+              await bagList.forEach((bag) => {
+                if (bag.statusBag === "Dalam Perjalanan") {
+                  dbBagRef.child(bag.key).update({
+                    statusBag: "Received",
+                  });
+                }
               });
+              alert("Berhasil approve");
+            });
           });
         }
       );

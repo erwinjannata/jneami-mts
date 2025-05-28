@@ -15,9 +15,7 @@ const MidMileDocument = ({ data, bagList }) => {
       };
     }
 
-    for (let index = 0; index < bag.koli; index++) {
-      acc[bag.sm].bagNumbers.push(`${bag.bagNumber}/${bag.weight}`);
-    }
+    acc[bag.sm].bagNumbers.push(`${bag.bagNumber}/${bag.weight}`);
     acc[bag.sm].totalKoli += parseInt(bag.koli);
     return acc;
   }, {});

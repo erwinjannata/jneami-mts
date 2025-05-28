@@ -30,6 +30,7 @@ const EMPUFindData = () => {
     if (state.awb === "") {
       alert("AWB kosong");
     } else {
+      // Initialize Database Reference
       const dbRef = firebase.database().ref(state.data);
 
       setLoading(true);

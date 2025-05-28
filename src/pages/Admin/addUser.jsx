@@ -9,7 +9,10 @@ import { cabangList } from "../../components/data/branchList";
 
 export default function AddUser() {
   const auth = UseAuth();
+
+  // Initialize Database Reference
   const dbRef = firebase.database();
+
   let navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [creds, setCreds] = useState({

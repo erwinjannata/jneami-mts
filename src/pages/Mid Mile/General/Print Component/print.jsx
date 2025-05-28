@@ -7,12 +7,10 @@ import { UseAuth } from "../../../../config/authContext";
 
 const MidMilePrintContent = ({ data }) => {
   const auth = UseAuth();
-  const d = new Date();
-  const date = moment(d).locale("en-sg").format("LLL");
+  const date = moment(new Date()).locale("en-sg").format("LLL");
 
   const tableContent = [
     { label: "Document No.", value: data.documentNumber },
-    { label: "QTY", value: `${data.totalPcs} Pcs` },
     { label: "Koli", value: `${data.totalKoli} Koli` },
     { label: "Weight", value: `${data.totalWeight} Kg` },
     {
@@ -55,28 +53,32 @@ const MidMilePrintContent = ({ data }) => {
         style={{
           borderBottom: "2px solid black",
           borderTop: "2px solid black",
-          paddingTop: "10px",
+          paddingTop: "8px",
         }}
       >
-        {tableContent.map((content, index) => (
-          <Row key={index} style={{ fontSize: "11px" }}>
-            <Col>
-              <p>{content.label}</p>
-            </Col>
-            <Col>
-              {index === 0 ? (
-                <p>
-                  {`: `}
-                  <strong>{`${content.value}`}</strong>
-                </p>
-              ) : (
-                <p>{`: ${content.value}`}</p>
-              )}
-            </Col>
-          </Row>
-        ))}
+        <Table borderless size="sm">
+          <tbody>
+            {tableContent.map((content, index) => (
+              <tr key={index} style={{ fontSize: "11px" }}>
+                <td>
+                  <p>{content.label}</p>
+                </td>
+                <td>
+                  {index === 0 ? (
+                    <p>
+                      {`: `}
+                      <strong>{`${content.value}`}</strong>
+                    </p>
+                  ) : (
+                    <p>{`: ${content.value}`}</p>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
       </div>
-      <Table borderless size="sm" style={{ fontSize: "10px" }}>
+      <Table borderless size="sm" style={{ fontSize: "8px" }}>
         <tbody>
           <tr>
             <td>{auth.name}</td>

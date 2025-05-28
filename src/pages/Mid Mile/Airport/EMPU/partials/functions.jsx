@@ -121,6 +121,7 @@ export const submitInboundData = ({ state, setLoading, doAfter }) => {
     const time = moment(d).locale("en-sg").format("LT");
     const date = moment(d).locale("en-ca").format("L");
 
+    // Initialize Database Reference
     // Test Env
     // const dbRef = firebase.database().ref("test/empu/inbound");
 
