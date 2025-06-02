@@ -1,10 +1,3 @@
-/* eslint-disable no-unused-vars */
-import {
-  ref,
-  getStorage,
-  uploadString,
-  getDownloadURL,
-} from "firebase/storage";
 import firebase from "../../../../../config/firebase";
 import * as XLSX from "xlsx";
 import moment from "moment";
@@ -90,6 +83,7 @@ export const approveDoc = async ({
   docNumber,
   collectionLength,
   setLoading,
+  onSuccess,
 }) => {
   if (confirm("Konfirmasi approve?") === true) {
     setLoading(true);
@@ -105,15 +99,6 @@ export const approveDoc = async ({
       .ref("test/status/midMileCollectionLength");
 
     const keyReference = dbDocRef.push().key;
-    const storage = getStorage();
-    const metadata = {
-      contentType: "image/png",
-    };
-    const storageRef = ref(
-      storage,
-      // `midMile/signatures/${keyReference}/submittedSignature.png`
-      `test/midMile/signatures/${keyReference}/submittedSignature.png`
-    );
 
     try {
       // Check if every bag is already submitted
@@ -180,7 +165,7 @@ export const approveDoc = async ({
         .then(() => {
           collectionLengthRef.set(collectionLength);
           setLoading(false);
-          alert("Data berhasil disimpan");
+          onSuccess;
         })
         .catch(() => {
           setLoading(false);

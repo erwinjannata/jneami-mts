@@ -40,75 +40,124 @@ export const fetchData = ({ dbRef, key, setLoading, setData, setBagList }) => {
 };
 
 // Handle Received button click
-export const handleAction = ({ bag, doc, statusBag }) => {
-  // Initialize Database Reference
-  // const dbBagRef = firebase.database().ref("midMile/bags");
-  // const dbDocRef = firebase.database().ref("midMile/documents");
-  const dbBagRef = firebase.database().ref("test/midMile/bags");
-  const dbDocRef = firebase.database().ref("test/midMile/documents");
-
-  let docUpdate = {
-    latestUpdate: moment().locale("fr-ca").format("L LT"),
-  };
-
-  if (doc.status === "Submitted" && statusBag !== "Missing") {
-    docUpdate = {
-      ...docUpdate,
-      status: "Standby",
-    };
-  }
-
-  // Update bag status to "Standby"
-  if (bag.statusBag === "Submitted") {
-    dbBagRef
-      .child(bag.key)
-      .update({
-        statusBag: statusBag,
-        receivedDate: moment().locale("fr-ca").format("L LT"),
-      })
-      .then(() => {
-        dbDocRef
-          .child(bag.documentId)
-          .update(docUpdate)
-          .then(() => {
-            alert("Bag telah dikonfirmasi");
-          });
-      });
+export const handleAction = async ({
+  state,
+  setState,
+  document,
+  statusBag,
+  bagList,
+  setToast,
+}) => {
+  if (state.searched === "") {
+    setToast({
+      show: true,
+      header: "Warning",
+      message: "Nomor bag kosong",
+    });
   } else {
-    return (
-      <Toast>
-        <Toast.Header>
-          <img src="holder.js/20x20?text=%20" className="rounded me-2" alt="" />
-          <strong className="me-auto">Bootstrap</strong>
-          <small>11 mins ago</small>
-        </Toast.Header>
-        <Toast.Body>Hello, world! This is a toast message.</Toast.Body>
-      </Toast>
-    );
+    const found = bagList.find((bag) => bag.bagNumber === state.searched);
+    if (found) {
+      // Initialize Database Reference
+      const dbBagRef = firebase.database().ref("midMile/bags");
+      const dbDocRef = firebase.database().ref("midMile/documents");
+      // const dbBagRef = firebase.database().ref("test/midMile/bags");
+      // const dbDocRef = firebase.database().ref("test/midMile/documents");
+
+      let docUpdate = {
+        latestUpdate: moment().locale("fr-ca").format("L LT"),
+      };
+
+      if (document.status === "Submitted" && statusBag !== "Missing") {
+        docUpdate = {
+          ...docUpdate,
+          status: "Standby",
+        };
+      }
+
+      // Update bag status to "Standby"
+      if (found.statusBag === "Submitted") {
+        await dbBagRef
+          .child(found.key)
+          .update({
+            statusBag: statusBag,
+            receivingDate: moment().locale("fr-ca").format("L LT"),
+          })
+          .then(() => {
+            dbDocRef
+              .child(found.documentId)
+              .update(docUpdate)
+              .then(() => {
+                if (setToast)
+                  setToast({
+                    show: true,
+                    header: "Info",
+                    message:
+                      statusBag === "Standby"
+                        ? `Bag ${found.bagNumber} berhasil di Receiving`
+                        : `Bag ${found.bagNumber} dikonfirmasi Missing`,
+                  });
+              });
+          });
+      } else {
+        if (setToast)
+          setToast({
+            show: true,
+            header: "Warning",
+            message: "Bag sudah di Receiving",
+          });
+      }
+      setState({
+        ...state,
+        searched: "",
+      });
+    } else {
+      if (setToast)
+        setToast({
+          show: true,
+          header: "Warning",
+          message: "Bag tidak ditemukan",
+        });
+    }
   }
 };
 
 // Handles Remark button click
 export const handleEdit = async ({
-  index,
+  state,
+  bagList,
+  show,
   setShow,
   setCurrentFocus,
-  setRemark,
 }) => {
-  await setCurrentFocus(index);
-  await setRemark("");
-  setShow(true);
+  if (state.searched === "") {
+    alert("No. Bag kosong!");
+  } else {
+    const found = bagList.find((bag) => bag.bagNumber === state.searched);
+    if (found) {
+      const index = bagList.findIndex((bag) => bag.key === found.key);
+      await setCurrentFocus(index);
+      setShow({
+        ...show,
+        editBag: true,
+      });
+    } else {
+      alert("Bag tidak ditemukan!");
+    }
+  }
 };
 
 // Handle Approve button click
-export const handleApprove = ({ user, bagList, setShow }) => {
+export const handleApprove = ({ user, bagList, show, setShow }) => {
   const isAllStandby = bagList.every((bag) => bag.statusBag === "Submitted");
   if (isAllStandby) {
     alert("Bag belum dikonfirmasi oleh tim Admin Airport");
   } else if (user === "") {
     alert("User tidak terbaca, silahkan refresh halaman atau login ulang");
   } else {
-    setShow(true);
+    setShow({
+      ...show,
+      checkerSignature: true,
+    });
   }
 };
 
@@ -120,6 +169,8 @@ export const updateData = async ({
   signatureImage,
   stateGudang,
   setLoading,
+  setToast,
+  onHide,
 }) => {
   if (signatureImage === "") {
     alert("Tanda tangan invalid");
@@ -187,8 +238,13 @@ export const updateData = async ({
                   .child(documentKey)
                   .update(updates)
                   .then(() => {
-                    alert("Approved");
                     setLoading(false);
+                    onHide();
+                    setToast({
+                      show: true,
+                      header: "Info",
+                      message: "Berhasil approve dokumen",
+                    });
                   });
               });
             });
@@ -208,16 +264,17 @@ export const handleTransport = async ({
   bagList,
   setLoading,
   driverState,
+  setToast,
 }) => {
   if (driverState.signatureImage === "") {
     alert("Tanda tangan invalid");
   } else {
     if (confirm("Konfirmasi proses?") === true) {
       // Initialize Database Reference
-      // const dbDocRef = firebase.database().ref("midMile/documents");
-      // const dbBagRef = firebase.database().ref("midMile/bags");
-      const dbDocRef = firebase.database().ref("test/midMile/documents");
-      const dbBagRef = firebase.database().ref("test/midMile/bags");
+      const dbBagRef = firebase.database().ref("midMile/bags");
+      const dbDocRef = firebase.database().ref("midMile/documents");
+      // const dbBagRef = firebase.database().ref("test/midMile/bags");
+      // const dbDocRef = firebase.database().ref("test/midMile/documents");
       const storage = getStorage();
       const metadata = {
         contentType: "image/png",
@@ -256,6 +313,13 @@ export const handleTransport = async ({
                     });
                   }
                 });
+                if (setToast) {
+                  setToast({
+                    show: true,
+                    header: "Info",
+                    message: "Berhasil update data dokumen",
+                  });
+                }
               });
           });
         });
@@ -266,68 +330,46 @@ export const handleTransport = async ({
   }
 };
 
-export const handleRcc = ({
-  state,
-  documentData,
+export const onTransportClick = ({
+  document,
   bagList,
-  setState,
-  inputRef,
-}) => {
-  if (state.searched === "") {
-    alert("No. Bag kosong!");
-  } else {
-    const found = bagList.find((bag) => bag.bagNumber === state.searched);
-    if (found) {
-      const findIndex = bagList.findIndex((bag) => bag.key === found.key);
-      handleAction({
-        bag: bagList[findIndex],
-        doc: documentData,
-        statusBag: "Standby",
-      });
-      setState({
-        ...state,
-        searched: "",
-      });
-      inputRef.current.focus();
-    } else {
-      alert("Bag tidak ditemukan!");
-    }
-  }
-};
-
-export const handleRmrk = ({
-  state,
-  bagList,
+  show,
   setShow,
-  setRemark,
-  setCurrentFocus,
-  inputRef,
+  setToast,
 }) => {
-  if (state.searched === "") {
-    alert("No. Bag kosong!");
-  } else {
-    const found = bagList.find((bag) => bag.bagNumber === state.searched);
-    if (found) {
-      const findIndex = bagList.findIndex((bag) => bag.key === found.key);
-      handleEdit({
-        index: findIndex,
-        setShow: setShow,
-        setRemark: setRemark,
-        setCurrentFocus: setCurrentFocus,
-      });
-      inputRef.current.focus();
-    } else {
-      alert("Bag tidak ditemukan!");
-    }
-  }
-};
+  const isAllOnTransport = bagList.every(
+    (bag) => bag.statusBag === "Dalam Perjalanan"
+  );
+  const isAllNotStandby = bagList.every((bag) => bag.statusBag === "Submitted");
 
-export const handleRemoveNewBag = ({ bagNo, setBagList }) => {
-  if (confirm("Hapus bag?") === true) {
-    setBagList((current) =>
-      current.filter((number) => {
-        return number.bagNumber !== bagNo;
-      })
-    );
+  if (document.status === "Submitted") {
+    setToast({
+      show: true,
+      header: "Warning",
+      message: "Semua bag belum dikonfirmasi oleh petugas EMPU",
+    });
+  } else if (document.approvedDate === undefined) {
+    setToast({
+      show: true,
+      header: "Warning",
+      message: "Dokumen belum di approve oleh Petugas EMPU",
+    });
+  } else if (isAllOnTransport) {
+    setToast({
+      show: true,
+      header: "Warning",
+      message: "Semua bag sedang dalam proses transport menuju Inbound Station",
+    });
+  } else if (isAllNotStandby) {
+    setToast({
+      show: true,
+      header: "Warning",
+      message: "Semua bag belum dikonfirmasi oleh petugas EMPU",
+    });
+  } else {
+    setShow({
+      ...show,
+      driverSignature: true,
+    });
   }
 };

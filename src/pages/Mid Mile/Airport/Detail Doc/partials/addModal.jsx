@@ -5,7 +5,7 @@ import { handleChange } from "../../../../../components/functions/functions";
 import firebase from "./../../../../../config/firebase";
 import moment from "moment";
 
-const AddBagModal = ({ show, setShow, document }) => {
+const AddBagModal = ({ show, onHide, document, setToast }) => {
   const [state, setState] = useState({});
 
   const forms = [
@@ -25,10 +25,10 @@ const AddBagModal = ({ show, setShow, document }) => {
       alert("Berat bag invalid!");
     } else {
       // Initialize Database Reference
-      // const dbRef = firebase.database().ref("midMile/bags");
-      // const dbDocRef = firebase.database().ref("midMile/documents");
-      const dbBagRef = firebase.database().ref("test/midMile/bags");
-      const dbDocRef = firebase.database().ref("test/midMile/documents");
+      const dbBagRef = firebase.database().ref("midMile/bags");
+      const dbDocRef = firebase.database().ref("midMile/documents");
+      // const dbBagRef = firebase.database().ref("test/midMile/bags");
+      // const dbDocRef = firebase.database().ref("test/midMile/documents");
 
       let docUpdates = {
         latestUpdate: moment().locale("fr-ca").format("L LT"),
@@ -53,16 +53,29 @@ const AddBagModal = ({ show, setShow, document }) => {
           remark: state.remark === undefined ? "" : state.remark,
           statusBag: "Standby",
           documentId: document.key,
-          receivedDate: moment().locale("fr-ca").format("L LT"),
+          receivingDate: moment().locale("fr-ca").format("L LT"),
         })
         .then(() => {
           dbDocRef
             .child(document.key)
             .update(docUpdates)
             .then(() => {
-              alert("Data bag berhasil disimpan");
+              if (setToast)
+                setToast({
+                  show: true,
+                  header: "Info",
+                  message: "Data bag ditambahkan",
+                });
               setState({});
-              setShow(false);
+              onHide();
+            });
+        })
+        .catch(() => {
+          if (setToast)
+            setToast({
+              show: true,
+              header: "Warning",
+              message: "Gagal upload data bag",
             });
         });
     }
@@ -76,7 +89,7 @@ const AddBagModal = ({ show, setShow, document }) => {
       show={show}
       onHide={() => {
         setState({});
-        setShow(false);
+        onHide();
       }}
     >
       <Modal.Header closeButton>

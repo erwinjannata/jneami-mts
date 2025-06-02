@@ -8,7 +8,7 @@ import {
   DropdownButton,
   Row,
 } from "react-bootstrap";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { UseAuth } from "../../../../config/authContext";
 import { useEffect, useRef, useState } from "react";
 import { fetchData } from "../../Airport/Detail Doc/partials/functions";
@@ -25,15 +25,15 @@ import MidMilePrintContent from "../../General/Print Component/print";
 import SignatureModal from "../../../../components/partials/signatureModal";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import MidMileDocument from "../../General/Print Component/midMileDocument";
+import ToastWarning from "../../../../components/partials/toastWarning";
 
 const MidMileInboundDoc = () => {
   const { key } = useParams();
   const auth = UseAuth();
-  const navigate = useNavigate();
 
   // Initialize Database Reference
-  // const dbRef = firebase.database().ref("midMile");
-  const dbRef = firebase.database().ref("test/midMile");
+  const dbRef = firebase.database().ref("midMile");
+  // const dbRef = firebase.database().ref("test/midMile");
 
   const contentRef = useRef(null);
   const reactToPrintFn = useReactToPrint({ contentRef });
@@ -41,8 +41,15 @@ const MidMileInboundDoc = () => {
   const [data, setData] = useState([]);
   const [bagList, setBagList] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [showSignatureModal, setShowSignatureModal] = useState(false);
   const [signatureImage, setSignatureImage] = useState("");
+  const [show, setShow] = useState({
+    inboundSignature: false,
+  });
+  const [toast, setToast] = useState({
+    show: false,
+    header: "",
+    message: "",
+  });
 
   useEffect(() => {
     fetchData({
@@ -74,7 +81,7 @@ const MidMileInboundDoc = () => {
               <Button
                 variant="primary"
                 className="me-2"
-                onClick={() => setShowSignatureModal(true)}
+                onClick={() => setShow({ ...show, inboundSignature: true })}
               >
                 Approve
               </Button>
@@ -107,22 +114,23 @@ const MidMileInboundDoc = () => {
           </div>
         </div>
         <SignatureModal
-          show={showSignatureModal}
+          show={show.inboundSignature}
           userText="Inbound Station"
-          onHide={() => setShowSignatureModal(false)}
+          onHide={() => setShow({ ...show, inboundSignature: false })}
           onChange={setSignatureImage}
-          onSubmit={async () => {
-            await handleApprove({
+          onSubmit={() => {
+            handleApprove({
               docKey: key,
               bagList: bagList,
               setLoading: setLoading,
               inboundUser: auth.name,
               signatureImage: signatureImage,
+              setToast: setToast,
             });
-            navigate("/mm");
           }}
         />
       </Container>
+      <ToastWarning toast={toast} setToast={setToast} />
     </div>
   );
 };

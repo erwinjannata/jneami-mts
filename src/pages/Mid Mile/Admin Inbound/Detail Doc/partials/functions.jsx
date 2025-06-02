@@ -14,6 +14,7 @@ export const handleApprove = async ({
   setLoading,
   inboundUser,
   signatureImage,
+  setToast,
 }) => {
   if (confirm("Konfirmasi approve?") === true) {
     // Filter Bag List from already Received Bags
@@ -30,6 +31,11 @@ export const handleApprove = async ({
     const isMissing = unreceivedBags.some((bag) => "Missing" === bag.statusBag);
 
     // Check for "Standby" bag
+    const isSubmitted = unreceivedBags.some(
+      (bag) => "Submitted" === bag.statusBag
+    );
+
+    // Check for "Standby" bag
     const isStandby = unreceivedBags.some((bag) => "Standby" === bag.statusBag);
 
     // Set Document Status
@@ -40,6 +46,8 @@ export const handleApprove = async ({
       finalStatus = "Received*";
     } else if (isStandby) {
       finalStatus = "Standby";
+    } else if (isSubmitted) {
+      finalStatus = "Ongoing";
     }
 
     try {
@@ -92,7 +100,12 @@ export const handleApprove = async ({
                   });
                 }
               });
-              alert("Berhasil approve");
+              setLoading(false);
+              setToast({
+                show: true,
+                header: "Info",
+                message: "Berhasil approve dokumen",
+              });
             });
           });
         }

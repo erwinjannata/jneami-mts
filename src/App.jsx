@@ -26,132 +26,154 @@ import EMPUCustomersList from "./pages/Mid Mile/Airport/EMPU/customersList";
 import EMPUFindData from "./pages/Mid Mile/Airport/EMPU/findData";
 import EMPUDownloadData from "./pages/Mid Mile/Airport/EMPU/downloadData";
 import EMPUConfirm from "./pages/Mid Mile/Airport/EMPU/confirm";
+import PenarikanMidMile from "./pages/Mid Mile/General/Penarikan Data/penarikan";
 
 function App() {
   const protectedRoute = [
-    // Last Mile
     {
-      name: "Home",
-      path: "/",
-      element: <Home />,
+      menu: "Last Mile",
+      submenus: [
+        {
+          name: "Home",
+          path: "/",
+          element: <Home />,
+        },
+        {
+          name: "Create Document",
+          path: "/create",
+          element: <CreateDoc />,
+        },
+        {
+          name: "Document Detail (Read Only)",
+          path: "/d/:key",
+          element: <Doc />,
+        },
+        {
+          name: "Document Detail (Origin)",
+          path: "/or/d/:key",
+          element: <OriginDoc />,
+        },
+        {
+          name: "Document Detail (Destination)",
+          path: "/ds/d/:key",
+          element: <DestinationDoc />,
+        },
+        {
+          name: "Unreceived",
+          path: "/unreceived",
+          element: <UnreceivedPage />,
+        },
+        {
+          name: "Penarikan Data",
+          path: "/get",
+          element: <Penarikan />,
+        },
+        {
+          name: "Cari Bag",
+          path: "/find",
+          element: <FindManifestNumber />,
+        },
+      ],
     },
     {
-      name: "Create Document",
-      path: "/create",
-      element: <CreateDoc />,
+      menu: "Mid Mile",
+      submenus: [
+        {
+          name: "Home",
+          path: "/mm",
+          element: <AirportHomePage />,
+        },
+        {
+          name: "Create Document",
+          path: "/mm/create",
+          element: <MidMileCreateDoc />,
+        },
+        {
+          name: "Document Detail (Airport)",
+          path: "/mm/a/d/:key",
+          element: <MidMileDoc />,
+        },
+        {
+          name: "Document Detail (Inbound)",
+          path: "/mm/i/d/:key",
+          element: <MidMileInboundDoc />,
+        },
+        {
+          name: "Find Bag",
+          path: "/mm/find",
+          element: <MidMileFindBag />,
+        },
+        {
+          name: "Penarikan Data",
+          path: "/mm/download",
+          element: <PenarikanMidMile />,
+        },
+      ],
     },
     {
-      name: "Document Detail (Read Only)",
-      path: "/d/:key",
-      element: <Doc />,
+      menu: "EMPU",
+      submenus: [
+        {
+          name: "EMPU Index",
+          path: "/empu",
+          element: <EMPUIndex />,
+        },
+        {
+          name: "EMPU Add Data",
+          path: "/empu/add",
+          element: <EMPUAddData />,
+        },
+        {
+          name: "EMPU Customers List",
+          path: "/empu/customers",
+          element: <EMPUCustomersList />,
+        },
+        {
+          name: "EMPU Find Transaction",
+          path: "/empu/find",
+          element: <EMPUFindData />,
+        },
+        {
+          name: "EMPU Konfirmasi Credit",
+          path: "/empu/confirm",
+          element: <EMPUConfirm />,
+        },
+        {
+          name: "EMPU Download Data",
+          path: "/empu/get",
+          element: <EMPUDownloadData />,
+        },
+      ],
     },
     {
-      name: "Document Detail (Origin)",
-      path: "/or/d/:key",
-      element: <OriginDoc />,
+      menu: "Vendor",
+      submenus: [
+        {
+          name: "Home",
+          path: "/v",
+          element: <Vendor />,
+        },
+        {
+          name: "Document Detail (Vendor)",
+          path: "/v/d/:key",
+          element: <VendorDoc />,
+        },
+      ],
     },
     {
-      name: "Document Detail (Destination)",
-      path: "/ds/d/:key",
-      element: <DestinationDoc />,
-    },
-    {
-      name: "Unreceived",
-      path: "/unreceived",
-      element: <UnreceivedPage />,
-    },
-    {
-      name: "Penarikan Data",
-      path: "/get",
-      element: <Penarikan />,
-    },
-    {
-      name: "Cari Bag",
-      path: "/find",
-      element: <FindManifestNumber />,
-    },
-
-    // Mid Mile
-    {
-      name: "Home",
-      path: "/mm",
-      element: <AirportHomePage />,
-    },
-    {
-      name: "Create Document",
-      path: "/mm/create",
-      element: <MidMileCreateDoc />,
-    },
-    {
-      name: "Document Detail (Airport)",
-      path: "/mm/a/d/:key",
-      element: <MidMileDoc />,
-    },
-    {
-      name: "Document Detail (Inbound)",
-      path: "/mm/i/d/:key",
-      element: <MidMileInboundDoc />,
-    },
-    {
-      name: "Find Bag",
-      path: "/mm/find",
-      element: <MidMileFindBag />,
-    },
-
-    // EMPU
-    {
-      name: "EMPU Index",
-      path: "/empu",
-      element: <EMPUIndex />,
-    },
-    {
-      name: "EMPU Add Data",
-      path: "/empu/add",
-      element: <EMPUAddData />,
-    },
-    {
-      name: "EMPU Customers List",
-      path: "/empu/customers",
-      element: <EMPUCustomersList />,
-    },
-    {
-      name: "EMPU Find Transaction",
-      path: "/empu/find",
-      element: <EMPUFindData />,
-    },
-    {
-      name: "EMPU Konfirmasi Credit",
-      path: "/empu/confirm",
-      element: <EMPUConfirm />,
-    },
-    {
-      name: "EMPU Download Data",
-      path: "/empu/get",
-      element: <EMPUDownloadData />,
-    },
-
-    // Vendor
-    {
-      name: "Home",
-      path: "/v",
-      element: <Vendor />,
-    },
-    {
-      name: "Document Detail (Vendor)",
-      path: "/v/d/:key",
-      element: <VendorDoc />,
-    },
-
-    // Admin
-    {
-      name: "Register User",
-      path: "/add",
-      element: <AddUser />,
-    },
-    {
-      name: "Error List",
-      path: "/error",
-      element: <ErrorListPage />,
+      menu: "Admin",
+      submenus: [
+        {
+          name: "Register User",
+          path: "/add",
+          element: <AddUser />,
+        },
+        {
+          name: "Error List",
+          path: "/error",
+          element: <ErrorListPage />,
+        },
+      ],
     },
   ];
 
@@ -159,12 +181,16 @@ function App() {
     <AuthProvider>
       <Routes>
         <Route path="/login" element={<Login />} />
-        {protectedRoute.map((route, index) => (
-          <Route
-            key={index}
-            path={route.path}
-            element={<PrivateRoute>{route.element}</PrivateRoute>}
-          />
+        {protectedRoute.map((menu) => (
+          <Route key={menu.menu}>
+            {menu.submenus.map((route) => (
+              <Route
+                key={route.name}
+                path={route.path}
+                element={<PrivateRoute>{route.element}</PrivateRoute>}
+              />
+            ))}
+          </Route>
         ))}
       </Routes>
     </AuthProvider>

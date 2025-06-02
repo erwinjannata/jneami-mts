@@ -1,7 +1,9 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
+/* eslint-disable no-unused-vars */
+
 import { Table } from "react-bootstrap";
 import LoadingAnimation from "../../../../../components/partials/loading";
+import moment from "moment";
 
 const InboundBagTable = ({ bagList, loading }) => {
   const tableHeader = [
@@ -12,6 +14,7 @@ const InboundBagTable = ({ bagList, loading }) => {
     { label: "Status Bag", className: "w-auto" },
     { label: "Remark", className: "w-50" },
     { label: "SM#", className: "w-50" },
+    { label: "Receiving Date", className: "w-auto" },
   ];
 
   const textStyle = ({ status }) => {
@@ -60,6 +63,13 @@ const InboundBagTable = ({ bagList, loading }) => {
             </td>
             <td>{bag.remark}</td>
             <td>{bag.sm}</td>
+            <td>
+              {bag.receivingDate
+                ? moment(Date.parse(bag.receivingDate))
+                    .locale("en-sg")
+                    .format("lll")
+                : "-"}
+            </td>
           </tr>
         ))}
       </tbody>

@@ -8,8 +8,8 @@ import LoadingAnimation from "../../../../components/partials/loading";
 
 const MidMileFindBag = () => {
   // Initialize Database Reference
-  // const dbRef = firebase.database().ref("midMile/bags");
-  const dbRef = firebase.database().ref("test/midMile/bags");
+  const dbRef = firebase.database().ref("midMile/bags");
+  // const dbRef = firebase.database().ref("test/midMile/bags");
 
   const [state, setState] = useState({
     bagNumber: "",

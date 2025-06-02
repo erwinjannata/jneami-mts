@@ -8,11 +8,16 @@ import DocumentTable from "./partials/documentTable";
 import NavMenu from "../../../../components/partials/navbarMenu";
 import MidMileCategoryCards from "./partials/categoryCards";
 import { handleChange } from "../../../../components/functions/functions";
+import { useLocation } from "react-router-dom";
+import ToastWarning from "../../../../components/partials/toastWarning";
 
 const AirportHomePage = () => {
   // Initialize Database Reference
-  // const dbRef = firebase.database().ref("midMile/documents");
-  const dbRef = firebase.database().ref("test/midMile/documents");
+  const dbRef = firebase.database().ref("midMile/documents");
+  // const dbRef = firebase.database().ref("test/midMile/documents");
+
+  const location = useLocation();
+  const { showToast, header, message } = location.state || {};
 
   const [data, setData] = useState([]);
   const [showData, setShowData] = useState([]);
@@ -25,6 +30,11 @@ const AirportHomePage = () => {
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
+  });
+  const [toast, setToast] = useState({
+    show: showToast || false,
+    header: header,
+    message: message,
   });
 
   useEffect(() => {
@@ -113,6 +123,7 @@ const AirportHomePage = () => {
           </Col>
         </Row>
       </Container>
+      <ToastWarning toast={toast} setToast={setToast} />
     </div>
   );
 };

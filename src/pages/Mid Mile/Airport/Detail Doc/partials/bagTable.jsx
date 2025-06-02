@@ -1,19 +1,8 @@
 /* eslint-disable react/prop-types */
 import { Spinner, Table } from "react-bootstrap";
-import TableButtons from "./tableButtons";
 import moment from "moment";
 
-const AirPortBagTable = ({
-  data,
-  bagList,
-  setBagList,
-  oldBagList,
-  setOldBagList,
-  loading,
-  setShow,
-  setRemark,
-  setCurrentFocus,
-}) => {
+const AirPortBagTable = ({ bagList, loading }) => {
   const tableHeader = [
     { label: "No.", className: "w-auto" },
     { label: "Master Bag No.", className: "w-25" },
@@ -41,60 +30,51 @@ const AirPortBagTable = ({
   return loading ? (
     <Spinner animation="grow" size="sm" />
   ) : (
-    <Table responsive striped id="tableData">
-      <thead id="stickyHead">
-        <tr>
-          {tableHeader.map((header, index) => (
-            <th key={index} className={header.className}>
-              {header.label}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {bagList.map((bag, index) => (
-          <tr key={index}>
-            <td>{index + 1}</td>
-            <td>{bag.bagNumber}</td>
-            <td>{bag.koli}</td>
-            <td>{bag.weight}</td>
-            <td className="d-flex">
-              <p
-                style={{ fontWeight: "bold" }}
-                className={`bg-opacity-10 rounded text-center py-1 px-2 ${textStyle(
-                  {
-                    status: bag.statusBag,
-                  }
-                )}`}
-              >
-                {bag.statusBag}
-              </p>
-            </td>
-            <td>{bag.remark}</td>
-            <td>{bag.sm}</td>
-            <td>
-              {bag.receivedDate
-                ? moment(Date.parse(bag.receivedDate))
-                    .locale("en-sg")
-                    .format("lll")
-                : "-"}
-            </td>
-            <TableButtons
-              bag={bag}
-              index={index}
-              data={data}
-              bagList={bagList}
-              setBagList={setBagList}
-              oldBagList={oldBagList}
-              setOldBagList={setOldBagList}
-              setShow={setShow}
-              setRemark={setRemark}
-              setCurrentFocus={setCurrentFocus}
-            />
+    <div>
+      <Table responsive striped id="tableData">
+        <thead id="stickyHead">
+          <tr>
+            {tableHeader.map((header, index) => (
+              <th key={index} className={header.className}>
+                {header.label}
+              </th>
+            ))}
           </tr>
-        ))}
-      </tbody>
-    </Table>
+        </thead>
+        <tbody>
+          {bagList.map((bag, index) => (
+            <tr key={index}>
+              <td>{index + 1}</td>
+              <td>{bag.bagNumber}</td>
+              <td>{bag.koli}</td>
+              <td>{bag.weight}</td>
+              <td className="d-flex">
+                <p
+                  style={{ fontWeight: "bold" }}
+                  className={`bg-opacity-10 rounded text-center py-1 px-2 ${textStyle(
+                    {
+                      status: bag.statusBag,
+                    }
+                  )}`}
+                >
+                  {bag.statusBag}
+                </p>
+              </td>
+              <td>{bag.remark}</td>
+              <td>{bag.sm}</td>
+              <td>
+                {bag.receivingDate
+                  ? moment(Date.parse(bag.receivingDate))
+                      .locale("en-sg")
+                      .format("lll")
+                  : "-"}
+              </td>
+              <td></td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+    </div>
   );
 };
 

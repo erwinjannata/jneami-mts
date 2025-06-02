@@ -50,6 +50,13 @@ const MidMileCreateDoc = () => {
         bagList: bagList,
         setLoading: setLoading,
         collectionLength: collectionLength,
+        onSuccess: navigate("/mm", {
+          state: {
+            showToast: true,
+            header: "Info",
+            message: "Dokumen berhasil disimpan",
+          },
+        }),
       });
     }
   };
@@ -88,11 +95,7 @@ const MidMileCreateDoc = () => {
             Submit
           </Button>
           <hr />
-          <BagTable
-            bagList={bagList}
-            setBagList={setBagList}
-            loading={loading}
-          />
+          <BagTable bagList={bagList} setBagList={setBagList} />
           <hr />
           <DocInfo bagList={bagList} />
           <hr />

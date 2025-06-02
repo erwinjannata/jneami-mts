@@ -5,7 +5,15 @@ import { useEffect, useState } from "react";
 import firebase from "./../../../../../config/firebase";
 import moment from "moment";
 
-const EditMasterBagModal = ({ show, setShow, bag, document }) => {
+const EditMasterBagModal = ({
+  show,
+  onHide,
+  bag,
+  document,
+  setToast,
+  search,
+  setSearch,
+}) => {
   const [state, setState] = useState({});
 
   const forms = [
@@ -53,10 +61,10 @@ const EditMasterBagModal = ({ show, setShow, bag, document }) => {
 
   const handleEdit = () => {
     // Initialize Database Reference
-    // const dbBagRef = firebase.database().ref("midMile/bags");
-    // const dbDocRef = firebase.database().ref("midMile/documents");
-    const dbBagRef = firebase.database().ref("test/midMile/bags");
-    const dbDocRef = firebase.database().ref("test/midMile/documents");
+    const dbBagRef = firebase.database().ref("midMile/bags");
+    const dbDocRef = firebase.database().ref("midMile/documents");
+    // const dbBagRef = firebase.database().ref("test/midMile/bags");
+    // const dbDocRef = firebase.database().ref("test/midMile/documents");
 
     let docUpdates = {
       latestUpdate: moment().locale("fr-ca").format("L LT"),
@@ -78,12 +86,27 @@ const EditMasterBagModal = ({ show, setShow, bag, document }) => {
           .child(bag.documentId)
           .update(docUpdates)
           .then(() => {
-            alert("Data berhasil diperbarui");
-            setShow(false);
+            onHide();
+            setSearch({
+              ...search,
+              searched: "",
+            });
+
+            if (setToast)
+              setToast({
+                show: true,
+                header: "Info",
+                message: "Data bag berhasil diperbarui",
+              });
           });
       })
       .catch(() => {
-        alert("Data gagal diperbarui");
+        if (setToast)
+          setToast({
+            show: true,
+            header: "Warning",
+            message: "Data bag gagal diperbarui",
+          });
       });
   };
 
@@ -98,7 +121,7 @@ const EditMasterBagModal = ({ show, setShow, bag, document }) => {
       backdrop="static"
       show={show}
       onHide={() => {
-        setShow(false);
+        onHide();
       }}
     >
       <Modal.Header closeButton>

@@ -7,7 +7,7 @@ import { handleChange } from "../../../../../components/functions/functions";
 const SignatureModalWithName = ({
   userText,
   show,
-  setShow,
+  onHide,
   state,
   setState,
   nextStep,
@@ -37,7 +37,7 @@ const SignatureModalWithName = ({
       show={show}
       onHide={() => {
         handleClear();
-        setShow(false);
+        onHide();
       }}
     >
       <Modal.Header closeButton>
@@ -80,9 +80,9 @@ const SignatureModalWithName = ({
         </Button>
         <Button
           variant="primary"
-          onClick={() => {
+          onClick={async () => {
             handleSubmit();
-            setShow(false);
+            await onHide();
             nextStep();
           }}
         >
