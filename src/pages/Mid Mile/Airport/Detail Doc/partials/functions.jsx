@@ -181,8 +181,8 @@ export const updateData = async ({
   } else {
     if (confirm("Konfirmasi approve?") === true) {
       // Initiate Firebase Storage
-      // const dbDocRef = firebase.database().ref("midMile/documents");
-      const dbDocRef = firebase.database().ref("test/midMile/documents");
+      const dbDocRef = firebase.database().ref("midMile/documents");
+      // const dbDocRef = firebase.database().ref("test/midMile/documents");
       const storage = getStorage();
       const metadata = {
         contentType: "image/png",

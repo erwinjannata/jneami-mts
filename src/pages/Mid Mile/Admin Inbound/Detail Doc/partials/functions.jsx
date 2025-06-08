@@ -51,13 +51,13 @@ export const handleApprove = async ({
     }
 
     try {
-      // Database Reference
-      // const dbDocRef = firebase.database().ref(`midMile/documents/${docKey}`);
-      // const dbBagRef = firebase.database().ref("midMile/bags");
-      const dbDocRef = firebase
-        .database()
-        .ref(`test/midMile/documents/${docKey}`);
-      const dbBagRef = firebase.database().ref("test/midMile/bags");
+      // Initialize Database Reference
+      const dbDocRef = firebase.database().ref(`midMile/documents/${docKey}`);
+      const dbBagRef = firebase.database().ref("midMile/bags");
+      // const dbDocRef = firebase
+      //   .database()
+      //   .ref(`test/midMile/documents/${docKey}`);
+      // const dbBagRef = firebase.database().ref("test/midMile/bags");
 
       // Initiate Firebase Storage
       const storage = getStorage();

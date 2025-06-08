@@ -88,11 +88,11 @@ export const approveDoc = async ({
   if (confirm("Konfirmasi approve?") === true) {
     setLoading(true);
 
-    // Database References
-    // const dbDocRef = firebase.database().ref("midMile/documents");
-    // const dbBagRef = firebase.database().ref("midMile/bags");
-    const dbDocRef = firebase.database().ref("test/midMile/documents");
-    const dbBagRef = firebase.database().ref("test/midMile/bags");
+    // Initialize Database References
+    const dbDocRef = firebase.database().ref("midMile/documents");
+    const dbBagRef = firebase.database().ref("midMile/bags");
+    // const dbDocRef = firebase.database().ref("test/midMile/documents");
+    // const dbBagRef = firebase.database().ref("test/midMile/bags");
     const collectionLengthRef = firebase
       .database()
       // .ref("status/midMileCollectionLength");
