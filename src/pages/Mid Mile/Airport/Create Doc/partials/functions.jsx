@@ -9,8 +9,8 @@ export const getDocNumber = ({
 }) => {
   firebase
     .database()
-    // .ref("status")
-    .ref("test/status")
+    .ref("status")
+    // .ref("test/status")
     .on("value", (snapshot) => {
       let count = parseInt(snapshot.child("midMileCollectionLength").val());
       let year = new Date().getFullYear().toString().substring(2, 4);
@@ -95,8 +95,8 @@ export const approveDoc = async ({
     // const dbBagRef = firebase.database().ref("test/midMile/bags");
     const collectionLengthRef = firebase
       .database()
-      // .ref("status/midMileCollectionLength");
-      .ref("test/status/midMileCollectionLength");
+      .ref("status/midMileCollectionLength");
+    // .ref("test/status/midMileCollectionLength");
 
     const keyReference = dbDocRef.push().key;
 
