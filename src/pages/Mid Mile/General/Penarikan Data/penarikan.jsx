@@ -5,10 +5,12 @@ import { Button, Col, Container, Row } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import { useState } from "react";
 import moment from "moment";
-import DocumentTable from "../Home/partials/documentTable";
+import InboundBagTable from "../../Admin Inbound/Detail Doc/partials/bagTable";
+import * as XLSX from "xlsx";
 
 const PenarikanMidMile = () => {
   const [documents, setDocuments] = useState([]);
+  const [bags, setBags] = useState([]);
   const [state, setState] = useState({
     dateFrom: moment().locale("en-ca").format("L"),
     dateThru: moment().locale("en-ca").format("L"),
@@ -24,37 +26,76 @@ const PenarikanMidMile = () => {
     const dbDocRef = firebase.database().ref("midMile/documents");
     const dbBagRef = firebase.database().ref("midMile/bags");
 
-    dbDocRef
-      .orderByChild("submittedDate")
+    dbBagRef
+      .orderByChild("receivingDate")
       .startAt(`${state.dateFrom} 00:00`)
       .endAt(`${state.dateThru} 23:59`)
-      .on("value", (documentSnapshot) => {
-        let documents = [];
+      .on("value", (bagSnapshot) => {
+        let bags = [];
 
-        documentSnapshot.forEach((document) => {
-          let bags = [];
-
-          dbBagRef
-            .orderByChild("documentId")
-            .equalTo(document.key)
-            .on("value", (bagSnapshot) => {
-              bagSnapshot.forEach((bag) => {
-                bags.push({
-                  key: bag.key,
-                  ...bag.val(),
-                });
-              });
-            });
-
-          documents.push({
-            key: document.key,
-            bagList: bags,
-            ...document.val(),
+        bagSnapshot.forEach((bag) => {
+          bags.push({
+            ...bag.val(),
           });
         });
 
-        setDocuments(documents);
+        // Get the document key and render it to Collection
+        const documentKeys = [...new Set(bags.map((bag) => bag.documentId))];
+        documentKeys.forEach((document) => {
+          let documents = [];
+          dbDocRef.child(document).on("value", (documentSnapshot) => {
+            documents.push({
+              ...documentSnapshot.val(),
+              key: documentSnapshot.key,
+            });
+            setDocuments(documents);
+          });
+        });
+
+        setBags(bags);
       });
+  };
+
+  // Handle processing data into XLSX file
+  const handleExcel = () => {
+    setLoading(true);
+    const processedData = bags.map((row) => {
+      let idx = documents.findIndex(
+        (document) => document.key === row.documentId
+      );
+
+      return {
+        bagNo: row.bagNumber,
+        smu: row.sm,
+        koli: row.koli,
+        weight: row.weight,
+        status: row.statusBag,
+        remark: row.remark,
+        receivingDate: row.receivingDate,
+        documentNumber: documents[idx].documentNumber,
+      };
+    });
+    const worksheet = XLSX.utils.json_to_sheet(processedData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+    XLSX.utils.sheet_add_aoa(
+      worksheet,
+      [
+        [
+          "Bag No.",
+          "SMU",
+          "Koli",
+          "Weight",
+          "Status",
+          "Remark",
+          "Receiving Date",
+          "Document No.",
+        ],
+      ],
+      { origin: "A1" }
+    );
+    XLSX.writeFile(workbook, `midmile.xlsx`);
+    setLoading(false);
   };
 
   return (
@@ -66,7 +107,7 @@ const PenarikanMidMile = () => {
         <Row className="mb-3">
           <Col>
             <label htmlFor="dateFrom" className="mx-2">
-              <strong>Date From</strong>
+              <strong>Date From: </strong>
             </label>
             <DatePicker
               id="dateFrom"
@@ -85,7 +126,7 @@ const PenarikanMidMile = () => {
           </Col>
           <Col>
             <label htmlFor="dateThru" className="mx-2">
-              <strong>Date From</strong>
+              <strong>Date Thru: </strong>
             </label>
             <DatePicker
               id="dateThru"
@@ -103,14 +144,20 @@ const PenarikanMidMile = () => {
             />
           </Col>
         </Row>
-        <Button className="me-2" onClick={() => fetchData()}>
+        <Button className="me-2" onClick={() => fetchData()} disabled={loading}>
           Submit
         </Button>
-        {/* {documents.length ? <Button variant="success">Download</Button> : null} */}
-        <hr />
-        {show ? (
-          <DocumentTable documents={documents} loading={loading} />
+        {documents.length ? (
+          <Button
+            variant="success"
+            onClick={() => handleExcel()}
+            disabled={loading}
+          >
+            Download
+          </Button>
         ) : null}
+        <hr />
+        {show ? <InboundBagTable bagList={bags} loading={loading} /> : null}
       </Container>
     </div>
   );

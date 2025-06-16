@@ -133,7 +133,10 @@ export const submitInboundData = ({ state, setLoading, doAfter }) => {
       .equalTo(state.awb)
       .get()
       .then((snapshot) => {
-        if (!snapshot.exists()) {
+        if (snapshot.exists()) {
+          alert("AWB sudah terdaftar");
+          setLoading(false);
+        } else {
           dbRef
             .push({
               ...state,
@@ -151,9 +154,6 @@ export const submitInboundData = ({ state, setLoading, doAfter }) => {
               alert(error);
               setLoading(false);
             });
-        } else {
-          alert("AWB sudah terdaftar");
-          setLoading(false);
         }
       });
   }

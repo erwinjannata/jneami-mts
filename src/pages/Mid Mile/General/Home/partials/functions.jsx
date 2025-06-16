@@ -6,21 +6,18 @@ export const fetchData = ({
   setShowData,
   setLoading,
 }) => {
-  dbRef
-    .orderByChild("submittedDate")
-    .limitToLast(parseInt(limit))
-    .on("value", (snapshot) => {
-      let data = [];
-      snapshot.forEach((childSnapshot) => {
-        data.push({
-          key: childSnapshot.key,
-          ...childSnapshot.val(),
-        });
+  dbRef.limitToLast(parseInt(limit)).on("value", (snapshot) => {
+    let data = [];
+    snapshot.forEach((childSnapshot) => {
+      data.push({
+        key: childSnapshot.key,
+        ...childSnapshot.val(),
       });
-      setData(data);
-      setShowData(data);
-      setLoading(false);
     });
+    setData(data);
+    setShowData(data);
+    setLoading(false);
+  });
 };
 
 // Handle click on category cards

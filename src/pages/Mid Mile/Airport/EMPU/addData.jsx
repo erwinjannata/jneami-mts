@@ -255,6 +255,7 @@ const EMPUAddData = () => {
               doAfter: navigate,
             })
           }
+          disabled={loading}
         >
           Approve
         </Button>

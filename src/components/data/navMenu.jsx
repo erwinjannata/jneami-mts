@@ -74,12 +74,12 @@ export const navbarMenus = [
         req: 1,
         icon: <HiDocumentPlus size={navSubMenuIconSize} />,
       },
-      // {
-      //   label: "Penarikan Data",
-      //   link: "/mm/download",
-      //   req: 1,
-      //   icon: <HiDocumentArrowDown size={navSubMenuIconSize} />,
-      // },
+      {
+        label: "Penarikan Data",
+        link: "/mm/download",
+        req: 1,
+        icon: <HiDocumentArrowDown size={navSubMenuIconSize} />,
+      },
       {
         label: "Cari",
         link: "/mm/find",
