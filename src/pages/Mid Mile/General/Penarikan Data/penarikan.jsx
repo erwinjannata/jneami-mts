@@ -11,6 +11,7 @@ import * as XLSX from "xlsx";
 const PenarikanMidMile = () => {
   const [documents, setDocuments] = useState([]);
   const [bags, setBags] = useState([]);
+  const [smu, setSMU] = useState([]);
   const [state, setState] = useState({
     dateFrom: moment().locale("en-ca").format("L"),
     dateThru: moment().locale("en-ca").format("L"),
@@ -52,6 +53,9 @@ const PenarikanMidMile = () => {
           });
         });
 
+        const smus = [...new Set(bags.map((bag) => bag.sm))];
+
+        setSMU(smus);
         setBags(bags);
       });
   };
@@ -157,7 +161,37 @@ const PenarikanMidMile = () => {
           </Button>
         ) : null}
         <hr />
-        {show ? <InboundBagTable bagList={bags} loading={loading} /> : null}
+        {show ? (
+          <>
+            <InboundBagTable bagList={bags} loading={loading} />
+            <hr />
+            <Row>
+              <Col xs={4} md={4}>
+                <p>
+                  <strong>Bag: </strong>
+                  <br />
+                  {bags.length} Bag
+                </p>
+              </Col>
+              <Col xs={4} md={4}>
+                <p>
+                  <strong>SMU: </strong>
+                  <br />
+                  {smu.length} SMU
+                </p>
+              </Col>
+              <Col xs={4} md={4}>
+                <p>
+                  <strong>Weight: </strong>
+                  <br />
+                  {`${bags.reduce((prev, next) => {
+                    return prev + parseInt(next.weight);
+                  }, 0)} kg`}
+                </p>
+              </Col>
+            </Row>
+          </>
+        ) : null}
       </Container>
     </div>
   );
