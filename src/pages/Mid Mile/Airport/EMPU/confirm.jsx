@@ -49,19 +49,16 @@ const EMPUConfirm = () => {
     // Initialize Database Reference
     const dbRefCustomers = firebase.database().ref("empu/customers");
 
-    dbRefCustomers
-      .orderByChild("customerType")
-      .equalTo("Agen")
-      .on("value", (snapshot) => {
-        let data = [];
-        snapshot.forEach((childSnapshot) => {
-          data.push({
-            key: childSnapshot.key,
-            ...childSnapshot.val(),
-          });
+    dbRefCustomers.on("value", (snapshot) => {
+      let data = [];
+      snapshot.forEach((childSnapshot) => {
+        data.push({
+          key: childSnapshot.key,
+          ...childSnapshot.val(),
         });
-        setCustomerList(data);
       });
+      setCustomerList(data);
+    });
   }, []);
 
   return (

@@ -50,7 +50,8 @@ const CreditTable = ({ awbList, customerList }) => {
           <Table responsive hover id="tableData">
             <thead id="stickyHead">
               <tr>
-                <th className="w-50">Customer</th>
+                <th className="w-25">Customer</th>
+                <th className="w-25">Type</th>
                 <th className="w-50">Credit</th>
                 <th className="w-50"></th>
               </tr>
@@ -64,6 +65,7 @@ const CreditTable = ({ awbList, customerList }) => {
                 return (
                   <tr key={index}>
                     <td>{customerList[idx]?.customerName}</td>
+                    <td>{customerList[idx]?.customerType}</td>
                     <td>{`Rp. ${Intl.NumberFormat().format(
                       awb.totalAmount
                     )}`}</td>
