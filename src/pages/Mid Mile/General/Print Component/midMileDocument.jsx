@@ -6,17 +6,22 @@ const MidMileDocument = ({ data, bagList }) => {
   const d = new Date();
   const today = moment(d).locale("id-ID").format("llll");
 
-  const itemsPerPage = 5;
+  const itemsPerPage = 7;
   const groupedBags = bagList.reduce((acc, bag) => {
     if (!acc[bag.sm]) {
       acc[bag.sm] = {
         bagNumbers: [],
         totalKoli: 0,
+        totalWeight: 0,
       };
     }
 
-    acc[bag.sm].bagNumbers.push(`${bag.bagNumber}/${bag.weight}`);
+    for (let index = 0; index < bag.koli; index++) {
+      acc[bag.sm].bagNumbers.push(`${bag.bagNumber}`);
+    }
+
     acc[bag.sm].totalKoli += parseInt(bag.koli);
+    acc[bag.sm].totalWeight += parseInt(bag.weight);
     return acc;
   }, {});
 
@@ -53,6 +58,7 @@ const MidMileDocument = ({ data, bagList }) => {
               <View style={[styles.row, styles.header]}>
                 <Text style={[styles.row1, styles.bold]}>SMU</Text>
                 <Text style={[styles.row2, styles.bold]}>Total Koli</Text>
+                <Text style={[styles.row1, styles.bold]}>Total Weight</Text>
                 <Text style={[styles.row3, styles.bold]}>Master Bag</Text>
               </View>
               {smus
@@ -65,6 +71,9 @@ const MidMileDocument = ({ data, bagList }) => {
                     <Text style={styles.row1}>{smu}</Text>
                     <Text style={styles.row2}>
                       {groupedBags[smu].totalKoli}
+                    </Text>
+                    <Text style={styles.row1}>
+                      {groupedBags[smu].totalWeight}
                     </Text>
                     <Text style={[styles.row3, styles.bags]}>
                       {groupedBags[smu].bagNumbers.join(" + ")}
@@ -117,7 +126,7 @@ const styles = StyleSheet.create({
     width: "10%",
   },
   row2: {
-    width: "30%",
+    width: "25%",
   },
   row3: {
     width: "60%",
