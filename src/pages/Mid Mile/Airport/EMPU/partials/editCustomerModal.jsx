@@ -51,7 +51,7 @@ const EMPUEditCustomerModal = ({
     setState({
       customerName: customer.customerName,
       customerType: customer.customerType,
-      customerNumber: customer.customerNumber,
+      customerNumber: customer.customerNumber || "",
     });
   }, [customer]);
 

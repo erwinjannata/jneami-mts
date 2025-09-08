@@ -23,3 +23,5 @@ dist-ssr
 *.sln
 *.sw?
 *.env
+
+CEKLIST_IN_BOUND_BANDARA(1).xlsx

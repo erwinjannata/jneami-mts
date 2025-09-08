@@ -203,18 +203,24 @@ export default function CreateDoc() {
   const handleApproval = () => {
     if (state.destination == "") {
       alert("Pilih destination valid");
+      return;
     } else if (state.origin == state.destination) {
       alert("Destinasi tidak boleh sama dengan Origin");
+      return;
     } else if (state.origin == "") {
       alert("Origin kosong, harap refresh halaman, atau login ulang");
+      return;
     } else if (state.preparedBy == "") {
       alert("Nama checker kosong, harap refresh halaman, atau login ulang");
+      return;
     } else if (state.noSurat == "") {
       alert(
         "No. Surat tidak terbaca, silahkan refresh halaman, atau login ulang"
       );
+      return;
     } else if (bagList.length == 0) {
       alert("Tidak ada data Manifest");
+      return;
     } else {
       setShow(true);
     }

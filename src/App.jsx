@@ -27,6 +27,10 @@ import EMPUFindData from "./pages/Mid Mile/Airport/EMPU/findData";
 import EMPUDownloadData from "./pages/Mid Mile/Airport/EMPU/downloadData";
 import EMPUConfirm from "./pages/Mid Mile/Airport/EMPU/confirm";
 import PenarikanMidMile from "./pages/Mid Mile/General/Penarikan Data/penarikan";
+import InvalidMTSIndex from "./pages/Last Mile/Invalid Bag/invalidMTS";
+import InsertInvalidMTS from "./pages/Last Mile/Invalid Bag/insertInvalidMTS";
+import InvalidMTSDoc from "./pages/Last Mile/Invalid Bag/invalidMTSDoc";
+import FindInvalidMTS from "./pages/Last Mile/Invalid Bag/findInvalidMTS";
 
 function App() {
   const protectedRoute = [
@@ -72,6 +76,36 @@ function App() {
           name: "Cari Bag",
           path: "/find",
           element: <FindManifestNumber />,
+        },
+      ],
+    },
+    {
+      menu: "Kiriman Invalid",
+      submenus: [
+        {
+          name: "Proses MTS",
+          path: "/mts",
+          element: <InvalidMTSIndex />,
+        },
+        {
+          name: "Document Detail (MTS)",
+          path: "/mts/d/:key",
+          element: <InvalidMTSDoc />,
+        },
+        {
+          name: "Insert MTS",
+          path: "/mts/insert",
+          element: <InsertInvalidMTS />,
+        },
+        {
+          name: "Find Data",
+          path: "/mts/find",
+          element: <FindInvalidMTS />,
+        },
+        {
+          name: "Download Data MTS",
+          path: "/mts/get",
+          element: <InsertInvalidMTS />,
         },
       ],
     },
