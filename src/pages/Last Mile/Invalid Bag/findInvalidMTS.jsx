@@ -16,7 +16,7 @@ import firebase from "./../../../config/firebase";
 import { useNavigate } from "react-router-dom";
 
 function FindInvalidMTS() {
-  const database = firebase.database();
+  const database = firebase.database().ref();
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
@@ -36,7 +36,7 @@ function FindInvalidMTS() {
     setLoading(true);
 
     database
-      .ref("mts/awb")
+      .child("mts/awb")
       .orderByChild("awb")
       .equalTo(state.searched.toUpperCase())
       .on("value", (snapshot) => {

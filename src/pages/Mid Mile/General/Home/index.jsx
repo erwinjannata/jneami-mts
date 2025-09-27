@@ -1,9 +1,7 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
 import { Col, Container, FloatingLabel, Form, Row } from "react-bootstrap";
 import { fetchData, handleFilter, handleFind } from "./partials/functions";
-import firebase from "../../../../config/firebase";
 import DocumentTable from "./partials/documentTable";
 import NavMenu from "../../../../components/partials/navbarMenu";
 import MidMileCategoryCards from "./partials/categoryCards";
@@ -12,10 +10,6 @@ import { useLocation } from "react-router-dom";
 import ToastWarning from "../../../../components/partials/toastWarning";
 
 const AirportHomePage = () => {
-  // Initialize Database Reference
-  const dbRef = firebase.database().ref("midMile/documents");
-  // const dbRef = firebase.database().ref("test/midMile/documents");
-
   const location = useLocation();
   const { showToast, header, message } = location.state || {};
 
@@ -40,7 +34,6 @@ const AirportHomePage = () => {
   useEffect(() => {
     setLoading(true);
     fetchData({
-      dbRef: dbRef,
       limit: state.limit,
       setData: setData,
       setLoading: setLoading,
@@ -65,7 +58,7 @@ const AirportHomePage = () => {
     <div className="screen">
       <NavMenu />
       <Container>
-        <h2>Mid Mile</h2>
+        <h2 className="fw-bold">Mid Mile</h2>
         <hr />
         <MidMileCategoryCards
           data={data}

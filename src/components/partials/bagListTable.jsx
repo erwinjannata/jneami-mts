@@ -1,36 +1,27 @@
 /* eslint-disable react/prop-types */
-/* eslint-disable no-unused-vars */
+import moment from "moment";
 import { Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
 function BagListTable({ bagList }) {
   const navigate = useNavigate();
 
-  const navToDetail = (key) => {
-    navigate(`/d/${key}`);
-  };
-
   return bagList.length == 0 ? (
     <strong>
       <i>Data tidak ditemukan</i>
     </strong>
   ) : (
-    <div>
+    <div className="rounded border p-2">
       <Table responsive striped hover id="tableData">
         <thead id="stickyHead">
           <tr>
-            <th>No. Manifest</th>
-            <th>Origin</th>
-            <th>Destination</th>
-            <th>Status Bag</th>
-            <th>Koli</th>
-            <th>Pcs</th>
-            <th>Weight</th>
-            <th>Remarks</th>
-            <th>No. Surat</th>
-            <th>Received date</th>
-            <th>Approved by</th>
-            <th>Received by</th>
+            <th className="w-25">Manifest</th>
+            <th className="w-auto">Koli</th>
+            <th className="w-auto">Pcs</th>
+            <th className="w-auto">Weight</th>
+            <th className="w-auto">Status</th>
+            <th className="w-50">MTS Date</th>
+            <th className="w-50">Receiving Date</th>
           </tr>
         </thead>
         <tbody>
@@ -38,21 +29,22 @@ function BagListTable({ bagList }) {
             .map((item, key) => (
               <tr
                 key={key}
-                onClick={() => navToDetail(item.key)}
+                onClick={() => navigate(`/d/${item.docId}`)}
                 className="position-relative user-select-none"
               >
                 <td>{item.manifestNo}</td>
-                <td>{item.origin}</td>
-                <td>{item.destination}</td>
-                <td>{item.statusBag}</td>
                 <td>{item.koli}</td>
                 <td>{item.pcs}</td>
-                <td>{`${item.kg} kg`}</td>
-                <td>{item.remark}</td>
-                <td>{item.noSurat}</td>
-                <td>{`${item.receivedDate} ${item.receivedTime}`}</td>
-                <td>{item.preparedBy}</td>
-                <td>{item.receivedBy}</td>
+                <td>{`${item.weight} kg`}</td>
+                <td>{item.status}</td>
+                <td>{moment(item.mtsDate).locale("id").format("ll LT")}</td>
+                <td>
+                  {item.receivedDate === undefined
+                    ? "-"
+                    : `${moment(item.receivedDate)
+                        .locale("id")
+                        .format("ll LT")}`}
+                </td>
               </tr>
             ))
             .reverse()}

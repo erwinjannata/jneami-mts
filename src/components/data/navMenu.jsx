@@ -36,7 +36,7 @@ export const navbarMenus = [
       },
       {
         label: "Manifest Transit",
-        link: "/create",
+        link: "/create2",
         req: 1,
         icon: <HiDocumentPlus size={navSubMenuIconSize} />,
       },
@@ -184,7 +184,7 @@ export const navbarMenus = [
     items: [
       {
         label: "Dashboard",
-        link: "/v",
+        link: "/",
         req: 1,
         icon: <MdHomeFilled size={navSubMenuIconSize} />,
       },
@@ -204,7 +204,7 @@ export const navbarMenus = [
     items: [
       {
         label: "Vendor",
-        link: "/v",
+        link: "/",
         req: 1,
         icon: <MdHomeFilled size={navSubMenuIconSize} />,
       },

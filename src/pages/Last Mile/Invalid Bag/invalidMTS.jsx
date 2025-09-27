@@ -26,30 +26,34 @@ export default function InvalidMTSIndex() {
     destination: "",
   });
 
-  let database = firebase.database().ref("mts/document");
+  let database = firebase.database().ref();
 
   useEffect(() => {
     setLoading(true);
 
     if (state.destination !== "") {
       database = database
+        .child("mts/document")
         .orderByChild("destination")
         .equalTo(state.destination);
     }
 
-    database.limitToLast(parseInt(state.limit)).on("value", (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        const formattedData = Object.keys(data).map((key) => ({
-          ...data[key],
-          id: key,
-        }));
-        setData(formattedData);
-      } else {
-        setData([]);
-      }
-      setLoading(false);
-    });
+    database
+      .child("mts/document")
+      .limitToLast(parseInt(state.limit))
+      .on("value", (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          const formattedData = Object.keys(data).map((key) => ({
+            ...data[key],
+            id: key,
+          }));
+          setData(formattedData);
+        } else {
+          setData([]);
+        }
+        setLoading(false);
+      });
   }, [state]);
 
   return (

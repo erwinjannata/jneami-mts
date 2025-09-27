@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { Button, Container, FloatingLabel, Form } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";

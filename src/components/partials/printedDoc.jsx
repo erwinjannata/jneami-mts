@@ -1,11 +1,4 @@
-import {
-  Document,
-  Image,
-  Page,
-  StyleSheet,
-  Text,
-  View,
-} from "@react-pdf/renderer";
+import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 import PropTypes from "prop-types";
 
 const styles = StyleSheet.create({
@@ -104,12 +97,6 @@ const Print = ({
   date2,
   origin,
   destination,
-  checkerSign,
-  vendorSign,
-  receiverSign,
-  checkerName,
-  receiverName,
-  driverName,
   status,
   noPolisi,
 }) => {
@@ -122,7 +109,7 @@ const Print = ({
     return prev + parseInt(next.pcs);
   }, 0);
   let totalWeight = data.reduce((prev, next) => {
-    return prev + parseInt(next.kg);
+    return prev + parseInt(next.weight);
   }, 0);
 
   return (
@@ -197,53 +184,10 @@ const Print = ({
                 <Text style={styles.row1}>{id + 1}</Text>
                 <Text style={styles.row2}>{item.manifestNo}</Text>
                 <Text style={styles.row3}>{item.pcs}</Text>
-                <Text style={styles.row4}>{item.kg}</Text>
+                <Text style={styles.row4}>{item.weight} kg</Text>
                 <Text style={styles.row5}>{item.remark}</Text>
               </View>
             ))}
-            <View style={[styles.row, styles.header, styles.bold]}>
-              <View style={styles.signRow}>
-                <View style={styles.signRow2}>
-                  <Text>Prepared by</Text>
-                </View>
-                <View style={styles.signRow2}>
-                  <Image source={checkerSign} style={styles.signatures} />
-                </View>
-                <View style={styles.signRow2}>
-                  <Text>{checkerName}</Text>
-                </View>
-              </View>
-              <View style={styles.signRow}>
-                <View style={styles.signRow2}>
-                  <Text>Received by</Text>
-                </View>
-                {vendorSign == "" ? null : (
-                  <View style={styles.signRow2}>
-                    <Image source={vendorSign} style={styles.signatures} />
-                  </View>
-                )}
-                {vendorSign == "" ? null : (
-                  <View style={styles.signRow2}>
-                    <Text>{driverName}</Text>
-                  </View>
-                )}
-              </View>
-              <View style={styles.signRow}>
-                <View style={styles.signRow2}>
-                  <Text>Received by</Text>
-                </View>
-                {receiverSign == "" ? null : (
-                  <View style={styles.signRow2}>
-                    <Image source={receiverSign} style={styles.signatures} />
-                  </View>
-                )}
-                {receiverSign == "" ? null : (
-                  <View style={styles.signRow2}>
-                    <Text>{receiverName}</Text>
-                  </View>
-                )}
-              </View>
-            </View>
           </View>
         </Page>
       ))}

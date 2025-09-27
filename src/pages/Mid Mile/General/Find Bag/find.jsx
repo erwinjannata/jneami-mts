@@ -8,31 +8,31 @@ import LoadingAnimation from "../../../../components/partials/loading";
 
 const MidMileFindBag = () => {
   // Initialize Database Reference
-  const dbRef = firebase.database().ref("midMile/bags");
-  // const dbRef = firebase.database().ref("test/midMile/bags");
-
   const [state, setState] = useState({
     bagNumber: "",
   });
   const [loading, setLoading] = useState(false);
   const [show, setShow] = useState(false);
-  const [data, setData] = useState([]);
+  const [bags, setBags] = useState([]);
 
   const fetchData = () => {
     setLoading(true);
-    dbRef
+
+    const database = firebase.database().ref();
+
+    database
+      .child("midMile/bags")
       .orderByChild("bagNumber")
       .equalTo(state.bagNumber.toUpperCase().replace(/ /g, ""))
       .on("value", (snapshot) => {
         if (snapshot.exists) {
-          let data = [];
+          setBags([]);
           snapshot.forEach((childSnapshot) => {
-            data.push({
-              key: childSnapshot.key,
-              ...childSnapshot.val(),
-            });
+            setBags((prev) => [
+              ...prev,
+              { key: childSnapshot.key, ...childSnapshot.val() },
+            ]);
           });
-          setData(data);
           setLoading(false);
           setShow(true);
         }
@@ -41,7 +41,7 @@ const MidMileFindBag = () => {
 
   const clearData = () => {
     setShow(false);
-    setData([]);
+    setBags([]);
   };
 
   return (
@@ -50,40 +50,42 @@ const MidMileFindBag = () => {
       <Container>
         <h2>Cari Bag</h2>
         <hr />
-        <FloatingLabel
-          controlId="floatingInput"
-          label="No. Manifest / Bag"
-          className="mb-3"
-        >
-          <Form.Control
-            name="bagNumber"
-            type="text"
-            placeholder="No. Manifest / Bag"
-            onChange={() =>
-              handleChange({ e: event, state: state, stateSetter: setState })
-            }
-          />
-        </FloatingLabel>
-        {loading ? (
-          <LoadingAnimation />
-        ) : (
-          <>
-            <Button variant="primary" onClick={() => fetchData()}>
-              Cari
-            </Button>
-            {show ? (
-              <Button
-                variant="outline-secondary"
-                className="mx-2"
-                onClick={() => clearData()}
-              >
-                Clear
+        <div className="rounded border p-4">
+          <FloatingLabel
+            controlId="floatingInput"
+            label="No. Manifest / Bag"
+            className="mb-3"
+          >
+            <Form.Control
+              name="bagNumber"
+              type="text"
+              placeholder="No. Manifest / Bag"
+              onChange={() =>
+                handleChange({ e: event, state: state, stateSetter: setState })
+              }
+            />
+          </FloatingLabel>
+          {loading ? (
+            <LoadingAnimation />
+          ) : (
+            <>
+              <Button variant="primary" onClick={() => fetchData()}>
+                Cari
               </Button>
-            ) : null}
-          </>
-        )}
-        <hr />
-        {show ? <BagTable bags={data} /> : null}
+              {show ? (
+                <Button
+                  variant="outline-secondary"
+                  className="mx-2"
+                  onClick={() => clearData()}
+                >
+                  Clear
+                </Button>
+              ) : null}
+            </>
+          )}
+          <hr />
+          {show ? <BagTable bags={bags} /> : null}
+        </div>
       </Container>
     </div>
   );

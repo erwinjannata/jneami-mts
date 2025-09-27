@@ -4,34 +4,33 @@ import { Col, Row } from "react-bootstrap";
 function BagInfo({ bagList }) {
   const documentInfo = [
     {
-      label: "Total Koli",
-      value: `${bagList.reduce((prev, next) => {
+      label: "Koli",
+      value: bagList.reduce((prev, next) => {
         return prev + parseInt(next.koli);
-      }, 0)} koli`,
+      }, 0),
     },
     {
-      label: "Total Pcs",
-      value: `${bagList.reduce((prev, next) => {
+      label: "Pcs",
+      value: bagList.reduce((prev, next) => {
         return prev + parseInt(next.pcs);
-      }, 0)} pcs`,
+      }, 0),
     },
     {
-      label: "Total Weight",
+      label: "Weight",
       value: `${bagList.reduce((prev, next) => {
-        return prev + parseInt(next.kg);
+        return prev + parseInt(next.weight);
       }, 0)} Kg`,
     },
   ];
 
   return (
-    <Row className="mt-4">
+    <Row className="mt-2">
       {documentInfo.map((info, index) => (
         <Col key={index}>
-          <p>
+          <Row>
             <strong>{info.label}</strong>
-            <br />
-            {info.value}
-          </p>
+            <p>{info.value}</p>
+          </Row>
         </Col>
       ))}
     </Row>

@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
 import { Table } from "react-bootstrap";
@@ -7,10 +6,6 @@ import { useNavigate } from "react-router-dom";
 function PenarikanListTable(props) {
   const navigate = useNavigate();
   const [data, setData] = useState([]);
-
-  const navToDetail = (key, origin, destination) => {
-    navigate(`/d/${key}`);
-  };
 
   useEffect(() => {
     setData(props.data);
@@ -44,9 +39,7 @@ function PenarikanListTable(props) {
             .map((item, key) => (
               <tr
                 key={key}
-                onClick={() =>
-                  navToDetail(item.key, item.origin, item.destination)
-                }
+                onClick={() => navigate(`/d/${item.key}`)}
                 className="position-relative user-select-none"
               >
                 <td>{item.noSurat}</td>

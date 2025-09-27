@@ -18,7 +18,6 @@ import firebase from "./../../../config/firebase";
 import { handleChange } from "../../../components/functions/functions";
 import { cabangList } from "../../../components/data/branchList";
 import LoadingAnimation from "../../../components/partials/loading";
-import NotFound from "../../../components/partials/notFound";
 import { FaRegTrashAlt } from "react-icons/fa";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
@@ -26,7 +25,7 @@ import { useNavigate } from "react-router-dom";
 export default function InsertInvalidMTS() {
   const auth = UseAuth();
   const navigate = useNavigate();
-  const database = firebase.database();
+  const database = firebase.database().ref();
 
   const [state, setState] = useState({
     mtsNo: "",
@@ -135,9 +134,9 @@ export default function InsertInvalidMTS() {
         const destinationCoding = selectedBranch.coding;
 
         // Generate document number
-        const counterRef = database
-          .ref("status")
-          .child(`invalidMTSLength/${state.destination.toLocaleLowerCase()}`);
+        const counterRef = database.child(
+          `status/invalidMTSLength/${state.destination.toLocaleLowerCase()}`
+        );
 
         const { snapshot, mtsNumber } = await new Promise((resolve, reject) => {
           counterRef.transaction(
@@ -161,12 +160,12 @@ export default function InsertInvalidMTS() {
         });
 
         // Get Key Reference
-        const keyReference = database.ref("mts/document").push().key;
+        const keyReference = database.child("mts/document").push().key;
 
         await Promise.all([
           // Upload AWB data
           ...awbList.map((awb) => {
-            return database.ref("mts/awb").push({
+            return database.child("mts/awb").push({
               mts_doc: keyReference,
               awb: awb.awb,
               quantity: awb.quantity,
@@ -175,7 +174,7 @@ export default function InsertInvalidMTS() {
           }),
 
           // Upload Document Data (MTS Bag)
-          database.ref("mts/document").child(keyReference).set({
+          database.child(`mts/document/${keyReference}`).set({
             mtsNo: mtsNumber,
             origin: state.origin,
             mtsUser: state.originUser,

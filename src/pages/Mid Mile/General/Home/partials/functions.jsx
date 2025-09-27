@@ -1,23 +1,24 @@
+import firebase from "./../../../../../config/firebase";
+
 // Fetch Data from database
-export const fetchData = ({
-  dbRef,
-  limit,
-  setData,
-  setShowData,
-  setLoading,
-}) => {
-  dbRef.limitToLast(parseInt(limit)).on("value", (snapshot) => {
-    let data = [];
-    snapshot.forEach((childSnapshot) => {
-      data.push({
-        key: childSnapshot.key,
-        ...childSnapshot.val(),
+export const fetchData = ({ limit, setData, setShowData, setLoading }) => {
+  const database = firebase.database().ref();
+
+  database
+    .child("midMile/documents")
+    .limitToLast(parseInt(limit))
+    .on("value", (snapshot) => {
+      let data = [];
+      snapshot.forEach((childSnapshot) => {
+        data.push({
+          key: childSnapshot.key,
+          ...childSnapshot.val(),
+        });
       });
+      setData(data);
+      setShowData(data);
+      setLoading(false);
     });
-    setData(data);
-    setShowData(data);
-    setLoading(false);
-  });
 };
 
 // Handle click on category cards

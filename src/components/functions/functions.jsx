@@ -10,15 +10,24 @@ export const handleChange = ({ e, state, stateSetter }) => {
   });
 };
 
-// Handle changes in Branch Options
-export const handleCabang = (e, state, stateSetter) => {
-  const value = e.target.value;
-  stateSetter({
-    ...state,
-    [e.target.name]: value,
-    filtered: false,
-    currentFilter: "",
-  });
+export const filterByRoute = ({ data, state }) => {
+  if (state.origin === "All Cabang" && state.destination !== "All Cabang") {
+    return data.filter((item) => item.destination === state.destination);
+  } else if (
+    state.origin !== "All Cabang" &&
+    state.destination === "All Cabang"
+  ) {
+    return data.filter((item) => item.origin === state.origin);
+  } else if (
+    state.origin !== "All Cabang" &&
+    state.destination !== "All Cabang"
+  ) {
+    return data.filter(
+      (item) =>
+        item.origin === state.origin && item.destination === state.destination
+    );
+  }
+  return data;
 };
 
 // Handle processing data into XLSX file
@@ -27,9 +36,11 @@ export const handleExcel = (documentDetails, bagList) => {
     manifestNo: row.manifestNo,
     koli: row.koli,
     pcs: row.pcs,
-    kg: row.kg,
+    kg: row.weight,
     remark: row.remark,
-    status: row.statusBag,
+    status: row.status,
+    mtsDate: row.mtsDate,
+    receivedDate: row.receivedDate,
     noSurat: documentDetails.noSurat,
     statusBag: documentDetails.status,
   }));
@@ -46,6 +57,8 @@ export const handleExcel = (documentDetails, bagList) => {
         "Kg / Weight",
         "Remark",
         "Status Bag",
+        "MTS Date",
+        "Received Date",
         "No Surat",
         "Status Manifest",
       ],
@@ -56,72 +69,44 @@ export const handleExcel = (documentDetails, bagList) => {
 };
 
 // Handle Download data
-export const handleDownload = (dataList, startDate, endDate) => {
+export const handleDownload = ({ documents, bags, startDate, endDate }) => {
   let processedData = [];
-  dataList.map((row, idx) => {
-    for (let i = 0; i < dataList[idx].bagList.length; i++) {
-      processedData.push({
-        noManifest: dataList[idx].bagList[i].manifestNo,
-        koli:
-          dataList[idx].bagList[i].koli == undefined
-            ? "-"
-            : parseFloat(dataList[idx].bagList[i].koli),
-        pcs: parseFloat(dataList[idx].bagList[i].pcs),
-        kg: parseFloat(dataList[idx].bagList[i].kg),
-        remark: dataList[idx].bagList[i].remark,
-        statusBag: dataList[idx].bagList[i].statusBag,
-        noSurat: row.noSurat,
-        noRef: row.noRef,
-        origin: row.origin,
-        destination: row.destination,
-        status: row.status,
-        preparedBy: row.preparedBy,
-        approvedDate: new Date(
-          new Date(row.approvedDate).setHours(
-            row.approvedTime.split(":")[0],
-            row.approvedTime.split(":")[1],
-            0
-          )
-        ),
-        receivedBy: row.receivedBy,
-        receivedDate:
-          row.receivedDate == ""
-            ? ""
-            : new Date(
-                new Date(row.receivedDate).setHours(
-                  row.receivedTime.split(":")[0],
-                  row.receivedTime.split(":")[1],
-                  0
-                )
-              ),
-        departureDate:
-          row.departureDate == ""
-            ? ""
-            : new Date(
-                new Date(row.departureDate).setHours(
-                  row.departureTime.split(":")[0],
-                  row.departureTime.split(":")[1],
-                  0
-                )
-              ),
-        arrivalDate:
-          row.arrivalDate == ""
-            ? ""
-            : new Date(
-                new Date(row.arrivalDate).setHours(
-                  row.arrivalTime.split(":")[0],
-                  row.arrivalTime.split(":")[1],
-                  0
-                )
-              ),
-        durasi: parseFloat(row.durasiJam),
-        noPolisi: row.noPolisi,
-        driver: row.driver,
-        // statusWaktu: row.statusWaktu,
-      });
-    }
+
+  bags.map((bag) => {
+    const doc = documents.find((document) => document.key === bag.docId);
+
+    processedData.push({
+      manifestNo: bag.manifestNo,
+      koli: bag.koli,
+      pcs: bag.pcs,
+      weight: bag.weight,
+      status: bag.status,
+      remark: bag.remark,
+      noSurat: doc.noSurat,
+      origin: doc.origin,
+      destination: doc.destination,
+      docStatus: doc.status,
+      approved: bag.mtsDate,
+      approvedUser: doc.approvedUser,
+      received: bag.receivedDate,
+      receivedUser: doc.receiveUser,
+      departure: doc.departure,
+      driver: doc.driver,
+      noPolisi: doc.noPolisi,
+      noRef: doc.noRef,
+    });
   });
-  const worksheet = utils.json_to_sheet(processedData.reverse());
+
+  generateExcel({
+    data: processedData,
+    start: startDate,
+    end: endDate,
+  });
+};
+
+export const generateExcel = ({ data, start, end }) => {
+  // Generate Excel
+  const worksheet = utils.json_to_sheet(data);
   const workbook = utils.book_new();
   utils.book_append_sheet(workbook, worksheet, "Data List");
   utils.sheet_add_aoa(
@@ -131,31 +116,28 @@ export const handleDownload = (dataList, startDate, endDate) => {
         "No. Manifest",
         "Koli",
         "Pcs",
-        "Kg",
+        "Weight",
+        "Status",
         "Remark",
-        "Status Bag",
         "No. Surat Manifest",
-        "No. Referensi Vendor",
         "Origin",
         "Destination",
-        "Status Manifest",
-        "Approved by",
-        "Approved Date",
-        "Received by",
-        "Received Date",
-        "Tanggal Keberangkatan",
-        "Tanggal Kedatangan",
-        "Durasi Perjalanan (Jam)",
-        "No. Polisi Kendaraan",
+        "Status Surat Manifest",
+        "MTS Date",
+        "Approve User",
+        "Received",
+        "Received User",
+        "Departure",
         "Driver",
-        // "Status Waktu",
+        "No. Polisi Kendaraan",
+        "No. Referensi Vendor",
       ],
     ],
     { origin: "A1" }
   );
   writeFile(
     workbook,
-    `MTM ${moment(startDate).locale("id").format("LL")} - ${moment(endDate)
+    `MTM ${moment(start).locale("id").format("LL")} - ${moment(end)
       .locale("id")
       .format("LL")}.xlsx`
   );

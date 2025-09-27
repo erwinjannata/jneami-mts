@@ -1,12 +1,11 @@
-/* eslint-disable no-unused-vars */
 import NavMenu from "../../../../components/partials/navbarMenu";
 import firebase from "./../../../../config/firebase";
 import { Button, Col, Container, Row } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import { useState } from "react";
 import moment from "moment";
-import InboundBagTable from "../../Admin Inbound/Detail Doc/partials/bagTable";
 import * as XLSX from "xlsx";
+import MidMileBagTable from "../../Detail Document/partials/bagTable";
 
 const PenarikanMidMile = () => {
   const [documents, setDocuments] = useState([]);
@@ -24,10 +23,10 @@ const PenarikanMidMile = () => {
     setShow(true);
 
     // Initialize Database Reference
-    const dbDocRef = firebase.database().ref("midMile/documents");
-    const dbBagRef = firebase.database().ref("midMile/bags");
+    const database = firebase.database().ref();
 
-    dbBagRef
+    database
+      .child("midMile/bags")
       .orderByChild("receivingDate")
       .startAt(`${state.dateFrom} 00:00`)
       .endAt(`${state.dateThru} 23:59`)
@@ -44,13 +43,15 @@ const PenarikanMidMile = () => {
         const documentKeys = [...new Set(bags.map((bag) => bag.documentId))];
         documentKeys.forEach((document) => {
           let documents = [];
-          dbDocRef.child(document).on("value", (documentSnapshot) => {
-            documents.push({
-              ...documentSnapshot.val(),
-              key: documentSnapshot.key,
+          database
+            .child(`midMile/documents/${document}`)
+            .on("value", (documentSnapshot) => {
+              documents.push({
+                ...documentSnapshot.val(),
+                key: documentSnapshot.key,
+              });
+              setDocuments(documents);
             });
-            setDocuments(documents);
-          });
         });
 
         const smus = [...new Set(bags.map((bag) => bag.sm))];
@@ -108,90 +109,96 @@ const PenarikanMidMile = () => {
       <Container>
         <h2>Penarikan Data</h2>
         <hr />
-        <Row className="mb-3">
-          <Col>
-            <label htmlFor="dateFrom" className="mx-2">
-              <strong>Date From: </strong>
-            </label>
-            <DatePicker
-              id="dateFrom"
-              portalId="root-portal"
-              title="End Date"
-              placeholder="End Date"
-              className="form-control form-control-solid"
-              selected={state.dateFrom}
-              onChange={(date) =>
-                setState({
-                  ...state,
-                  dateFrom: moment(date).locale("en-ca").format("L"),
-                })
-              }
-            />
-          </Col>
-          <Col>
-            <label htmlFor="dateThru" className="mx-2">
-              <strong>Date Thru: </strong>
-            </label>
-            <DatePicker
-              id="dateThru"
-              portalId="root-portal"
-              title="End Date"
-              placeholder="End Date"
-              className="form-control form-control-solid"
-              selected={state.dateThru}
-              onChange={(date) =>
-                setState({
-                  ...state,
-                  dateThru: moment(date).locale("en-ca").format("L"),
-                })
-              }
-            />
-          </Col>
-        </Row>
-        <Button className="me-2" onClick={() => fetchData()} disabled={loading}>
-          Submit
-        </Button>
-        {documents.length ? (
+        <div className="rounded border p-4">
+          <Row className="mb-3">
+            <Col>
+              <label htmlFor="dateFrom" className="mx-2">
+                <strong>Date From: </strong>
+              </label>
+              <DatePicker
+                id="dateFrom"
+                portalId="root-portal"
+                title="End Date"
+                placeholder="End Date"
+                className="form-control form-control-solid"
+                selected={state.dateFrom}
+                onChange={(date) =>
+                  setState({
+                    ...state,
+                    dateFrom: moment(date).locale("en-ca").format("L"),
+                  })
+                }
+              />
+            </Col>
+            <Col>
+              <label htmlFor="dateThru" className="mx-2">
+                <strong>Date Thru: </strong>
+              </label>
+              <DatePicker
+                id="dateThru"
+                portalId="root-portal"
+                title="End Date"
+                placeholder="End Date"
+                className="form-control form-control-solid"
+                selected={state.dateThru}
+                onChange={(date) =>
+                  setState({
+                    ...state,
+                    dateThru: moment(date).locale("en-ca").format("L"),
+                  })
+                }
+              />
+            </Col>
+          </Row>
           <Button
-            variant="success"
-            onClick={() => handleExcel()}
+            className="me-2"
+            onClick={() => fetchData()}
             disabled={loading}
           >
-            Download
+            Submit
           </Button>
-        ) : null}
-        <hr />
-        {show ? (
-          <>
-            <InboundBagTable bagList={bags} loading={loading} />
-            <hr />
-            <Row>
-              <Col xs={4} md={4}>
-                <p>
-                  <strong>Bag: </strong>
-                  <br />
-                  {bags.length} Bag
-                </p>
-              </Col>
-              <Col xs={4} md={4}>
-                <p>
-                  <strong>SMU: </strong>
-                  <br />
-                  {smu.length} SMU
-                </p>
-              </Col>
-              <Col xs={4} md={4}>
-                <p>
-                  <strong>Weight: </strong>
-                  <br />
-                  {`${bags.reduce((prev, next) => {
-                    return prev + parseInt(next.weight);
-                  }, 0)} kg`}
-                </p>
-              </Col>
-            </Row>
-          </>
-        ) : null}
+          {documents.length ? (
+            <Button
+              variant="success"
+              onClick={() => handleExcel()}
+              disabled={loading}
+            >
+              Download
+            </Button>
+          ) : null}
+          <hr />
+          {show ? (
+            <>
+              <MidMileBagTable bagList={bags} loading={loading} />
+              <hr />
+              <Row>
+                <Col xs={4} md={4}>
+                  <p>
+                    <strong>Bag: </strong>
+                    <br />
+                    {bags.length} Bag
+                  </p>
+                </Col>
+                <Col xs={4} md={4}>
+                  <p>
+                    <strong>SMU: </strong>
+                    <br />
+                    {smu.length} SMU
+                  </p>
+                </Col>
+                <Col xs={4} md={4}>
+                  <p>
+                    <strong>Weight: </strong>
+                    <br />
+                    {`${bags.reduce((prev, next) => {
+                      return prev + parseInt(next.weight);
+                    }, 0)} kg`}
+                  </p>
+                </Col>
+              </Row>
+            </>
+          ) : null}
+        </div>
       </Container>
     </div>
   );

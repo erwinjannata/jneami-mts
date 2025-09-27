@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import { useRef } from "react";
 import { Button, Modal } from "react-bootstrap";

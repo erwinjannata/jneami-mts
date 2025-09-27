@@ -8,21 +8,14 @@ function PrintFn(props) {
       data={props.bagList}
       noSurat={props.data.noSurat}
       noRef={props.data.noRef}
-      date1={`${moment(props.data.approvedDate).locale("id").format("LL")} ${
-        props.data.approvedTime
-      }`}
+      date1={`${moment(props.data.approved).locale("en-sg").format("LLL")}`}
       date2={
         props.data.receivedDate == ""
           ? "-"
-          : `${moment(props.data.receivedDate).locale("id").format("LL")} ${
-              props.data.receivedTime
-            }`
+          : `${moment(props.data.received).locale("en-sg").format("LLL")}`
       }
       origin={props.data.origin}
       destination={props.data.destination}
-      checkerSign={props.data.checkerSign}
-      vendorSign={props.data.vendorSign}
-      receiverSign={props.data.receiverSign}
       checkerName={props.data.preparedBy}
       receiverName={props.data.receivedBy}
       driverName={props.data.driver}

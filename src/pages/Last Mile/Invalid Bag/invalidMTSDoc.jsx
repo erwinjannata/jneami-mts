@@ -20,7 +20,7 @@ import MTSBagTable from "./partials/mtsBagTable";
 export default function InvalidMTSDoc() {
   const { key } = useParams();
   const auth = UseAuth();
-  const database = firebase.database();
+  const database = firebase.database().ref();
   const inputRef = useRef(null);
 
   const [loading, setLoading] = useState(false);
@@ -45,22 +45,16 @@ export default function InvalidMTSDoc() {
       }
 
       await Promise.all([
-        database
-          .ref("mts/awb")
-          .child(found.key)
-          .update({
-            mtiDate: moment().local("fr-ca").format("L LT"),
-          }),
-        database
-          .ref("mts/document")
-          .child(document.key)
-          .update({
-            mtiUser: auth.name,
-            mtiDate:
-              document.mtiDate !== undefined
-                ? document.mtiDate
-                : moment().local("fr-ca").format("L LT"),
-          }),
+        database.child(`mts/awb/${found.key}`).update({
+          mtiDate: moment().local("fr-ca").format("L LT"),
+        }),
+        database.child(`mts/document/${document.key}`).update({
+          mtiUser: auth.name,
+          mtiDate:
+            document.mtiDate !== undefined
+              ? document.mtiDate
+              : moment().local("fr-ca").format("L LT"),
+        }),
         alert("Proses MTI berhasil"),
         setState({
           ...state,
@@ -85,37 +79,34 @@ export default function InvalidMTSDoc() {
 
   useEffect(() => {
     setLoading(true);
-    database
-      .ref("mts/document")
-      .child(key)
-      .on("value", (snapshot) => {
-        if (snapshot.exists()) {
-          setDocument({
-            key: snapshot.key,
-            ...snapshot.val(),
-          });
-          database
-            .ref("mts/awb")
-            .orderByChild("mts_doc")
-            .equalTo(key)
-            .on("value", (snapshot) => {
-              if (snapshot.exists()) {
-                let awb = [];
-                snapshot.forEach((childSnapshot) => {
-                  awb.push({
-                    key: childSnapshot.key,
-                    ...childSnapshot.val(),
-                  });
+    database.child(`mts/document/${key}`).on("value", (snapshot) => {
+      if (snapshot.exists()) {
+        setDocument({
+          key: snapshot.key,
+          ...snapshot.val(),
+        });
+        database
+          .child("mts/awb")
+          .orderByChild("mts_doc")
+          .equalTo(key)
+          .on("value", (snapshot) => {
+            if (snapshot.exists()) {
+              let awb = [];
+              snapshot.forEach((childSnapshot) => {
+                awb.push({
+                  key: childSnapshot.key,
+                  ...childSnapshot.val(),
                 });
-                setAWBList(awb);
-                setLoading(false);
-              }
-            });
-        } else {
-          setDocument([]);
-          setLoading(false);
-        }
-      });
+              });
+              setAWBList(awb);
+              setLoading(false);
+            }
+          });
+      } else {
+        setDocument([]);
+        setLoading(false);
+      }
+    });
   }, [auth.name]);
 
   return (

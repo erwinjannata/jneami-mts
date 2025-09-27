@@ -3,44 +3,36 @@ import { Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import NotFound from "../../../../../components/partials/notFound";
 import LoadingAnimation from "./../../../../../components/partials/loading";
-import { UseAuth } from "../../../../../config/authContext";
 
 /* eslint-disable react/prop-types */
 const DocumentTable = ({ documents, loading }) => {
-  const auth = UseAuth();
   const navigate = useNavigate();
   const tableHeader = [
-    { name: "Document No." },
-    { name: "Pcs" },
-    { name: "Weight" },
-    { name: "Status" },
-    { name: "Submit Date" },
-    { name: "Transport Date" },
-    { name: "Received Date" },
+    { name: "Document No.", cn: "w-25" },
+    { name: "Pcs", cn: "w-auto" },
+    { name: "Weight", cn: "w-auto" },
+    { name: "Status", cn: "w-25" },
+    { name: "Submit Date", cn: "w-25" },
+    { name: "Transport Date", cn: "w-25" },
+    { name: "Received Date", cn: "w-25" },
   ];
-
-  const routing = (key) => {
-    if (auth.origin === "BANDARA") {
-      navigate(`/mm/a/d/${key}`);
-    } else {
-      navigate(`/mm/i/d/${key}`);
-    }
-  };
 
   return (
     <div>
       {loading ? (
         <LoadingAnimation />
       ) : (
-        <div>
+        <div className="rounded border p-2">
           {documents.length === 0 ? (
             <NotFound />
           ) : (
-            <Table responsive hover>
+            <Table responsive hover id="tableData">
               <thead id="stickyHead">
                 <tr>
                   {tableHeader.map((header, index) => (
-                    <th key={index}>{header.name}</th>
+                    <th key={index} className={header.cn}>
+                      {header.name}
+                    </th>
                   ))}
                 </tr>
               </thead>
@@ -48,7 +40,10 @@ const DocumentTable = ({ documents, loading }) => {
                 {documents
                   .map((document, index) => {
                     return (
-                      <tr key={index} onClick={() => routing(document.key)}>
+                      <tr
+                        key={index}
+                        onClick={() => navigate(`/mm/d/${document.key}`)}
+                      >
                         <td>{document.documentNumber}</td>
                         <td>{`${document.totalPcs}`}</td>
                         <td>{`${document.totalWeight} kg`}</td>
