@@ -1,17 +1,12 @@
 import { BiError, BiSearchAlt } from "react-icons/bi";
 import {
-  FaBookOpen,
   FaBoxOpen,
   FaFileInvoiceDollar,
   FaPlaneArrival,
   FaTruck,
   FaWarehouse,
 } from "react-icons/fa6";
-import {
-  HiClipboardDocumentCheck,
-  HiDocumentArrowDown,
-  HiDocumentPlus,
-} from "react-icons/hi2";
+import { HiDocumentArrowDown, HiDocumentPlus } from "react-icons/hi2";
 import { MdHomeFilled, MdNearbyError, MdPayments } from "react-icons/md";
 import { RiAdminFill, RiUserAddFill } from "react-icons/ri";
 import { cabangList } from "./branchList";
@@ -60,32 +55,32 @@ export const navbarMenus = [
       },
     ],
   },
-  {
-    label: "Invalid Bag",
-    req: 1,
-    allowedOrigin: cabangList.map((cabang) => cabang.name),
-    icon: <BiError size={navMenuIconSize} />,
-    items: [
-      {
-        label: "MTS & MTI",
-        link: "/mts",
-        req: 1,
-        icon: <HiClipboardDocumentCheck size={navSubMenuIconSize} />,
-      },
-      {
-        label: "Cari AWB",
-        link: "/mts/find",
-        req: 1,
-        icon: <BiSearchAlt size={navSubMenuIconSize} />,
-      },
-      // {
-      //   label: "Penarikan Data",
-      //   link: "/mts/get",
-      //   req: 1,
-      //   icon: <HiDocumentArrowDown size={navSubMenuIconSize} />,
-      // },
-    ],
-  },
+  // {
+  //   label: "Invalid Bag",
+  //   req: 1,
+  //   allowedOrigin: cabangList.map((cabang) => cabang.name),
+  //   icon: <BiError size={navMenuIconSize} />,
+  //   items: [
+  //     {
+  //       label: "MTS & MTI",
+  //       link: "/mts",
+  //       req: 1,
+  //       icon: <HiClipboardDocumentCheck size={navSubMenuIconSize} />,
+  //     },
+  //     {
+  //       label: "Cari AWB",
+  //       link: "/mts/find",
+  //       req: 1,
+  //       icon: <BiSearchAlt size={navSubMenuIconSize} />,
+  //     },
+  //     {
+  //       label: "Penarikan Data",
+  //       link: "/mts/get",
+  //       req: 1,
+  //       icon: <HiDocumentArrowDown size={navSubMenuIconSize} />,
+  //     },
+  //   ],
+  // },
   {
     label: "Mid Mile",
     req: 2,
@@ -162,20 +157,20 @@ export const navbarMenus = [
       },
     ],
   },
-  {
-    label: "Manual Book",
-    req: 1,
-    allowedOrigin: cabangList.map((cabang) => cabang.name),
-    icon: <FaBookOpen size={navMenuIconSize} />,
-    items: [
-      {
-        label: "Mid Mile",
-        link: "https://e-mts-manualbook.tiiny.site/",
-        req: 1,
-        icon: <FaPlaneArrival size={navSubMenuIconSize} />,
-      },
-    ],
-  },
+  // {
+  //   label: "Manual Book",
+  //   req: 1,
+  //   allowedOrigin: cabangList.map((cabang) => cabang.name),
+  //   icon: <FaBookOpen size={navMenuIconSize} />,
+  //   items: [
+  //     {
+  //       label: "Mid Mile",
+  //       link: "https://e-mts-manualbook.tiiny.site/",
+  //       req: 1,
+  //       icon: <FaPlaneArrival size={navSubMenuIconSize} />,
+  //     },
+  //   ],
+  // },
   {
     label: "Muatan Vendor",
     req: 1,
