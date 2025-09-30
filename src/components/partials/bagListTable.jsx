@@ -39,11 +39,11 @@ function BagListTable({ bagList }) {
                 <td>{item.status}</td>
                 <td>{moment(item.mtsDate).locale("id").format("ll LT")}</td>
                 <td>
-                  {item.receivedDate === undefined
+                  {item.received === undefined ||
+                  item.received === undefined ||
+                  item.received === " "
                     ? "-"
-                    : `${moment(item.receivedDate)
-                        .locale("id")
-                        .format("ll LT")}`}
+                    : `${moment(item.received).locale("id").format("ll LT")}`}
                 </td>
               </tr>
             ))

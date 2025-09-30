@@ -57,7 +57,9 @@ function DocumentInfo({ data }) {
           label: "Received",
           user: data.receiveUser || "-",
           value:
-            data.received === "" || data.received === undefined
+            data.received === " " ||
+            data.received === undefined ||
+            data.received === ""
               ? "-"
               : moment(data.received).locale("id").format("ll LT"),
         },
@@ -76,7 +78,9 @@ function DocumentInfo({ data }) {
           label: "Departure",
           user: data.noRef || "-",
           value:
-            data.departure === "" || data.departure === undefined
+            data.departure === "" ||
+            data.departure === undefined ||
+            data.departure === " "
               ? "-"
               : moment(data.departure).locale("id").format("ll LT"),
         },

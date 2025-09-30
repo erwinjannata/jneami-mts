@@ -42,7 +42,7 @@ export default function Penarikan() {
   const [loading, setLoading] = useState(false);
 
   const radioList = [
-    { label: "Approved", value: "approve" },
+    { label: "Approved", value: "approved" },
     { label: "Departure", value: "departure" },
     { label: "Receiving", value: "received" },
   ];
@@ -67,7 +67,7 @@ export default function Penarikan() {
       try {
         setLoading(true);
 
-        const database = firebase.database().ref("test");
+        const database = firebase.database().ref();
 
         // Fetch Document Data
         database
@@ -108,11 +108,11 @@ export default function Penarikan() {
 
             // Apply data
             setDocuments(result);
+            // Finish Process
+            setLoading(false);
           });
 
-        // Finish Process
         setShow(true);
-        setLoading(false);
       } catch (error) {
         console.log(error);
         alert("Error fetching data from database");

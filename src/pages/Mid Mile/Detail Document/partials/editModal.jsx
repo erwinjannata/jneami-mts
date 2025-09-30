@@ -59,7 +59,7 @@ const EditMasterBagModal = ({
 
   const handleEdit = () => {
     // Initialize Database Reference
-    const database = firebase.database().ref("test");
+    const database = firebase.database().ref();
 
     database
       .child(`midMile/bags/${bag.key}`)

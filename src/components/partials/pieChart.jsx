@@ -21,38 +21,29 @@ const PieChart = (data) => {
   //   { name: "Lebih Awal", color: "rgba(25, 135, 84, 0.8)" },
   // ];
 
-  let statusData = [
-    dataList.reduce(
-      (counter, obj) =>
-        obj.status == "Received" || obj.status == "Received*"
-          ? (counter += 1)
-          : counter,
+  const statusData = statusList.map((status) => {
+    return dataList.reduce(
+      (counter, obj) => (obj.status === status.name ? counter + 1 : counter),
       0
-    ),
-    dataList.reduce(
-      (counter, obj) =>
-        obj.status == "Dalam Perjalanan" ? (counter += 1) : counter,
-      0
-    ),
-    dataList.reduce(
-      (counter, obj) => (obj.status == "Standby" ? (counter += 1) : counter),
-      0
-    ),
-    dataList.reduce(
-      (counter, obj) => (obj.status == "Unreceived" ? (counter += 1) : counter),
-      0
-    ),
-  ];
+    );
+  });
 
-  let cabangData = cabangList.map((item) => {
-    return [
-      dataList.reduce(
+  const filteredStatusList = statusList.filter(
+    (_, index) => statusData[index] > 0
+  );
+  const filteredStatusData = statusData.filter((count) => count > 0);
+
+  const cabangDataWithLabels = cabangList
+    .map((item) => ({
+      name: item.name,
+      color: item.color,
+      count: dataList.reduce(
         (counter, obj) =>
-          obj.destination == item.name ? (counter += 1) : counter,
+          obj.destination === item.name ? counter + 1 : counter,
         0
       ),
-    ];
-  });
+    }))
+    .filter((item) => item.count > 0);
 
   // let waktuData = waktuList.map((item) => {
   //   return [
@@ -72,12 +63,12 @@ const PieChart = (data) => {
     {
       label: "Status Surat Manifest",
       data: {
-        labels: statusList.map((item) => item.name),
+        labels: filteredStatusList.map((item) => item.name),
         datasets: [
           {
             label: "Surat Manifest",
-            data: statusData,
-            backgroundColor: statusList.map((item) => item.color),
+            data: filteredStatusData,
+            backgroundColor: filteredStatusList.map((item) => item.color),
             borderColor: "white",
             borderWidth: 3,
           },
@@ -102,12 +93,12 @@ const PieChart = (data) => {
     {
       label: "Surat Manifest per Destinasi",
       data: {
-        labels: cabangList.map((item) => item.name),
+        labels: cabangDataWithLabels.map((item) => item.name),
         datasets: [
           {
             label: "Surat Manifest",
-            data: cabangData,
-            backgroundColor: cabangList.map((item) => item.color),
+            data: cabangDataWithLabels.map((item) => item.count),
+            backgroundColor: cabangDataWithLabels.map((item) => item.color),
             borderColor: "white",
             borderWidth: 3,
           },
@@ -117,7 +108,7 @@ const PieChart = (data) => {
   ];
 
   return charts.map((chart, index) => (
-    <Col key={index}>
+    <Col key={index} sm={12} md={6} lg={4} className="mb-4">
       <Pie
         data={chart.data}
         options={{

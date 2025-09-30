@@ -5,29 +5,19 @@ import { UseAuth } from "../../config/authContext";
 import firebase from "./../../config/firebase";
 import NavMenu from "../../components/partials/navbarMenu";
 import { cabangList } from "../../components/data/branchList";
+import { handleChange } from "../../components/functions/functions";
 
 export default function AddUser() {
   const auth = UseAuth();
 
-  // Initialize Database Reference
-  const dbRef = firebase.database();
-
   let navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [creds, setCreds] = useState({
+  const [state, setState] = useState({
     email: "",
     name: "",
     origin: "MATARAM",
     level: 1,
   });
-
-  const handleChange = (e) => {
-    const value = e.target.value;
-    setCreds({
-      ...creds,
-      [e.target.name]: value,
-    });
-  };
 
   const handleSubmit = (e, name, email, password, origin, level) => {
     if (name !== "" && auth.level === 5) {
@@ -37,8 +27,10 @@ export default function AddUser() {
         .auth()
         .createUserWithEmailAndPassword(email, password)
         .then(async (data) => {
-          await dbRef
-            .ref(`users/${data.user.uid}`)
+          const database = firebase.database().ref();
+
+          await database
+            .child(`users/${data.user.uid}`)
             .set({
               name: name,
               origin: origin,
@@ -48,8 +40,8 @@ export default function AddUser() {
               setLoading(false);
               alert("Registered");
             });
-          setCreds({
-            ...creds,
+          setState({
+            ...state,
             name: "",
             email: "",
             origin: "MATARAM",
@@ -83,8 +75,10 @@ export default function AddUser() {
               type="text"
               name="name"
               placeholder="Nama Lengkap"
-              value={creds.name}
-              onChange={handleChange}
+              value={state.name}
+              onChange={() =>
+                handleChange({ e: event, state: state, stateSetter: setState })
+              }
               required
             />
           </FloatingLabel>
@@ -97,8 +91,10 @@ export default function AddUser() {
               type="email"
               name="email"
               placeholder="Email"
-              value={creds.email}
-              onChange={handleChange}
+              value={state.email}
+              onChange={() =>
+                handleChange({ e: event, state: state, stateSetter: setState })
+              }
               required
             />
           </FloatingLabel>
@@ -109,9 +105,11 @@ export default function AddUser() {
           >
             <Form.Select
               aria-label="Cabang / Agen"
-              onChange={handleChange}
+              onChange={() =>
+                handleChange({ e: event, state: state, stateSetter: setState })
+              }
               name="origin"
-              value={creds.origin}
+              value={state.origin}
             >
               {cabangList.map((item, id) => (
                 <option key={id} value={item.name}>
@@ -127,9 +125,11 @@ export default function AddUser() {
           >
             <Form.Select
               aria-label="Permission Level"
-              onChange={handleChange}
+              onChange={() =>
+                handleChange({ e: event, state: state, stateSetter: setState })
+              }
               name="level"
-              value={creds.level}
+              value={state.level}
             >
               <option value="1">1</option>
               <option value="2">2</option>
@@ -147,11 +147,11 @@ export default function AddUser() {
             onClick={(e) =>
               handleSubmit(
                 e,
-                creds.name,
-                creds.email,
+                state.name,
+                state.email,
                 "12345678",
-                creds.origin,
-                creds.level
+                state.origin,
+                state.level
               )
             }
           >

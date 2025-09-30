@@ -49,7 +49,7 @@ function DocListTable({ data, loading }) {
                         <td>{item.totalPcs}</td>
                         <td>{item.totalWeight} kg</td>
                         <td>
-                          {item.departureDate == ""
+                          {item.approved === ""
                             ? "-"
                             : `${moment(item.approved)
                                 .locale("id")

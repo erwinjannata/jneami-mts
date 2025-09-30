@@ -5,28 +5,30 @@ import { Container } from "react-bootstrap";
 import DocListTable from "../../components/partials/documentListTable";
 
 const ErrorListPage = () => {
-  // Initialize Database Reference
-  const dbRef = firebase.database().ref("manifestTransit");
-
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useState(() => {
     setLoading(true);
-    dbRef
+    const database = firebase.database().ref();
+
+    database
+      .child("manifestTransit")
       .orderByChild("destination")
       .equalTo("")
       .limitToLast(50000)
       .on("value", (snapshot) => {
-        let data = [];
+        setData([]);
         if (snapshot.exists()) {
           snapshot.forEach((childSnapshot) => {
-            data.push({
-              key: childSnapshot.key,
-              ...childSnapshot.val(),
-            });
+            setData((prev) => [
+              ...prev,
+              {
+                key: childSnapshot.key,
+                ...childSnapshot.val(),
+              },
+            ]);
           });
-          setData(data);
         }
         setLoading(false);
       });

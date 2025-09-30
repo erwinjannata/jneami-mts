@@ -4,7 +4,7 @@ import firebase from "./../../../../config/firebase";
 import { cabangList } from "../../../../components/data/branchList";
 
 export const getDocNumber = ({ document, setDocument, setLoading, auth }) => {
-  const database = firebase.database().ref("test");
+  const database = firebase.database().ref();
 
   try {
     setLoading(true);
@@ -106,7 +106,7 @@ export const approveDoc = async ({ document, bags, setLoading, route }) => {
       return;
     } else {
       // eslint-disable-next-line no-unused-vars
-      const database = firebase.database().ref("test");
+      const database = firebase.database().ref();
       const keyReference = database.child("eMTS/documents").push().key;
 
       try {

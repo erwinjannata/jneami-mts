@@ -226,7 +226,7 @@ export default function Doc() {
                         title="Bag Overload"
                         onClick={() =>
                           handleOverload({
-                            bags: filteredBags,
+                            bags: bags,
                             document: document,
                             setLoading: setLoading,
                             user: auth.name,
@@ -244,7 +244,7 @@ export default function Doc() {
                         title="Receive Bag"
                         onClick={() =>
                           handleReceiving({
-                            bags: filteredBags,
+                            bags: bags,
                             document: document,
                             setLoading: setLoading,
                             user: auth.name,
@@ -260,7 +260,7 @@ export default function Doc() {
                         title="Bag Unreceived"
                         onClick={() =>
                           handleUnreceiving({
-                            bags: filteredBags,
+                            bags: bags,
                             document: document,
                             setLoading: setLoading,
                           })
@@ -310,7 +310,7 @@ export default function Doc() {
         <TransportModal
           show={showModal}
           setShow={setShowModal}
-          bags={filteredBags}
+          bags={bags}
           document={document}
         />
         <RemarkModal

@@ -1,6 +1,13 @@
 /* eslint-disable no-unused-vars */
 import { useEffect, useState } from "react";
-import { Button, Container, FloatingLabel, Form } from "react-bootstrap";
+import {
+  Button,
+  Col,
+  Container,
+  FloatingLabel,
+  Form,
+  Row,
+} from "react-bootstrap";
 import firebase from "./../../config/firebase";
 import NavMenu from "../../components/partials/navbarMenu";
 import { handleChange } from "../../components/functions/functions";
@@ -8,8 +15,13 @@ import { months } from "../../components/data/months";
 import CreditTable from "./partials/creditTable";
 
 const EMPUConfirm = () => {
+  const currentYear = new Date().getFullYear();
+  const currentMonth = new Date().getMonth() + 1;
+
   const [state, setState] = useState({
-    periode: "",
+    bulan: currentMonth < 10 ? `0${currentMonth}` : currentMonth,
+    tahun: currentYear,
+    show: false,
   });
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -24,8 +36,8 @@ const EMPUConfirm = () => {
     database
       .child("empu/inbound")
       .orderByChild("dateAdded")
-      .startAt(`2025-${state.periode}-01 00:00`)
-      .endAt(`2025-${state.periode}-31 23:59`)
+      .startAt(`${state.tahun}-${state.bulan}-01 00:00`)
+      .endAt(`${state.tahun}-${state.bulan}-31 23:59`)
       .on("value", (snapshot) => {
         setData([]);
         snapshot.forEach((childSnapshot) => {
@@ -43,6 +55,7 @@ const EMPUConfirm = () => {
           }
         });
         setLoading(false);
+        setState({ ...state, show: true });
       });
   };
 
@@ -51,14 +64,16 @@ const EMPUConfirm = () => {
     const database = firebase.database().ref();
 
     database.child("empu/customers").on("value", (snapshot) => {
-      let data = [];
+      setCustomerList([]);
       snapshot.forEach((childSnapshot) => {
-        data.push({
-          key: childSnapshot.key,
-          ...childSnapshot.val(),
-        });
+        setCustomerList((prev) => [
+          ...prev,
+          {
+            key: childSnapshot.key,
+            ...childSnapshot.val(),
+          },
+        ]);
       });
-      setCustomerList(data);
     });
   }, []);
 
@@ -68,35 +83,65 @@ const EMPUConfirm = () => {
       <Container>
         <h2 className="fw-bold">Konfirmasi Pembayaran Credit</h2>
         <hr />
-        <FloatingLabel label="Periode">
-          <Form.Select
-            name="periode"
-            className="mb-2"
-            onChange={() =>
-              handleChange({ e: event, state: state, stateSetter: setState })
-            }
-          >
-            <option>- Bulan -</option>
-            {months.map((month, index) => (
-              <option key={index} value={month.number}>
-                {month.name}
-              </option>
-            ))}
-          </Form.Select>
-        </FloatingLabel>
-        <Button
-          variant="primary"
-          className="mt-2 me-2"
-          onClick={() => handleSubmit()}
-        >
+        <Row>
+          <Col sm>
+            <FloatingLabel label="Bulan">
+              <Form.Select
+                name="bulan"
+                value={state.bulan}
+                className="mb-2"
+                onChange={() =>
+                  handleChange({
+                    e: event,
+                    state: state,
+                    stateSetter: setState,
+                  })
+                }
+              >
+                {months.map((month, index) => (
+                  <option key={index} value={month.number}>
+                    {month.name}
+                  </option>
+                ))}
+              </Form.Select>
+            </FloatingLabel>
+          </Col>
+          <Col sm>
+            <FloatingLabel label="Tahun">
+              <Form.Select
+                name="tahun"
+                value={state.tahun}
+                className="mb-2"
+                onChange={() =>
+                  handleChange({
+                    e: event,
+                    state: state,
+                    stateSetter: setState,
+                  })
+                }
+              >
+                {Array.from({ length: 5 }, (_, i) => currentYear + i).map(
+                  (year, index) => (
+                    <option key={index} value={year}>
+                      {year}
+                    </option>
+                  )
+                )}
+              </Form.Select>
+            </FloatingLabel>
+          </Col>
+        </Row>
+        <Button variant="primary" onClick={() => handleSubmit()}>
           Submit
         </Button>
         <hr />
-        <CreditTable
-          awbList={data}
-          loading={loading}
-          customerList={customerList}
-        />
+        {state.show ? (
+          <CreditTable
+            awbList={data}
+            loading={loading}
+            customerList={customerList}
+          />
+        ) : null}
       </Container>
     </div>
   );

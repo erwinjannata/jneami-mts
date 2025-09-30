@@ -25,30 +25,27 @@ export default function FindManifestNumber() {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
-    const database = firebase.database().ref("test");
+    const database = firebase.database().ref();
 
-    await Promise.all([
-      setLoading(true),
-      database
-        .child("eMTS/bags/")
-        .orderByChild("manifestNo")
-        .equalTo(state.search)
-        .on("value", (snapshot) => {
-          if (snapshot.exists()) {
-            var bags = [];
-
-            snapshot.forEach((childSnapshot) => {
-              bags.push({
-                key: childSnapshot.key,
-                ...childSnapshot.val(),
-              });
-            });
-            setBags(bags);
-            setState({ ...state, show: true });
-          }
-        }),
-      setLoading(false),
-    ]);
+    setLoading(true);
+    database
+      .child("eMTS/bags/")
+      .orderByChild("manifestNo")
+      .equalTo(state.search)
+      .on("value", (snapshot) => {
+        setBags([]);
+        snapshot.forEach((childSnapshot) => {
+          setBags((prev) => [
+            ...prev,
+            {
+              key: childSnapshot.key,
+              ...childSnapshot.val(),
+            },
+          ]);
+        });
+      });
+    setLoading(false);
+    setState({ ...state, show: true });
   };
 
   return (

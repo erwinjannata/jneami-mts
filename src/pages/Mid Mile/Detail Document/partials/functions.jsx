@@ -63,7 +63,7 @@ export const handleAction = async ({
     const found = bagList.find((bag) => bag.bagNumber === state.searched);
     if (found) {
       // Initialize Database Reference
-      const database = firebase.database().ref("test");
+      const database = firebase.database().ref();
 
       // Update bag status to "Standby"
       if (found.statusBag === "Submitted") {
@@ -170,7 +170,7 @@ export const approveData = async ({
     return;
   } else {
     // Initiate Firebase Storage
-    const database = firebase.database().ref("test");
+    const database = firebase.database().ref();
 
     try {
       setLoading(true);
@@ -221,7 +221,7 @@ export const handleTransport = async ({
     return;
   } else {
     // Initialize Database Reference
-    const database = firebase.database().ref("test");
+    const database = firebase.database().ref();
 
     try {
       setLoading(true);
@@ -345,7 +345,7 @@ export const handleReceivingByInbound = async ({
 
     try {
       // Initialize Database Reference
-      const database = firebase.database().ref("test");
+      const database = firebase.database().ref();
 
       await database
         .child(`midMile/documents/${document.key}`)

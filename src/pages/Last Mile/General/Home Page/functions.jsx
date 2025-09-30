@@ -14,7 +14,7 @@ export const fetchData = ({
   if (userOrigin === "BANDARA") {
     route("/mm");
   }
-  const database = firebase.database().ref("test");
+  const database = firebase.database().ref();
 
   database
     .child("eMTS/documents")

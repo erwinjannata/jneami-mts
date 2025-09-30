@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { UseAuth } from "../../config/authContext";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   Button,
   Container,
@@ -11,6 +11,7 @@ import {
 import logo from "./../../images/jne_brand.png";
 import "./../../styles/login.css";
 import { MdArrowBackIos, MdArrowForwardIos } from "react-icons/md";
+import { handleChange } from "../../components/functions/functions";
 
 export default function Login() {
   const [creds, setCreds] = useState({ email: "", password: "" });
@@ -22,14 +23,6 @@ export default function Login() {
   let location = useLocation();
 
   let redirectPath = location.state?.path || "/";
-
-  const handleChange = (e) => {
-    const value = e.target.value;
-    setCreds({
-      ...creds,
-      [e.target.name]: value,
-    });
-  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -59,9 +52,7 @@ export default function Login() {
   return (
     <div id="login">
       <Container>
-        <Link to="/">
-          <img src={logo} alt="JNE" />
-        </Link>
+        <img src={logo} alt="JNE" />
         <Form className="mt-5 d-grid gap-2">
           <FloatingLabel controlId="floatingInput" label="Email">
             <Form.Control
@@ -70,8 +61,10 @@ export default function Login() {
               name="email"
               autoComplete="on"
               value={creds.email}
-              onChange={handleChange}
-              disabled={loading ? true : false}
+              onChange={() =>
+                handleChange({ e: event, state: creds, stateSetter: setCreds })
+              }
+              disabled={loading}
               required
             />
           </FloatingLabel>
@@ -82,9 +75,15 @@ export default function Login() {
                 placeholder="Password"
                 name="password"
                 value={creds.password}
-                onChange={handleChange}
+                onChange={() =>
+                  handleChange({
+                    e: event,
+                    state: creds,
+                    stateSetter: setCreds,
+                  })
+                }
                 autoComplete="on"
-                disabled={loading ? true : false}
+                disabled={loading}
                 required
               />
             </FloatingLabel>

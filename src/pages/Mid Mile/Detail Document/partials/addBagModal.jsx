@@ -25,7 +25,7 @@ const AddBagModal = ({ mainState, setMainState, document, setToast }) => {
       alert("Berat bag invalid!");
     } else {
       // Initialize Database Reference
-      const database = firebase.database().ref("test");
+      const database = firebase.database().ref();
 
       database
         .child(`midMile/bags`)

@@ -2,7 +2,7 @@ import moment from "moment";
 import firebase from "../../../../../config/firebase";
 
 export const fetchData = ({ key, setLoading, setDocument, setBags, route }) => {
-  const database = firebase.database().ref("test");
+  const database = firebase.database().ref();
 
   try {
     setLoading(true);
@@ -54,7 +54,7 @@ export const handleCheckAll = ({ bags, setBags }) => {
 
 export const handleRemark = async ({ bag, setLoading, remark, setShow }) => {
   try {
-    const database = firebase.database().ref("test");
+    const database = firebase.database().ref();
 
     setLoading(true);
 
@@ -83,7 +83,7 @@ export const handleTransport = async ({
 }) => {
   try {
     setLoading(true);
-    const database = firebase.database().ref("test");
+    const database = firebase.database().ref();
 
     // Update bags details
     await Promise.all(
@@ -153,7 +153,7 @@ export const handleOverload = async ({ document, bags, setLoading, user }) => {
 
     const number = document.noSurat.split("_");
 
-    const database = firebase.database().ref("test");
+    const database = firebase.database().ref();
     const keyReference = database.child("eMTS").push().key;
 
     setLoading(true);
@@ -226,7 +226,7 @@ export const handleReceiving = async ({ document, bags, user, setLoading }) => {
     }
 
     setLoading(true);
-    const database = firebase.database().ref("test");
+    const database = firebase.database().ref();
 
     await Promise.all(
       // Update bag details
@@ -295,7 +295,7 @@ export const handleUnreceiving = async ({ document, bags, setLoading }) => {
     }
 
     setLoading(true);
-    const database = firebase.database().ref("test");
+    const database = firebase.database().ref();
 
     await Promise.all(
       // Update bag status

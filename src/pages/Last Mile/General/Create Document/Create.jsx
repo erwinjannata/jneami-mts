@@ -192,7 +192,11 @@ export default function CreateMTS() {
                 </Row>
                 <Row>
                   <Col className="d-grid gap-2">
-                    <Button variant="outline-primary" type="submit">
+                    <Button
+                      variant="outline-primary"
+                      type="submit"
+                      disabled={loading}
+                    >
                       Add Bag
                     </Button>
                   </Col>
@@ -217,6 +221,7 @@ export default function CreateMTS() {
                     placeholder="Paste data dari excel disini..."
                     style={{ height: "100px" }}
                     onPaste={() => handlePaste({ e: event, setBags: setBags })}
+                    disabled={loading}
                   />
                 </FloatingLabel>
               </>
@@ -312,6 +317,7 @@ export default function CreateMTS() {
               <Button
                 variant="dark"
                 title="Approve Manifest"
+                disabled={loading}
                 onClick={() =>
                   approveDoc({
                     document: document,
