@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 import moment from "moment";
 import firebase from "./../../../../config/firebase";
+import { utils, writeFile } from "xlsx";
 
 export const fetchData = async ({ key, setLoading, setDocument, setBags }) => {
   try {
@@ -377,4 +378,37 @@ export const handleReceivingByInbound = async ({
       alert("Gagal approve");
     }
   }
+};
+
+export const handleExcelDownload = ({ bags, document }) => {
+  const processedData = bags.map((row) => ({
+    bagNumber: row.bagNumber,
+    koli: row.koli,
+    kg: row.weight,
+    remark: row.remark,
+    status: row.statusBag,
+    sm: row.sm,
+    receivingDate: row.receivingDate,
+    documentNumber: document.documentNumber,
+  }));
+  const worksheet = utils.json_to_sheet(processedData);
+  const workbook = utils.book_new();
+  utils.book_append_sheet(workbook, worksheet, "Sheet1");
+  utils.sheet_add_aoa(
+    worksheet,
+    [
+      [
+        "No. Master Bag",
+        "Koli",
+        "Weight",
+        "Remark",
+        "Status Bag",
+        "SMU",
+        "Received Date",
+        "No. Document",
+      ],
+    ],
+    { origin: "A1" }
+  );
+  writeFile(workbook, `${document.documentNumber}.xlsx`);
 };

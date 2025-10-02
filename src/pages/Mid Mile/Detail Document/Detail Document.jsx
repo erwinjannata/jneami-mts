@@ -5,6 +5,7 @@ import {
   approveData,
   fetchData,
   handleApprove,
+  handleExcelDownload,
   handleReceivingByInbound,
   handleTransport,
   onTransportClick,
@@ -169,6 +170,14 @@ function DetailDocument() {
         >
           <Dropdown.Item eventKey="1" onClick={() => reactToPrintFn()}>
             Print Ticket
+          </Dropdown.Item>
+          <Dropdown.Item
+            eventKey="2"
+            onClick={() =>
+              handleExcelDownload({ bags: bags, document: document })
+            }
+          >
+            Download Excel File
           </Dropdown.Item>
           <Dropdown.Divider />
           <PDFDownloadLink

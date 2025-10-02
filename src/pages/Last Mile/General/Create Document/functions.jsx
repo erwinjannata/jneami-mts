@@ -53,6 +53,7 @@ export const handleAdd = ({ e, form, bags, setBags, setForm }) => {
       ...prev,
       {
         ...form,
+        manifestNo: form.manifestNo.trim(),
         status: "Standby",
         mtsDate: moment().format("YYYY-MM-DD HH:mm"),
       },
@@ -72,7 +73,7 @@ export const handlePaste = ({ e, setBags }) => {
   const newData = rows.map((row) => {
     const cols = row.split("\t");
     return {
-      manifestNo: cols[0] || "",
+      manifestNo: (cols[0] || "").trim(),
       koli: Number(cols[1]) || 1,
       pcs: Number(cols[2]) || 1,
       weight: Number(cols[3]) || 1,
