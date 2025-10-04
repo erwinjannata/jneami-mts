@@ -32,6 +32,9 @@ export const getDocNumber = ({ document, setDocument, setLoading, auth }) => {
 
 export const handleAdd = ({ e, form, bags, setBags, setForm }) => {
   e.preventDefault();
+
+  const cleanManifestNo = form.manifestNo.replace(/\s/g, "").toUpperCase();
+
   if (!form.manifestNo) {
     alert("No. Manifest kosong");
     return;
@@ -53,7 +56,7 @@ export const handleAdd = ({ e, form, bags, setBags, setForm }) => {
       ...prev,
       {
         ...form,
-        manifestNo: form.manifestNo.trim(),
+        manifestNo: cleanManifestNo,
         status: "Standby",
         mtsDate: moment().format("YYYY-MM-DD HH:mm"),
       },
@@ -73,7 +76,7 @@ export const handlePaste = ({ e, setBags }) => {
   const newData = rows.map((row) => {
     const cols = row.split("\t");
     return {
-      manifestNo: (cols[0] || "").trim(),
+      manifestNo: (cols[0] || "").replace(/\s/g, "").toUpperCase(),
       koli: Number(cols[1]) || 1,
       pcs: Number(cols[2]) || 1,
       weight: Number(cols[3]) || 1,

@@ -31,7 +31,7 @@ export default function FindManifestNumber() {
     database
       .child("eMTS/bags/")
       .orderByChild("manifestNo")
-      .equalTo(state.search)
+      .equalTo(state.search.replace(/\s/g, "").toUpperCase())
       .on("value", (snapshot) => {
         setBags([]);
         snapshot.forEach((childSnapshot) => {
