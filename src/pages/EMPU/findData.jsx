@@ -27,7 +27,10 @@ const EMPUFindData = () => {
       setCustomerList: setCustomerList,
       setLoading: setLoading,
     });
-    if (state.awb === "") {
+
+    const cleanAWB = state.awb.replace(/\s+/g, "").toUpperCase();
+
+    if (cleanAWB === "") {
       alert("AWB kosong");
     } else {
       // Initialize Database Reference
@@ -37,7 +40,7 @@ const EMPUFindData = () => {
       database
         .child(state.data)
         .orderByChild("awb")
-        .equalTo(state.awb)
+        .equalTo(cleanAWB)
         .on("value", (snapshot) => {
           setAwbList([]);
           snapshot.forEach((childSnapshot) => {

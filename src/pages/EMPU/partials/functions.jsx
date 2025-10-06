@@ -106,7 +106,10 @@ export const fetchInboundData = ({
 };
 
 export const submitInboundData = ({ state, setLoading, doAfter }) => {
-  if (state.awb === "") {
+  // Clean AWB From spaces and turn to uppercase
+  const cleanAWB = state.awb.replace(/\s+/g, "").toUpperCase();
+
+  if (cleanAWB === "") {
     alert("AWB kosong");
   } else if (state.pcs === 0) {
     alert("Pcs invalid");
@@ -128,7 +131,7 @@ export const submitInboundData = ({ state, setLoading, doAfter }) => {
     database
       .child("empu/inbound")
       .orderByChild("awb")
-      .equalTo(state.awb)
+      .equalTo(cleanAWB)
       .get()
       .then((snapshot) => {
         if (snapshot.exists()) {
@@ -139,6 +142,7 @@ export const submitInboundData = ({ state, setLoading, doAfter }) => {
             .child("empu/inbound")
             .push({
               ...state,
+              awb: cleanAWB,
               dateAdded: `${date} ${time}`,
               paymentStatus:
                 state.paymentMethod === "CREDIT" ? "UNPAID" : "PAID",
