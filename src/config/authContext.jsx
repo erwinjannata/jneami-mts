@@ -3,6 +3,8 @@
 import { createContext, useEffect, useState } from "react";
 import firebase from "./../config/firebase";
 import { useContext } from "react";
+import NavMenu from "@/components/partials/navbarMenu";
+import { useLocation } from "react-router-dom";
 
 const AuthContext = createContext(null);
 
@@ -12,14 +14,17 @@ export const AuthProvider = ({ children }) => {
   const [name, setName] = useState("");
   const [origin, setOrigin] = useState("");
   const [level, setLevel] = useState(0);
-  let db = firebase.database();
+  const location = useLocation();
+  const isLoginPage = location.pathname === "/login";
+
+  const database = firebase.database();
 
   useEffect(() => {
     const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
       if (user) {
         setUser(user);
         setUid(user.uid);
-        db.ref(`users/${user.uid}`).on("value", (snapshot) => {
+        database.ref(`users/${user.uid}`).on("value", (snapshot) => {
           if (snapshot.exists()) {
             setName(snapshot.val().name);
             setOrigin(snapshot.val().origin);
@@ -31,7 +36,7 @@ export const AuthProvider = ({ children }) => {
       }
     });
     return () => unsubscribe();
-  }, [db]);
+  }, [database]);
 
   const login = (email, password) => {
     return new Promise(async (resolve, reject) => {
@@ -86,7 +91,10 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider
       value={{ user, uid, name, origin, level, login, logout, resetPassword }}
     >
-      {children}
+      <div className="screen">
+        {!isLoginPage && <NavMenu />}
+        {children}
+      </div>
     </AuthContext.Provider>
   );
 };

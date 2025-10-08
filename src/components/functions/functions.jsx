@@ -34,9 +34,9 @@ export const filterByRoute = ({ data, state }) => {
 export const handleExcel = (documentDetails, bagList) => {
   const processedData = bagList.map((row) => ({
     manifestNo: row.manifestNo,
-    koli: row.koli,
-    pcs: row.pcs,
-    kg: row.weight,
+    koli: parseInt(row.koli),
+    pcs: parseInt(row.pcs),
+    kg: parseInt(row.weight),
     remark: row.remark,
     status: row.status,
     mtsDate: row.mtsDate,
@@ -77,9 +77,9 @@ export const handleDownload = ({ documents, bags, startDate, endDate }) => {
 
     processedData.push({
       manifestNo: bag.manifestNo,
-      koli: bag.koli,
-      pcs: bag.pcs,
-      weight: bag.weight,
+      koli: parseInt(bag.koli),
+      pcs: parseInt(bag.pcs),
+      weight: parseInt(bag.weight),
       status: bag.status,
       remark: bag.remark,
       noSurat: doc.noSurat,

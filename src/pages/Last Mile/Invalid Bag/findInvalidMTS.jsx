@@ -12,7 +12,7 @@ import { handleChange } from "../../../components/functions/functions";
 import moment from "moment";
 import NotFound from "../../../components/partials/notFound";
 import LoadingAnimation from "../../../components/partials/loading";
-import firebase from "./../../../config/firebase";
+import firebase from "@/config/firebase";
 import { useNavigate } from "react-router-dom";
 
 function FindInvalidMTS() {

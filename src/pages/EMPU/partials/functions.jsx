@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import * as XLSX from "xlsx";
-import firebase from "./../../../config/firebase";
+import firebase from "@/config/firebase";
 import moment from "moment";
 
 export const readFile = ({ file, setAwbList }) => {

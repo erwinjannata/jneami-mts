@@ -3,7 +3,7 @@
 /* eslint-disable react/prop-types */
 import { Button, FloatingLabel, Form, Modal } from "react-bootstrap";
 import { useEffect, useState } from "react";
-import firebase from "./../../../config/firebase";
+import firebase from "@/config/firebase";
 import CustomInput from "../../../components/partials/customInput";
 import { handleChange } from "../../../components/functions/functions";
 

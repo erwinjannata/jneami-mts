@@ -383,8 +383,8 @@ export const handleReceivingByInbound = async ({
 export const handleExcelDownload = ({ bags, document }) => {
   const processedData = bags.map((row) => ({
     bagNumber: row.bagNumber,
-    koli: row.koli,
-    kg: row.weight,
+    koli: parseInt(row.koli),
+    kg: parseInt(row.weight),
     remark: row.remark,
     status: row.statusBag,
     sm: row.sm,

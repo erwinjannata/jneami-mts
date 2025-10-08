@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button, FloatingLabel, Form, Modal } from "react-bootstrap";
 import moment from "moment";
-import firebase from "./../../../config/firebase";
+import firebase from "@/config/firebase";
 import CustomInput from "../../../components/partials/customInput";
 import { handleChange } from "../../../components/functions/functions";
 

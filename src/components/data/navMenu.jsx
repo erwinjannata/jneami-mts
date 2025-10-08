@@ -31,7 +31,7 @@ export const navbarMenus = [
       },
       {
         label: "Manifest Transit",
-        link: "/create2",
+        link: "/create",
         req: 1,
         icon: <HiDocumentPlus size={navSubMenuIconSize} />,
       },
@@ -127,10 +127,16 @@ export const navbarMenus = [
       },
       {
         label: "Inbound",
-        link: "/empu/add",
+        link: "/empu/inbound/add",
         req: 1,
         icon: <FaFileInvoiceDollar size={navSubMenuIconSize} />,
       },
+      // {
+      //   label: "Outbound",
+      //   link: "/empu/outbound/add",
+      //   req: 1,
+      //   icon: <FaFileInvoiceDollar size={navSubMenuIconSize} />,
+      // },
       {
         label: "Customers",
         link: "/empu/customers",

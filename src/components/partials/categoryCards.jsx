@@ -1,7 +1,7 @@
 import { Card, Col, Placeholder, Row } from "react-bootstrap";
 import { FaBoxes, FaTruckLoading } from "react-icons/fa";
 import { FaTruckPlane } from "react-icons/fa6";
-import { handleFilter } from "../../pages/Last Mile/General/Home Page/functions";
+import { handleFilter } from "@/pages/Last Mile/Home Page/functions";
 import { GrDocumentMissing } from "react-icons/gr";
 
 function CategoryCards({ documents, state, setState, setShowList, loading }) {

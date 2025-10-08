@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { Button, FloatingLabel, Form, Modal } from "react-bootstrap";
 import { useState } from "react";
-import firebase from "../../../../config/firebase";
+import firebase from "@/config/firebase";
 import moment from "moment";
 import { handleChange } from "../../../../components/functions/functions";
 

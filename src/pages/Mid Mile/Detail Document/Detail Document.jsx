@@ -10,7 +10,6 @@ import {
   handleTransport,
   onTransportClick,
 } from "./partials/functions";
-import NavMenu from "../../../components/partials/navbarMenu";
 import {
   Button,
   ButtonGroup,
@@ -69,8 +68,7 @@ function DetailDocument() {
   }, [auth.name, auth.origin]);
 
   return (
-    <div className="screen">
-      <NavMenu />
+    <>
       <Container>
         <h2 className="fw-bold">{document.documentNumber}</h2>
         <hr />
@@ -254,7 +252,7 @@ function DetailDocument() {
         </div>
       </div>
       <ToastWarning toast={toast} setToast={setToast} />
-    </div>
+    </>
   );
 }
 

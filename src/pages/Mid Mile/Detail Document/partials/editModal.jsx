@@ -2,7 +2,7 @@
 import { Button, FloatingLabel, Form, Modal } from "react-bootstrap";
 import { handleChange } from "../../../../components/functions/functions";
 import { useEffect, useState } from "react";
-import firebase from "../../../../config/firebase";
+import firebase from "@/config/firebase";
 import moment from "moment";
 
 const EditMasterBagModal = ({

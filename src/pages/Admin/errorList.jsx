@@ -1,8 +1,7 @@
 import { useState } from "react";
-import firebase from "./../../config/firebase";
-import NavMenu from "../../components/partials/navbarMenu";
+import firebase from "@/config/firebase";
 import { Container } from "react-bootstrap";
-import DocListTable from "../../components/partials/documentListTable";
+import DocListTable from "@/components/partials/documentListTable";
 
 const ErrorListPage = () => {
   const [data, setData] = useState([]);
@@ -35,14 +34,11 @@ const ErrorListPage = () => {
   }, []);
 
   return (
-    <div className="screen">
-      <NavMenu />
-      <Container>
-        <h2>No Destination Docs</h2>
-        <hr />
-        <DocListTable data={data} loading={loading} />
-      </Container>
-    </div>
+    <Container>
+      <h2>No Destination Docs</h2>
+      <hr />
+      <DocListTable data={data} loading={loading} />
+    </Container>
   );
 };
 

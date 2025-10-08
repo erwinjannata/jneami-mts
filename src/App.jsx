@@ -1,30 +1,31 @@
 import { Route, Routes } from "react-router-dom";
-import { AuthProvider } from "./config/authContext";
-import { PrivateRoute } from "./config/prirvateRoute";
-import Login from "./pages/Guest/Login";
-import Home from "./pages/Last Mile/General/Home Page/Home";
-import Doc from "./pages/Last Mile/General/Detail Document/Doc";
-import UnreceivedPage from "./pages/Last Mile/General/Unreceived Manifest/unreceived";
-import Penarikan from "./pages/Last Mile/General/Penarikan Data/Penarikan";
-import FindManifestNumber from "./pages/Last Mile/General/Find Manifest/findManifest";
-import AirportHomePage from "./pages/Mid Mile/General/Home";
-import MidMileFindBag from "./pages/Mid Mile/General/Find Bag/find";
+import { AuthProvider } from "@/config/authContext";
+import PrivateRoute from "@/config/prirvateRoute";
+import Home from "@/pages/Last Mile/Home Page/Home";
+import CreateMTS from "@/pages/Last Mile/Create Document/Create";
+import Doc from "@/pages/Last Mile/Detail Document/Doc";
+import UnreceivedPage from "./pages/Last Mile/Unreceived Manifest/unreceived";
+import Penarikan from "./pages/Last Mile/Penarikan Data/Penarikan";
+import FindManifestNumber from "./pages/Last Mile/Find Manifest/findManifest";
+import InvalidMTSIndex from "./pages/Last Mile/Invalid Bag/invalidMTS";
+import InvalidMTSDoc from "./pages/Last Mile/Invalid Bag/invalidMTSDoc";
+import InsertInvalidMTS from "./pages/Last Mile/Invalid Bag/insertInvalidMTS";
+import FindInvalidMTS from "./pages/Last Mile/Invalid Bag/findInvalidMTS";
+import AirportHomePage from "./pages/Mid Mile/Home";
+import MidMileCreateDoc from "./pages/Mid Mile/Create Doc/create";
+import DetailDocument from "./pages/Mid Mile/Detail Document/Detail Document";
+import MidMileFindBag from "./pages/Mid Mile/Find Bag/find";
+import PenarikanMidMile from "./pages/Mid Mile/Penarikan Data/penarikan";
 import AddUser from "./pages/Admin/addUser";
 import ErrorListPage from "./pages/Admin/errorList";
-import PenarikanMidMile from "./pages/Mid Mile/General/Penarikan Data/penarikan";
-import InvalidMTSIndex from "./pages/Last Mile/Invalid Bag/invalidMTS";
-import InsertInvalidMTS from "./pages/Last Mile/Invalid Bag/insertInvalidMTS";
-import InvalidMTSDoc from "./pages/Last Mile/Invalid Bag/invalidMTSDoc";
-import FindInvalidMTS from "./pages/Last Mile/Invalid Bag/findInvalidMTS";
-import CreateMTS from "./pages/Last Mile/General/Create Document/Create";
-import DetailDocument from "./pages/Mid Mile/Detail Document/Detail Document";
-import MidMileCreateDoc from "./pages/Mid Mile/General/Create Doc/create";
-import EMPUAddData from "./pages/EMPU/addData";
-import EMPUCustomersList from "./pages/EMPU/customersList";
-import EMPUFindData from "./pages/EMPU/findData";
-import EMPUConfirm from "./pages/EMPU/confirm";
-import EMPUDownloadData from "./pages/EMPU/downloadData";
-import EMPUHome from "./pages/EMPU/Home";
+import Login from "./pages/Guest/Login";
+import EMPUHome from "./pages/EMPU/Inbound/Home/Home";
+import EMPUAddData from "./pages/EMPU/Inbound/Create Transaction/addData";
+import EMPUCustomersList from "./pages/EMPU/Inbound/Customer/customersList";
+import EMPUFindData from "./pages/EMPU/Find Transaction/findData";
+import EMPUConfirm from "./pages/EMPU/Inbound/Confirm Credit Payment/confirm";
+import EMPUDownloadData from "./pages/EMPU/Download Transaction Data/downloadData";
+import EMPUOutboundAdd from "./pages/EMPU/Outbound/Create Transaction/create";
 
 function App() {
   const protectedRoute = [
@@ -38,7 +39,7 @@ function App() {
         },
         {
           name: "Create MTS Document",
-          path: "/create2",
+          path: "/create",
           element: <CreateMTS />,
         },
         {
@@ -132,9 +133,14 @@ function App() {
           element: <EMPUHome />,
         },
         {
-          name: "EMPU Add Data",
-          path: "/empu/add",
+          name: "EMPU Inbound Add Data",
+          path: "/empu/inbound/add",
           element: <EMPUAddData />,
+        },
+        {
+          name: "EMPU Outbound Add Data",
+          path: "/empu/outbound/add",
+          element: <EMPUOutboundAdd />,
         },
         {
           name: "EMPU Customers List",
